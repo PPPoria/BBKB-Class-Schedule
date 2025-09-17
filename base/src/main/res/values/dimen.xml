@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding_h_1">30dp</dimen>
+    <dimen name="padding_h_2">20dp</dimen>
+    <dimen name="padding_h_3">10dp</dimen>
+    <dimen name="padding_v_1">20dp</dimen>
+    <dimen name="padding_v_2">10dp</dimen>
+    <dimen name="padding_v_3">6dp</dimen>
+    <dimen name="text_size_2h">15sp</dimen>
+    <dimen name="text_size_hb">19sp</dimen>
+    <dimen name="text_size_2b">23sp</dimen>
+    <dimen name="text_size_5b">29sp</dimen>
+    <dimen name="translation_z_1">4dp</dimen>
+    <dimen name="translation_z_2">8dp</dimen>
+</resources>

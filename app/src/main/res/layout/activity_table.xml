@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary"
+    android:orientation="vertical"
+    tools:context=".activity.TableActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/primary"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_h_2"
+            android:text="@string/class_schedule"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_hb"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/more_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginEnd="@dimen/padding_h_2"
+            android:contentDescription="@string/none"
+            android:src="@mipmap/ic_more"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bar">
+
+        <LinearLayout
+            android:id="@+id/today_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/bar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding_h_2"
+                android:layout_marginTop="@dimen/padding_v_2"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/today_date"
+                    android:textColor="@color/gray"
+                    android:textSize="@dimen/text_size_2h" />
+
+                <TextView
+                    android:id="@+id/today_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/none"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_2h" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/padding_h_2"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/today_zc"
+                    android:textColor="@color/gray"
+                    android:textSize="@dimen/text_size_2h" />
+
+                <TextView
+                    android:id="@+id/today_zc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/none"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_2h" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="@dimen/padding_h_3"
+            android:layout_marginVertical="@dimen/padding_v_2"
+            android:layout_weight="1"
+            android:background="@drawable/corner_24"
+            android:backgroundTint="@color/gray_shade"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_v_3"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/table_pre_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:src="@mipmap/ic_back_btn_1" />
+
+                <TextView
+                    android:id="@+id/zc"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:paddingVertical="@dimen/padding_v_3"
+                    android:text="--"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_hb" />
+
+                <ImageView
+                    android:id="@+id/table_next_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:rotation="180"
+                    android:src="@mipmap/ic_back_btn_1" />
+            </LinearLayout>
+
+            <com.bbkb.sc.widget.TableView
+                android:id="@+id/table"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/padding_h_2"
+                android:layout_marginVertical="@dimen/padding_v_2" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- filter menu -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/filter_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible">
+
+        <LinearLayout
+            android:id="@+id/filter_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/padding_h_2"
+            android:layout_marginTop="50dp"
+            android:background="@drawable/corner_12"
+            android:backgroundTint="@color/white"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/padding_h_3"
+            android:paddingVertical="@dimen/padding_v_3"
+            android:translationZ="@dimen/translation_z_1"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/name_filter"
+                        android:textColor="@color/gray"
+                        android:textSize="@dimen/text_size_2h" />
+
+                    <EditText
+                        android:id="@+id/name_filter"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/gray_shade"
+                        android:hint="--"
+                        android:paddingHorizontal="@dimen/padding_h_3"
+                        android:paddingVertical="@dimen/padding_v_3"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_2h" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/padding_v_3"
+                    android:gravity="top"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/major_filter"
+                        android:textColor="@color/gray"
+                        android:textSize="@dimen/text_size_2h" />
+
+                    <EditText
+                        android:id="@+id/major_filter"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@color/gray_shade"
+                        android:hint="--"
+                        android:paddingHorizontal="@dimen/padding_h_3"
+                        android:paddingVertical="@dimen/padding_v_3"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/text_size_2h" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- line -->
+            <View
+                android:layout_width="2dp"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/padding_h_3"
+                android:background="@color/gray_shade" />
+
+            <LinearLayout
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/ignore_saturday_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/corner_888"
+                    android:backgroundTint="@color/gray_shade"
+                    android:gravity="center"
+                    android:paddingVertical="@dimen/padding_v_3"
+                    android:text="@string/ignore_saturday"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_2h" />
+
+                <TextView
+                    android:id="@+id/ignore_sunday_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="@dimen/padding_v_3"
+                    android:background="@drawable/corner_888"
+                    android:backgroundTint="@color/gray_shade"
+                    android:gravity="center"
+                    android:paddingVertical="@dimen/padding_v_3"
+                    android:text="@string/ignore_sunday"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_2h" />
+
+                <TextView
+                    android:id="@+id/ignore_evening_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/corner_888"
+                    android:backgroundTint="@color/gray_shade"
+                    android:gravity="center"
+                    android:paddingVertical="@dimen/padding_v_3"
+                    android:text="@string/ignore_evening"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/text_size_2h" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
