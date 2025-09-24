@@ -39,6 +39,7 @@ class SchoolSelectorDialog : BaseDialog<DialogSchoolSelectorBinding>() {
 
     private fun onClick(sd: School.SchoolData) {
         Intent(requireActivity(), AuthActivity::class.java).apply {
+            putExtra("update_zc", 0)
             putExtra("school_id", sd.id)
             requireActivity().startActivity(this)
         }

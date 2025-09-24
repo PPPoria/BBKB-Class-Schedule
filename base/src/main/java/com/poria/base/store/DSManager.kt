@@ -14,7 +14,7 @@ import com.poria.base.BaseApp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-object DSHelper {
+object DSManager {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "pulse_sense_preferences")
     private val ds by lazy { BaseApp.app.dataStore }
 

@@ -4,6 +4,7 @@
 
     <!-- Main Activity -->
     <string name="user_settings">用户设置</string>
+    <string name="update_zc_courses">更新课表</string>
     <string name="my_notes">我的笔记</string>
     <string name="class_schedule">课表详细</string>
 
@@ -37,6 +38,10 @@
     <string name="classroom_name">教学场地：</string>
     <string name="course_description">课程描述：</string>
     <string name="remark">备注：</string>
+
+    <!-- Toast Messages -->
+    <string name="please_bind_school">暂未绑定学校\n请前往用户设置中绑定</string>
+    <string name="schedule_is_empty">暂无课表数据</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

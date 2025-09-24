@@ -1,6 +1,6 @@
 package com.bbkb.sc.schedule.gdut
 
-import com.bbkb.sc.schedule.data.Course
+import com.bbkb.sc.schedule.database.Course
 import com.bbkb.sc.schedule.Gripper
 import com.bbkb.sc.util.SCLog
 import com.google.gson.GsonBuilder
@@ -28,12 +28,12 @@ class GDUTGripper : Gripper() {
     override fun getAllCoursesJs(): List<String> {
         val courses = mutableListOf<String>()
         for (i in 1..20) courses.add(
-            getCourseJs(i)
+            getZCCourseJs(i)
         )
         return courses
     }
 
-    override fun getCourseJs(zc: Int) =
+    override fun getZCCourseJs(zc: Int) =
         """
 (function(){
     const url = `https://jxfw.gdut.edu.cn/xsgrkbcx!getKbRq.action?xnxqdm=202501&zc=${zc}`;
@@ -100,7 +100,6 @@ class GDUTGripper : Gripper() {
                         month = beginDate[1],
                         day = beginDate[2],
                     ).toTimeStamp(),
-                    remark = item.jxhjmc!!,
                     description = item.sknrjj!!
                 ).also { add(it) }
             }

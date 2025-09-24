@@ -2,9 +2,18 @@ package com.bbkb.sc.activity
 
 
 import android.content.Intent
+import androidx.lifecycle.lifecycleScope
+import com.bbkb.sc.R
 import com.bbkb.sc.databinding.ActivityMainBinding
+import com.bbkb.sc.datastore.StringKeys
+import com.bbkb.sc.schedule.ScheduleUtils
+import com.bbkb.sc.schedule.School
+import com.bbkb.sc.util.SCToast
 import com.poria.base.base.BaseActivity
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
+import com.poria.base.store.DSManager
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun onViewBindingCreate() = ActivityMainBinding.inflate(layoutInflater)
@@ -29,22 +38,38 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     override fun initListener() = binding.apply {
-        userSettingsBtn.setOnClickListenerWithClickAnimation { goToUserSettings() }
-        myNotesLayout.setOnClickListenerWithClickAnimation { goToMyNotes() }
-        classScheduleLayout.setOnClickListenerWithClickAnimation { goToClassSchedule() }
+        userSettingsBtn.setOnClickListenerWithClickAnimation {
+            Intent(
+                this@MainActivity,
+                UserSettingsActivity::class.java
+            ).also { startActivity(it) }
+        }
+        updateCoursesBtn.setOnClickListenerWithClickAnimation {
+            onUpdateCoursesBtnClick()
+        }
+        myNotesLayout.setOnClickListenerWithClickAnimation { }
+        classScheduleLayout.setOnClickListenerWithClickAnimation {
+            Intent(
+                this@MainActivity,
+                TableActivity::class.java
+            ).also { startActivity(it) }
+        }
     }.let { }
 
-    private fun goToUserSettings() {
-        Intent(this, UserSettingsActivity::class.java)
-            .also { startActivity(it) }
-    }
-
-    private fun goToMyNotes() {
-
-    }
-
-    private fun goToClassSchedule() {
-        Intent(this, TableActivity::class.java)
-            .also { startActivity(it) }
+    private fun onUpdateCoursesBtnClick() = lifecycleScope.launch {
+        val zc = ScheduleUtils.getZC(System.currentTimeMillis())
+        val id = DSManager
+            .getString(StringKeys.SCHOOL_NAME, "--")
+            .first().let { name ->
+                School.dataList.find { it.name == name } ?: run {
+                    SCToast.show(getString(R.string.please_bind_school))
+                    return@launch
+                }
+            }.id
+        Intent(this@MainActivity, AuthActivity::class.java).apply {
+            putExtra("update_zc", zc)
+            putExtra("school_id", id)
+            startActivity(this)
+        }
     }
 }

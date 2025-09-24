@@ -6,23 +6,25 @@ import android.text.TextWatcher
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.bbkb.sc.R
 import com.bbkb.sc.widget.TableView
 import com.bbkb.sc.databinding.ActivityTableBinding
 import com.bbkb.sc.datastore.LongKeys
 import com.bbkb.sc.datastore.StringKeys
 import com.bbkb.sc.dialog.CourseDetailDialog
+import com.bbkb.sc.schedule.ScheduleUtils
 import com.bbkb.sc.schedule.School
-import com.bbkb.sc.schedule.UserConfig
-import com.bbkb.sc.schedule.data.Course
-import com.bbkb.sc.schedule.data.CourseDB
+import com.bbkb.sc.schedule.TableConfig
+import com.bbkb.sc.schedule.database.Course
+import com.bbkb.sc.schedule.database.CourseDB
 import com.bbkb.sc.util.SCToast
 import com.google.gson.Gson
 import com.poria.base.base.BaseActivity
 import com.poria.base.ext.genMacaronColor
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
 import com.poria.base.ext.toDateFormat
-import com.poria.base.store.DSHelper
+import com.poria.base.store.DSManager
 import com.poria.base.viewmodel.SingleVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +32,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 class TableActivity : BaseActivity<ActivityTableBinding>() {
     override fun onViewBindingCreate() = ActivityTableBinding.inflate(layoutInflater)
@@ -102,11 +105,13 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 SCToast.show("已经是第一周")
                 return@setOnClickListenerWithClickAnimation
             }
-            MainScope().launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 CourseDB.get().dao().getByZC(data.tableZC - 1).first().also {
                     data.tableZC -= 1
                     data.courses = it
-                    vm.cur.value = data
+                    withContext(Dispatchers.Main) {
+                        vm.cur.value = data
+                    }
                 }
             }
         }
@@ -116,18 +121,20 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 SCToast.show("已经是最后一周")
                 return@setOnClickListenerWithClickAnimation
             }
-            MainScope().launch {
+            CoroutineScope(Dispatchers.IO).launch {
                 CourseDB.get().dao().getByZC(data.tableZC + 1).first().also {
                     data.tableZC += 1
                     data.courses = it
-                    vm.cur.value = data
+                    withContext(Dispatchers.Main) {
+                        vm.cur.value = data
+                    }
                 }
             }
         }
     }.let { }
 
     override fun initObserver() = vm.cur.observe(this) { data ->
-        tableConfigBtnUi(data.tableConfig)
+        tableConfigMenuUi(data.tableConfig)
         System.currentTimeMillis().toDateFormat().run {
             "${month}月${day}日"
         }.also { binding.todayDate.text = it }
@@ -140,7 +147,8 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         )
     }
 
-    private fun tableConfigBtnUi(tableConfig: UserConfig.TableConfig) {
+    // 筛选项的UI更新
+    private fun tableConfigMenuUi(tableConfig: TableConfig) {
         binding.ignoreSaturdayBtn.also {
             if (tableConfig.ignoreSaturday) {
                 it.setTextColor(this@TableActivity.getColor(R.color.white))
@@ -190,57 +198,36 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }
     }
 
-    override fun refreshDataWhenOnStart() = MainScope().launch {
-        val data = DSHelper.run {
+    // 刷新vm数据，在onStart中调用
+    override fun refreshDataWhenOnStart() = lifecycleScope.launch {
+        val data = DSManager.run {
             getString(StringKeys.SCHOOL_NAME).first()
         }.let { name ->
             School.dataList.find { it.name == name }
         }.let {
             if (it == null) {
-                SCToast.show("暂未绑定学校\n请前往用户设置中绑定")
+                SCToast.show(getString(R.string.please_bind_school))
                 return@launch
             }
             vm.cur.value ?: MData(it.copy())
         }
-        getCurZC().also {
+        ScheduleUtils.getZC(System.currentTimeMillis()).also {
             data.curZC = it
             if (data.tableZC == 0) data.tableZC = it
         }
         CourseDB.get().dao().getByZC(data.tableZC).first().also {
             data.courses = it
         }
-        getTableConfig().also { tc ->
+        ScheduleUtils.getTableConfig().also { tc ->
             data.tableConfig = tc
         }
         vm.cur.value = data
     }.let { }
 
-    private suspend fun getCurZC(): Int {
-        val oneWeek = 604800000L
-        val cur = System.currentTimeMillis()
-        return DSHelper.getLong(
-            LongKeys.FIRST_ZC_MONDAY_TIME_STAMP,
-            cur
-        ).first().let { first ->
-            ((cur - first) / oneWeek + 1).toInt()
-        }
-    }
-
-    private suspend fun getTableConfig() = Gson().let {
-        if (vm.cur.value != null) return@let vm.cur.value!!.tableConfig
-        it.fromJson(
-            DSHelper.getString(
-                StringKeys.TABLE_CONFIG,
-                it.toJson(UserConfig.TableConfig())
-            ).first(),
-            UserConfig.TableConfig::class.java
-        )
-    }
-
     private fun showTable(
         tableZC: Int,
         courses: List<Course>,
-        tableConfig: UserConfig.TableConfig
+        tableConfig: TableConfig
     ) = MainScope().launch {
         val sd = vm.cur.value?.schoolData ?: return@launch
         val cells = courses.asSequence().filter {
@@ -278,7 +265,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 }
             } else {
                 runBlocking {
-                    DSHelper.getLong(
+                    DSManager.getLong(
                         LongKeys.FIRST_ZC_MONDAY_TIME_STAMP,
                         System.currentTimeMillis()
                     ).first().let {
@@ -327,7 +314,6 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             it.name == cell.title
         }!!
         CourseDetailDialog().also {
-            it.updateCourse = this::updateCourse
             it.course = course
             it.show(supportFragmentManager, "CourseDetailDialog")
         }
@@ -340,23 +326,11 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }
     }
 
-    private fun saveTableConfig(tableConfig: UserConfig.TableConfig) {
+    private fun saveTableConfig(tableConfig: TableConfig) {
         CoroutineScope(Dispatchers.IO).launch {
             Gson().toJson(tableConfig).also { str ->
-                DSHelper.setString(StringKeys.TABLE_CONFIG, str)
+                DSManager.setString(StringKeys.TABLE_CONFIG, str)
             }
-        }
-    }
-
-    private fun updateCourse(course: Course) {
-        MainScope().launch {
-            vm.cur.value?.apply {
-                courses.find { it.id == course.id }
-                    ?.remark = course.remark
-            }
-        }
-        CoroutineScope(Dispatchers.IO).launch {
-            CourseDB.get().dao().update(course)
         }
     }
 
@@ -365,6 +339,6 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         var curZC: Int = 0,
         var tableZC: Int = 0,
         var courses: List<Course> = emptyList(),
-        var tableConfig: UserConfig.TableConfig = UserConfig.TableConfig()
+        var tableConfig: TableConfig = TableConfig()
     )
 }

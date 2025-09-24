@@ -1,4 +1,4 @@
-package com.bbkb.sc.schedule.data
+package com.bbkb.sc.schedule.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -16,6 +16,5 @@ data class Course(
     var startNode: Int,// 开始节数，从1开始
     var endNode: Int,// 结束节数
     var timeStamp: Long,// 上课日期，时间戳表示
-    var remark: String = "暂无备注",// 备注
     var description: String = "暂无描述",// 课程描述
 )

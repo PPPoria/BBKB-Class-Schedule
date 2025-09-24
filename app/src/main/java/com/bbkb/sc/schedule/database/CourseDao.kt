@@ -1,4 +1,4 @@
-package com.bbkb.sc.schedule.data
+package com.bbkb.sc.schedule.database
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -26,4 +26,7 @@ interface CourseDao {
 
     @Query("DELETE FROM courses")
     fun deleteAll()
+
+    @Query("DELETE FROM courses WHERE zc = :zc")
+    fun deleteByZC(zc: Int)
 }

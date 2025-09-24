@@ -1,4 +1,4 @@
-package com.bbkb.sc.schedule.data
+package com.bbkb.sc.schedule.database
 
 import androidx.room.Database
 import androidx.room.Room

@@ -1,6 +1,6 @@
 package com.bbkb.sc.schedule
 
-import com.bbkb.sc.schedule.data.Course
+import com.bbkb.sc.schedule.database.Course
 import com.bbkb.sc.schedule.gdut.GDUTGripper
 
 abstract class Gripper {
@@ -9,7 +9,7 @@ abstract class Gripper {
     abstract fun getCheckAuthJs(): String
     abstract fun getStepsJsAfterAuth(): List<String>
     abstract fun getAllCoursesJs(): List<String>
-    abstract fun getCourseJs(zc: Int): String
+    abstract fun getZCCourseJs(zc: Int): String
     abstract fun decodeCourseData(data: String): List<Course>
 
     companion object {
