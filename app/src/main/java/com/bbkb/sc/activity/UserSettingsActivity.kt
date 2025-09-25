@@ -3,7 +3,6 @@ package com.bbkb.sc.activity
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.bbkb.sc.databinding.ActivityUserSettingsBinding
 import com.bbkb.sc.datastore.StringKeys
 import com.bbkb.sc.dialog.SchoolSelectorDialog
@@ -12,7 +11,6 @@ import com.poria.base.ext.setOnClickListenerWithClickAnimation
 import com.poria.base.store.DSManager
 import com.poria.base.viewmodel.SingleVM
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
 class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
     override fun onViewBindingCreate() = ActivityUserSettingsBinding.inflate(layoutInflater)
@@ -35,19 +33,19 @@ class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
         }
     }.let { }
 
-    override suspend fun setObserverInScope() = vm.flow.run {
-        flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-    }.collect { data ->
-        binding.bindSchoolName.text = data.schoolName
-    }
+    override suspend fun setObserverInScope() = vm.flow
+        .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+        .collect { state ->
+            binding.bindSchoolName.text = state.value.schoolName
+        }
 
-    override suspend fun refreshDataInScope() = lifecycleScope.launch {
+    override suspend fun refreshDataInScope() {
         val data = vm.latest() ?: MData()
         data.schoolName = DSManager
             .getString(StringKeys.SCHOOL_NAME, defaultValue = "--")
             .first()
         vm.update(data)
-    }.let { }
+    }
 
     data class MData(
         var schoolName: String = "--",

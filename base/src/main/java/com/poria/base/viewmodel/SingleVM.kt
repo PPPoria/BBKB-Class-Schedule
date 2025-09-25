@@ -1,25 +1,37 @@
 package com.poria.base.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import java.util.Objects
 
 class SingleVM<T> : ViewModel() {
-    private val mutableFlow: MutableStateFlow<T> by lazy {
-        MutableStateFlow(latestData.value!!)
-    }
-    private val latestData by lazy { MutableLiveData<T>() }
+    private var latestState: State<T>? = null
+    private val mutableFlow by lazy { MutableStateFlow(latestState!!) }
     val flow by lazy { mutableFlow.asStateFlow() }
 
-    fun update(value: T) = CoroutineScope(Dispatchers.Main).launch {
-        latestData.value = value
-        mutableFlow.value = value
-        mutableFlow.emit(value)
-    }.let { }
+    fun update(value: T, timeStamp: Long = System.currentTimeMillis()) {
+        synchronized(this) {
+            latestState = State(
+                timeStamp = timeStamp,
+                value = value
+            )
+            mutableFlow.value = latestState!!
+        }
+    }
 
-    fun latest(): T? = mutableFlow.value
+    fun latest(): T? = latestState?.value
+
+    data class State<T> (
+        var timeStamp: Long,
+        var value: T
+    ) {
+        override fun equals(other: Any?): Boolean {
+            return other is State<*> && other.timeStamp == timeStamp
+        }
+
+        override fun hashCode(): Int {
+            return Objects.hash(timeStamp)
+        }
+    }
 }
