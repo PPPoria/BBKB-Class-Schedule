@@ -2,16 +2,24 @@ package com.poria.base.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class SingleVM<T>: ViewModel() {
-    val cur: MutableLiveData<T> by lazy {
-        MutableLiveData<T>()
-    }
+class SingleVM<T> : ViewModel() {
     private val mutableFlow: MutableStateFlow<T> by lazy {
-        MutableStateFlow(cur.value!!)
+        MutableStateFlow(latestData.value!!)
     }
-    val flow = mutableFlow.asStateFlow()
+    private val latestData by lazy { MutableLiveData<T>() }
+    val flow by lazy { mutableFlow.asStateFlow() }
+
+    fun update(value: T) = CoroutineScope(Dispatchers.Main).launch {
+        latestData.value = value
+        mutableFlow.value = value
+        mutableFlow.emit(value)
+    }.let { }
+
+    fun latest(): T? = mutableFlow.value
 }

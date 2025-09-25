@@ -1,6 +1,8 @@
 package com.bbkb.sc.activity
 
 import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.bbkb.sc.databinding.ActivityUserSettingsBinding
 import com.bbkb.sc.datastore.StringKeys
@@ -24,7 +26,7 @@ class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
     override fun initListener() = binding.apply {
         bindSchoolBtn.setOnClickListenerWithClickAnimation {
             SchoolSelectorDialog().also {
-                it.schoolName = vm.cur.value?.schoolName ?: "--"
+                it.schoolName = vm.latest()?.schoolName ?: "--"
                 it.show(supportFragmentManager, "SchoolSelectorDialog")
             }
         }
@@ -33,16 +35,18 @@ class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
         }
     }.let { }
 
-    override fun initObserver() = vm.cur.observe(this) { data ->
+    override suspend fun setObserverInScope() = vm.flow.run {
+        flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+    }.collect { data ->
         binding.bindSchoolName.text = data.schoolName
     }
 
-    override fun refreshDataWhenOnStart() = lifecycleScope.launch {
-        val data = vm.cur.value ?: MData()
+    override suspend fun refreshDataInScope() = lifecycleScope.launch {
+        val data = vm.latest() ?: MData()
         data.schoolName = DSManager
             .getString(StringKeys.SCHOOL_NAME, defaultValue = "--")
             .first()
-        vm.cur.value = data
+        vm.update(data)
     }.let { }
 
     data class MData(

@@ -6,7 +6,10 @@ import android.text.TextWatcher
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.bbkb.sc.R
 import com.bbkb.sc.widget.TableView
 import com.bbkb.sc.databinding.ActivityTableBinding
@@ -67,40 +70,40 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }
         filterBg.setOnClickListener { filterBg.isVisible = false }
         ignoreSaturdayBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.cur.value ?: return@setOnClickListenerWithClickAnimation
+            val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
             data.tableConfig.ignoreSaturday = !data.tableConfig.ignoreSaturday
-            vm.cur.value = data
+            vm.update(data)
         }
         ignoreSundayBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.cur.value ?: return@setOnClickListenerWithClickAnimation
+            val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
             data.tableConfig.ignoreSunday = !data.tableConfig.ignoreSunday
-            vm.cur.value = data
+            vm.update(data)
         }
         ignoreEveningBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.cur.value ?: return@setOnClickListenerWithClickAnimation
+            val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
             data.tableConfig.ignoreEvening = !data.tableConfig.ignoreEvening
-            vm.cur.value = data
+            vm.update(data)
         }
         nameFilter.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun afterTextChanged(et: Editable?) {
-                val data = vm.cur.value ?: return
+                val data = vm.latest() ?: return
                 data.tableConfig.nameFilter = et.toString()
-                vm.cur.value = data
+                vm.update(data)
             }
         })
         majorFilter.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun afterTextChanged(et: Editable?) {
-                val data = vm.cur.value ?: return
+                val data = vm.latest() ?: return
                 data.tableConfig.majorFilter = et.toString()
-                vm.cur.value = data
+                vm.update(data)
             }
         })
         tablePreBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.cur.value ?: return@setOnClickListenerWithClickAnimation
+            val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
             if (data.tableZC == 1) {
                 SCToast.show("已经是第一周")
                 return@setOnClickListenerWithClickAnimation
@@ -109,14 +112,12 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 CourseDB.get().dao().getByZC(data.tableZC - 1).first().also {
                     data.tableZC -= 1
                     data.courses = it
-                    withContext(Dispatchers.Main) {
-                        vm.cur.value = data
-                    }
+                    vm.update(data)
                 }
             }
         }
         tableNextBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.cur.value ?: return@setOnClickListenerWithClickAnimation
+            val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
             if (data.tableZC == data.schoolData.weekNum) {
                 SCToast.show("已经是最后一周")
                 return@setOnClickListenerWithClickAnimation
@@ -125,27 +126,27 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 CourseDB.get().dao().getByZC(data.tableZC + 1).first().also {
                     data.tableZC += 1
                     data.courses = it
-                    withContext(Dispatchers.Main) {
-                        vm.cur.value = data
-                    }
+                    vm.update(data)
                 }
             }
         }
     }.let { }
 
-    override fun initObserver() = vm.cur.observe(this) { data ->
-        tableConfigMenuUi(data.tableConfig)
-        System.currentTimeMillis().toDateFormat().run {
-            "${month}月${day}日"
-        }.also { binding.todayDate.text = it }
-        "第${data.curZC}周".also { binding.todayZc.text = it }
-        "第${data.tableZC}周".also { binding.zc.text = it }
-        showTable(
-            data.tableZC,
-            data.courses,
-            data.tableConfig.copy()
-        )
-    }
+    override suspend fun setObserverInScope() = vm.flow
+        .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+        .collect { data ->
+            tableConfigMenuUi(data.tableConfig)
+            System.currentTimeMillis().toDateFormat().run {
+                "${month}月${day}日"
+            }.also { binding.todayDate.text = it }
+            "第${data.curZC}周".also { binding.todayZc.text = it }
+            "第${data.tableZC}周".also { binding.zc.text = it }
+            showTable(
+                data.tableZC,
+                data.courses,
+                data.tableConfig
+            )
+        }
 
     // 筛选项的UI更新
     private fun tableConfigMenuUi(tableConfig: TableConfig) {
@@ -198,19 +199,17 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }
     }
 
-    // 刷新vm数据，在onStart中调用
-    override fun refreshDataWhenOnStart() = lifecycleScope.launch {
-        val data = DSManager.run {
+    override suspend fun refreshDataInScope() {
+        val data = vm.latest() ?: DSManager.run {
             getString(StringKeys.SCHOOL_NAME).first()
         }.let { name ->
             School.dataList.find { it.name == name }
-        }.let {
+        }.also {
             if (it == null) {
                 SCToast.show(getString(R.string.please_bind_school))
-                return@launch
+                return
             }
-            vm.cur.value ?: MData(it.copy())
-        }
+        }.let { MData(it!!.copy()) }
         ScheduleUtils.getZC(System.currentTimeMillis()).also {
             data.curZC = it
             if (data.tableZC == 0) data.tableZC = it
@@ -221,15 +220,15 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         ScheduleUtils.getTableConfig().also { tc ->
             data.tableConfig = tc
         }
-        vm.cur.value = data
-    }.let { }
+        vm.update(data)
+    }
 
     private fun showTable(
         tableZC: Int,
         courses: List<Course>,
         tableConfig: TableConfig
     ) = MainScope().launch {
-        val sd = vm.cur.value?.schoolData ?: return@launch
+        val sd = vm.latest()?.schoolData ?: return@launch
         val cells = courses.asSequence().filter {
             if (tableConfig.ignoreSaturday) it.xq != 6
             else true
@@ -309,8 +308,8 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     }
 
     private fun onClickTableItem(cell: TableView.Cell) {
-        if (vm.cur.value == null) return
-        val course = vm.cur.value!!.courses.find {
+        if (vm.latest() == null) return
+        val course = vm.latest()!!.courses.find {
             it.name == cell.title
         }!!
         CourseDetailDialog().also {
@@ -321,7 +320,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
-        vm.cur.value?.apply {
+        vm.latest()?.apply {
             saveTableConfig(tableConfig.copy())
         }
     }
