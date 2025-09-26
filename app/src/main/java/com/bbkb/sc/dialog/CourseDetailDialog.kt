@@ -11,9 +11,7 @@ import com.bbkb.sc.schedule.database.RemarkDB
 import com.poria.base.base.BaseDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 class CourseDetailDialog : BaseDialog<DialogCourseDetailBinding>() {

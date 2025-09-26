@@ -6,9 +6,9 @@ object UserConfig {
 }
 
 data class TableConfig(
-    var ignoreSaturday: Boolean = false,
-    var ignoreSunday: Boolean = false,
-    var ignoreEvening: Boolean = false,
-    var nameFilter: String = "",
-    var majorFilter: String = "",
+    val ignoreSaturday: Boolean = false,
+    val ignoreSunday: Boolean = false,
+    val ignoreEvening: Boolean = false,
+    val nameFilter: String = "",
+    val majorFilter: String = "",
 )

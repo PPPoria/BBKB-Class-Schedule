@@ -37,7 +37,7 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
         initListener()
         lifecycleScope.launch {
             refreshDataInScope()
-            setObserverInScope()
+            observeDataInScope()
         }
     }
 
@@ -65,7 +65,7 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
     open fun initView() {}
     open fun initListener() {}
     open suspend fun refreshDataInScope() {}
-    open suspend fun setObserverInScope() {}
+    open suspend fun observeDataInScope() {}
 
     fun setLightStatusBar(isLight: Boolean = true) {
         WindowCompat.getInsetsController(window, window.decorView)

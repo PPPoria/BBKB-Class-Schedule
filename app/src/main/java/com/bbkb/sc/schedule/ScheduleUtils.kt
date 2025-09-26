@@ -14,14 +14,16 @@ object ScheduleUtils {
     private const val ONE_DAY_TIMESTAMP = 86400000L
     private const val ONE_WEEK_TIMESTAMP = 604800000L
 
+    // 周次
     suspend fun getZC(timeStamp: Long): Int {
         return withContext(Dispatchers.Default) {
             DSManager.getLong(
                 LongKeys.FIRST_ZC_MONDAY_TIME_STAMP,
-                timeStamp
+                timeStamp + 1L
             ).first().let { first ->
-                if (timeStamp < first)
+                if (timeStamp < first) {
                     throw IllegalArgumentException("Time stamp is before the first ZC")
+                }
                 ((timeStamp - first) / ONE_WEEK_TIMESTAMP + 1).toInt()
             }
         }

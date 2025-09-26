@@ -33,10 +33,10 @@ class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
         }
     }.let { }
 
-    override suspend fun setObserverInScope() = vm.flow
+    override suspend fun observeDataInScope() = vm.flow
         .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-        .collect { state ->
-            binding.bindSchoolName.text = state.value.schoolName
+        .collect { data ->
+            binding.bindSchoolName.text = data.schoolName
         }
 
     override suspend fun refreshDataInScope() {

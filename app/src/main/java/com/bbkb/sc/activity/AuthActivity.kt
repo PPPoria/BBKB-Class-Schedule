@@ -61,7 +61,7 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
 
     // 开启一个浏览器，模拟用户操作
     @SuppressLint("SetJavaScriptEnabled")
-    private fun showAuthView() = binding.webView.apply {
+    private fun showAuthView() = with(binding.webView) {
         settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -75,7 +75,7 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
                 super.onPageFinished(view, url)
                 CookieManager.getInstance().flush()
                 if (url == gripper.authUrl && !authSuccess) {
-                    this@apply.evaluateJavascript(gripper.getCheckAuthJs()) {
+                    this@with.evaluateJavascript(gripper.getCheckAuthJs()) {
                         if (it.contains("true")) onAuth(true)
                         else onAuth(false)
                     }

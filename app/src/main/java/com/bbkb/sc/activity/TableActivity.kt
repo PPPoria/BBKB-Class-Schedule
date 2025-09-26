@@ -69,34 +69,38 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         filterBg.setOnClickListener { filterBg.isVisible = false }
         ignoreSaturdayBtn.setOnClickListenerWithClickAnimation {
             val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
-            data.tableConfig.ignoreSaturday = !data.tableConfig.ignoreSaturday
-            lifecycleScope.launch {
-                vm.update(data)
-            }
+            data.tableConfig.let {
+                it.copy(ignoreSaturday = !it.ignoreSaturday)
+            }.let {
+                data.copy(tableConfig = it)
+            }.also { vm.update(it) }
         }
         ignoreSundayBtn.setOnClickListenerWithClickAnimation {
             val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
-            data.tableConfig.ignoreSunday = !data.tableConfig.ignoreSunday
-            lifecycleScope.launch {
-                vm.update(data)
-            }
+            data.tableConfig.let {
+                it.copy(ignoreSunday = !it.ignoreSunday)
+            }.let {
+                data.copy(tableConfig = it)
+            }.also { vm.update(it) }
         }
         ignoreEveningBtn.setOnClickListenerWithClickAnimation {
             val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
-            data.tableConfig.ignoreEvening = !data.tableConfig.ignoreEvening
-            lifecycleScope.launch {
-                vm.update(data)
-            }
+            data.tableConfig.let {
+                it.copy(ignoreEvening = !it.ignoreEvening)
+            }.let {
+                data.copy(tableConfig = it)
+            }.also { vm.update(it) }
         }
         nameFilter.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun afterTextChanged(et: Editable?) {
                 val data = vm.latest() ?: return
-                data.tableConfig.nameFilter = et.toString()
-                lifecycleScope.launch {
-                    vm.update(data)
-                }
+                data.tableConfig.copy(
+                    nameFilter = et.toString()
+                ).let {
+                    data.copy(tableConfig = it)
+                }.also { vm.update(it) }
             }
         })
         majorFilter.addTextChangedListener(object : TextWatcher {
@@ -104,10 +108,11 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun afterTextChanged(et: Editable?) {
                 val data = vm.latest() ?: return
-                data.tableConfig.majorFilter = et.toString()
-                lifecycleScope.launch {
-                    vm.update(data)
-                }
+                data.tableConfig.copy(
+                    majorFilter = et.toString()
+                ).let {
+                    data.copy(tableConfig = it)
+                }.also { vm.update(it) }
             }
         })
         tablePreBtn.setOnClickListenerWithClickAnimation {
@@ -117,13 +122,14 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 return@setOnClickListenerWithClickAnimation
             }
             lifecycleScope.launch {
-                data.tableZC -= 1
-                data.courses = withContext(Dispatchers.IO) {
-                    CourseDB.get().dao()
-                        .getByZC(data.tableZC)
-                        .first()
-                }
-                vm.update(data)
+                data.copy(
+                    tableZC = data.tableZC - 1,
+                    courses = withContext(Dispatchers.IO) {
+                        CourseDB.get().dao()
+                            .getByZC(data.tableZC - 1)
+                            .first()
+                    }
+                ).also { vm.update(it) }
             }
         }
         tableNextBtn.setOnClickListenerWithClickAnimation {
@@ -133,13 +139,14 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 return@setOnClickListenerWithClickAnimation
             }
             lifecycleScope.launch {
-                data.tableZC += 1
-                data.courses = withContext(Dispatchers.IO) {
-                    CourseDB.get().dao()
-                        .getByZC(data.tableZC)
-                        .first()
-                }
-                vm.update(data)
+                data.copy(
+                    tableZC = data.tableZC + 1,
+                    courses = withContext(Dispatchers.IO) {
+                        CourseDB.get().dao()
+                            .getByZC(data.tableZC + 1)
+                            .first()
+                    }
+                ).also { vm.update(it) }
             }
         }
     }.let { }
@@ -154,24 +161,24 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 SCToast.show(getString(R.string.please_bind_school))
                 return
             }
-        }.let { MData(it!!.copy()) }
-        ScheduleUtils.getZC(System.currentTimeMillis()).also {
-            data.curZC = it
-            if (data.tableZC == 0) data.tableZC = it
-        }
-        CourseDB.get().dao().getByZC(data.tableZC).first().also {
-            data.courses = it
-        }
-        ScheduleUtils.getTableConfig().also { tc ->
-            data.tableConfig = tc
-        }
-        vm.update(data)
+        }.let { MData(schoolData = it!!.copy()) }
+        val curZC = ScheduleUtils.getZC(System.currentTimeMillis())
+        val tableZC = if (data.tableZC == 0) curZC else data.tableZC
+        data.copy(
+            curZC = curZC,
+            tableZC = tableZC,
+            courses = withContext(Dispatchers.IO) {
+                CourseDB.get().dao().getByZC(tableZC).first()
+            },
+            tableConfig = withContext(Dispatchers.IO) {
+                ScheduleUtils.getTableConfig()
+            }
+        ).also { vm.update(it) }
     }
 
-    override suspend fun setObserverInScope() {
+    override suspend fun observeDataInScope() {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
-            vm.flow.collect { state ->
-                val data = state.value
+            vm.flow.collect { data ->
                 tableConfigMenuUi(data.tableConfig)
                 System.currentTimeMillis().toDateFormat().run {
                     "${month}月${day}日"
@@ -271,7 +278,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }.toList()
         val oneDay = 86_400_000L
         val oneWeek = oneDay * 7
-        val mondayTimeStamp =
+        val curZcMondayTimeStamp =
             if (courses.isNotEmpty()) {
                 courses.first().let {
                     val offset = (it.xq - 1) * oneDay
@@ -305,11 +312,11 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                         else i + 1
                     } ${
                         if (i == 5 && tableConfig.ignoreSaturday) {
-                            (mondayTimeStamp + (i + 1) * oneDay).toDateFormat().run {
+                            (curZcMondayTimeStamp + (i + 1) * oneDay).toDateFormat().run {
                                 "($month.$day)"
                             }
                         } else {
-                            (mondayTimeStamp + i * oneDay).toDateFormat().run {
+                            (curZcMondayTimeStamp + i * oneDay).toDateFormat().run {
                                 "($month.$day)"
                             }
                         }
@@ -349,10 +356,10 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     }
 
     data class MData(
-        var schoolData: School.SchoolData,
-        var curZC: Int = 0,
-        var tableZC: Int = 0,
-        var courses: List<Course> = emptyList(),
-        var tableConfig: TableConfig = TableConfig()
+        val schoolData: School.SchoolData,
+        val curZC: Int = 0,
+        val tableZC: Int = 0,
+        val courses: List<Course> = emptyList(),
+        val tableConfig: TableConfig = TableConfig()
     )
 }

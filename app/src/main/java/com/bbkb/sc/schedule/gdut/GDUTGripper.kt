@@ -80,6 +80,7 @@ class GDUTGripper : Gripper() {
             ?.split("-")?.map {
                 it.toInt()
             } ?: return emptyList()
+        val oneDay = 86_400_000L
         return ArrayList<Course>().apply {
             for (i in 0..items.size - 8) {
                 val item = items[i]
@@ -99,7 +100,7 @@ class GDUTGripper : Gripper() {
                         year = beginDate[0],
                         month = beginDate[1],
                         day = beginDate[2],
-                    ).toTimeStamp(),
+                    ).toTimeStamp() + ((item.xq.toInt() - 1) * oneDay),
                     description = item.sknrjj!!
                 ).also { add(it) }
             }

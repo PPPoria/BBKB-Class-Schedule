@@ -76,6 +76,20 @@ data class DateFormat(
     var minute: Int = 0,
     var second: Int = 0
 ) {
+    override fun equals(other: Any?): Boolean {
+        return other is DateFormat &&
+                other.year == year &&
+                other.month == month &&
+                other.day == day &&
+                other.hour == hour &&
+                other.minute == minute &&
+                other.second == second
+    }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
+
     override fun toString() = StringBuilder().run {
         append(year).append('-').append(month).append('-').append(day)
         if (hour == 0 && minute == 0 && second == 0) this.toString()
