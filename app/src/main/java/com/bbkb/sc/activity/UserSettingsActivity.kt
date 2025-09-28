@@ -2,7 +2,7 @@ package com.bbkb.sc.activity
 
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.bbkb.sc.databinding.ActivityUserSettingsBinding
 import com.bbkb.sc.datastore.StringKeys
 import com.bbkb.sc.dialog.SchoolSelectorDialog
@@ -10,7 +10,9 @@ import com.poria.base.base.BaseActivity
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
 import com.poria.base.store.DSManager
 import com.poria.base.viewmodel.SingleVM
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 
 class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
     override fun onViewBindingCreate() = ActivityUserSettingsBinding.inflate(layoutInflater)
@@ -33,21 +35,27 @@ class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
         }
     }.let { }
 
-    override suspend fun observeDataInScope() = vm.flow
-        .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-        .collect { data ->
-            binding.bindSchoolName.text = data.schoolName
+    override suspend fun observeDataInScope() {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+            vm.flow.collect { data ->
+                binding.bindSchoolName.text = data.schoolName
+            }
         }
+    }
 
     override suspend fun refreshDataInScope() {
-        val data = vm.latest() ?: MData()
-        data.schoolName = DSManager
-            .getString(StringKeys.SCHOOL_NAME, defaultValue = "--")
-            .first()
-        vm.update(data)
+        val old = vm.latest() ?: MData()
+        old.copy(
+            schoolName = withContext(Dispatchers.IO) {
+                DSManager.getString(
+                    StringKeys.SCHOOL_NAME,
+                    defaultValue = "--"
+                ).first()
+            }
+        ).also { vm.update(it) }
     }
 
     data class MData(
-        var schoolName: String = "--",
+        val schoolName: String = "--",
     )
 }

@@ -1,0 +1,15 @@
+package com.bbkb.sc.schedule.database
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.bbkb.sc.util.StringListConverter
+
+@Entity(tableName = "note_categories")
+@TypeConverters(StringListConverter::class)
+data class NoteCategory(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    var name: String,
+    var courseNames: List<String> = emptyList(),// 一个笔记种类可以关联多个课程
+)

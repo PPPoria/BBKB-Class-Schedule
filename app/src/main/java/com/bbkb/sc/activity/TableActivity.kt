@@ -152,7 +152,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     }.let { }
 
     override suspend fun refreshDataInScope() {
-        val data = vm.latest() ?: DSManager.run {
+        val old = vm.latest() ?: DSManager.run {
             getString(StringKeys.SCHOOL_NAME).first()
         }.let { name ->
             School.dataList.find { it.name == name }
@@ -163,8 +163,8 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             }
         }.let { MData(schoolData = it!!.copy()) }
         val curZC = ScheduleUtils.getZC(System.currentTimeMillis())
-        val tableZC = if (data.tableZC == 0) curZC else data.tableZC
-        data.copy(
+        val tableZC = if (old.tableZC == 0) curZC else old.tableZC
+        old.copy(
             curZC = curZC,
             tableZC = tableZC,
             courses = withContext(Dispatchers.IO) {
@@ -205,7 +205,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             } else {
                 it.setTextColor(this@TableActivity.getColor(R.color.black))
                 it.backgroundTintList = ColorStateList.valueOf(
-                    this@TableActivity.getColor(R.color.gray_shade)
+                    this@TableActivity.getColor(R.color.white_dim)
                 )
             }
         }
@@ -218,7 +218,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             } else {
                 it.setTextColor(this@TableActivity.getColor(R.color.black))
                 it.backgroundTintList = ColorStateList.valueOf(
-                    this@TableActivity.getColor(R.color.gray_shade)
+                    this@TableActivity.getColor(R.color.white_dim)
                 )
             }
         }
@@ -231,7 +231,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             } else {
                 it.setTextColor(this@TableActivity.getColor(R.color.black))
                 it.backgroundTintList = ColorStateList.valueOf(
-                    this@TableActivity.getColor(R.color.gray_shade)
+                    this@TableActivity.getColor(R.color.white_dim)
                 )
             }
         }

@@ -112,7 +112,7 @@
             android:layout_marginVertical="@dimen/padding_v_2"
             android:layout_weight="1"
             android:background="@drawable/corner_24"
-            android:backgroundTint="@color/gray_shade"
+            android:backgroundTint="@color/white_dim"
             android:orientation="vertical">
 
             <LinearLayout
@@ -202,7 +202,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@color/gray_shade"
+                        android:background="@color/white_dim"
                         android:hint="--"
                         android:paddingHorizontal="@dimen/padding_h_3"
                         android:paddingVertical="@dimen/padding_v_3"
@@ -229,7 +229,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@color/gray_shade"
+                        android:background="@color/white_dim"
                         android:hint="--"
                         android:paddingHorizontal="@dimen/padding_h_3"
                         android:paddingVertical="@dimen/padding_v_3"
@@ -243,7 +243,7 @@
                 android:layout_width="2dp"
                 android:layout_height="match_parent"
                 android:layout_marginHorizontal="@dimen/padding_h_3"
-                android:background="@color/gray_shade" />
+                android:background="@color/white_dim" />
 
             <LinearLayout
                 android:layout_width="110dp"
@@ -255,7 +255,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/corner_888"
-                    android:backgroundTint="@color/gray_shade"
+                    android:backgroundTint="@color/white_dim"
                     android:gravity="center"
                     android:paddingVertical="@dimen/padding_v_3"
                     android:text="@string/ignore_saturday"
@@ -268,7 +268,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="@dimen/padding_v_3"
                     android:background="@drawable/corner_888"
-                    android:backgroundTint="@color/gray_shade"
+                    android:backgroundTint="@color/white_dim"
                     android:gravity="center"
                     android:paddingVertical="@dimen/padding_v_3"
                     android:text="@string/ignore_sunday"
@@ -280,7 +280,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/corner_888"
-                    android:backgroundTint="@color/gray_shade"
+                    android:backgroundTint="@color/white_dim"
                     android:gravity="center"
                     android:paddingVertical="@dimen/padding_v_3"
                     android:text="@string/ignore_evening"

@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BBKBClassSchedule">
         <activity
+            android:name=".activity.NoteCategoryListActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.TableActivity"
             android:exported="false"
             android:screenOrientation="portrait" />

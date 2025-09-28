@@ -13,7 +13,7 @@ object SCToast {
         ).show()
     }
 
-    fun debug(message: String) {
-        if (BuildConfig.DEBUG) show(message)
+    fun debug(message: String, isShort: Boolean = true) {
+        if (BuildConfig.DEBUG) show(message, isShort)
     }
 }

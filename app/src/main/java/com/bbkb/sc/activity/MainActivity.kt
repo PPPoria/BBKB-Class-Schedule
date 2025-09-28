@@ -3,6 +3,7 @@ package com.bbkb.sc.activity
 
 import android.content.Intent
 import androidx.lifecycle.lifecycleScope
+import com.bbkb.sc.BuildConfig
 import com.bbkb.sc.R
 import com.bbkb.sc.databinding.ActivityMainBinding
 import com.bbkb.sc.datastore.StringKeys
@@ -18,7 +19,7 @@ import kotlinx.coroutines.launch
 class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun onViewBindingCreate() = ActivityMainBinding.inflate(layoutInflater)
 
-    override fun initWindowInsets(l: Int, t: Int, r: Int, b: Int) {
+    /*override fun initWindowInsets(l: Int, t: Int, r: Int, b: Int) {
         super.initWindowInsets(l, t, r, b)
         binding.root.setPadding(
             systemBarPadding[l],
@@ -30,11 +31,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             0, 0, 0,
             systemBarPadding[b]
         )
-    }
+    }*/
 
     override fun initView() {
-        setLightStatusBar(false)
+        setLightStatusBar(true)
         setLightNavigationBar(true)
+        "${
+          if (BuildConfig.DEBUG) "测试版"
+          else "正式版"
+        } v${BuildConfig.VERSION_NAME}".also {
+            binding.version.text = it
+        }
+
     }
 
     override fun initListener() = binding.apply {
@@ -47,7 +55,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         updateCoursesBtn.setOnClickListenerWithClickAnimation {
             onUpdateCoursesBtnClick()
         }
-        myNotesLayout.setOnClickListenerWithClickAnimation { }
+        myNotesLayout.setOnClickListenerWithClickAnimation {
+            Intent(
+                this@MainActivity,
+                NoteCategoryListActivity::class.java
+            ).also { startActivity(it) }
+        }
         classScheduleLayout.setOnClickListenerWithClickAnimation {
             Intent(
                 this@MainActivity,
