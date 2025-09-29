@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/padding_v_3">
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_h_2"
+        android:layout_marginTop="@dimen/padding_v_3"
+        android:text="9月1日"
+        android:textColor="@color/quaternary"
+        android:textSize="@dimen/text_size_2h"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- unfoldable content -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_h_3"
+        android:layout_marginTop="-24dp"
+        android:background="@drawable/corner_12"
+        android:paddingHorizontal="@dimen/padding_h_3"
+        android:paddingTop="30dp"
+        android:paddingBottom="@dimen/padding_v_3"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/item_bg">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/picture_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/item_bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_h_3"
+        android:layout_marginTop="@dimen/padding_v_3"
+        android:background="@drawable/corner_12"
+        android:backgroundTint="#FFFFFF"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/padding_h_3"
+        android:paddingVertical="@dimen/padding_v_3"
+        app:layout_constraintTop_toBottomOf="@id/date">
+
+        <EditText
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/padding_h_3"
+            android:background="@color/transparent"
+            android:hint="@string/note_item_title_unname"
+            android:maxLength="20"
+            android:text="@string/note_item_title_unname"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_hb"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/unfold_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0字 0图"
+            android:textColor="@color/gray"
+            android:textSize="@dimen/text_size_2h"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title" />
+
+        <ImageView
+            android:id="@+id/unfold_btn"
+            android:layout_width="@dimen/text_size_2b"
+            android:layout_height="@dimen/text_size_2b"
+            android:contentDescription="@string/none"
+            android:rotation="90"
+            android:src="@mipmap/ic_back_btn_1"
+            app:layout_constraintBottom_toBottomOf="@id/description"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/title" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginHorizontal="@dimen/padding_h_2"
+        android:background="@color/gray_shade"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

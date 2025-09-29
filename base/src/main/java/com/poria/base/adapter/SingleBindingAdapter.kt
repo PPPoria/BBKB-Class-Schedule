@@ -12,7 +12,7 @@ class SingleBindingAdapter<VB : ViewBinding, T : Any>(
     private val itemLayoutId: Int,
     private val vbBind: (View) -> VB,
     private val itemId: ((T) -> Long)? = null,
-    private val onBindView: ((DataParcel<VB, T>) -> Unit)? = null
+    private val onBindView: ((binding: VB, position: Int, item: T) -> Unit)? = null
 ) : RecyclerView.Adapter<SingleBindingAdapter.RVHolder<VB>>() {
     init {
         setHasStableIds(true)
@@ -57,21 +57,13 @@ class SingleBindingAdapter<VB : ViewBinding, T : Any>(
 
     override fun onBindViewHolder(holder: RVHolder<VB>, position: Int) {
         onBindView?.invoke(
-            DataParcel(
-                binding = holder.binding,
-                item = data[position],
-                index = position,
-            )
+            holder.binding,
+            position,
+            data[position]
         )
     }
 
     class RVHolder<VB : ViewBinding>(
         val binding: VB
     ) : RecyclerView.ViewHolder(binding.root) {}
-
-    data class DataParcel<VB : ViewBinding, T : Any>(
-        val binding: VB,
-        val item: T,
-        val index: Int,
-    )
 }

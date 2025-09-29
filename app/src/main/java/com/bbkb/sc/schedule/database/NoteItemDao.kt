@@ -10,11 +10,20 @@ import kotlinx.coroutines.flow.Flow
 interface NoteItemDao {
 
     @Insert
-    fun insert(items: List<NoteItem>)
+    fun insert(item: NoteItem): Long
+
+    @Insert
+    fun insert(items: List<NoteItem>): List<Long>
 
     @Update
     fun update(item: NoteItem)
 
+    @Update
+    fun update(items: List<NoteItem>)
+
     @Query("SELECT * FROM note_items")
     fun getAll(): Flow<List<NoteItem>>
+
+    @Query("SELECT * FROM note_items WHERE categoryId = :categoryId")
+    fun getByCategoryId(categoryId: Long): Flow<List<NoteItem>>
 }

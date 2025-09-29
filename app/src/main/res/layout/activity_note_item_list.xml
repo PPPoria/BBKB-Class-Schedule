@@ -6,30 +6,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".activity.NoteCategoryListActivity">
+    tools:context=".activity.NoteItemListActivity">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/padding_h_2"
         android:layout_marginTop="@dimen/padding_v_2"
-        android:text="@string/note"
+        android:background="@color/transparent"
+        android:hint="@string/note_name_unname"
+        android:maxLength="60"
+        android:paddingHorizontal="@dimen/padding_h_2"
+        android:text="@string/note_name_unname"
         android:textColor="@color/black"
         android:textSize="@dimen/text_size_2b"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/name_length_limit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding_h_2"
+        android:text="0/60"
+        android:textColor="@color/gray"
+        android:textSize="@dimen/text_size_2h"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/name" />
 
     <View
         android:id="@+id/line_1"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="@dimen/padding_v_2"
-        android:background="@color/quaternary"
-        app:layout_constraintEnd_toEndOf="@id/title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        android:layout_marginTop="@dimen/padding_v_3"
+        android:background="@color/gray_shade"
+        app:layout_constraintTop_toBottomOf="@id/name_length_limit" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -42,24 +53,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Space -->
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/padding_v_2"
-                android:background="@drawable/corner_888"
-                android:paddingHorizontal="@dimen/padding_h_2"
-                android:paddingVertical="@dimen/padding_v_3"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_hb"
-                android:visibility="invisible" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/padding_v_3"
-                android:layout_marginTop="@dimen/padding_v_3"
                 android:nestedScrollingEnabled="false" />
 
             <Space
@@ -70,21 +67,6 @@
                 android:padding="@dimen/padding_v_1" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <EditText
-        android:id="@+id/search_edit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding_h_2"
-        android:layout_marginTop="@dimen/padding_v_2"
-        android:background="@drawable/corner_888"
-        android:backgroundTint="@color/gray_shade"
-        android:hint="@string/seek_hint"
-        android:paddingHorizontal="@dimen/padding_h_2"
-        android:paddingVertical="@dimen/padding_v_3"
-        android:textColor="@color/black"
-        android:textSize="@dimen/text_size_hb"
-        app:layout_constraintTop_toBottomOf="@id/line_1" />
 
     <ImageView
         android:id="@+id/add_btn"

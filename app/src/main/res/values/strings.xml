@@ -40,10 +40,9 @@
     <string name="remark">备注：</string>
 
     <!-- Note Activity -->
-    <string name="note_category">笔记类别</string>
-    <string name="note_item">笔记子项</string>
-    <string name="create_category">创建类别</string>
-    <string name="create_item">创建子项</string>
+    <string name="note">笔记</string>
+    <string name="note_name_unname">未命名笔记</string>
+    <string name="note_item_title_unname">空白标题</string>
     <string name="seek_hint">搜索关键字</string>
 
     <!-- Toast Messages -->

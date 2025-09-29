@@ -15,28 +15,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BBKBClassSchedule">
         <activity
+            android:name=".activity.NoteItemListActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.NoteCategoryListActivity"
             android:exported="false" />
         <activity
             android:name=".activity.TableActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name=".activity.AuthActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name=".activity.UserSettingsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name=".activity.MainActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
+            android:exported="false" />
         <activity
             android:name=".activity.SplashActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -9,7 +9,8 @@ import com.bbkb.sc.util.StringListConverter
 @TypeConverters(StringListConverter::class)
 data class NoteCategory(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
     var name: String,
+    var timeStamp: Long = 0,// 记录最后一次修改时间
     var courseNames: List<String> = emptyList(),// 一个笔记种类可以关联多个课程
 )

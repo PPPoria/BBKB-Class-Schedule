@@ -9,7 +9,8 @@ import com.bbkb.sc.util.StringListConverter
 @TypeConverters(StringListConverter::class)
 data class NoteItem(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0,
+    var categoryId: Long,
     var timeStamp: Long,// 确定年月日，同日的优先级由priority决定
     var priority: Int,// 数字越大优先级越低
     var title: String,

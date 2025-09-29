@@ -10,7 +10,10 @@ import kotlinx.coroutines.flow.Flow
 interface CourseDao {
 
     @Insert
-    fun insert(courses: List<Course>)
+    fun insert(course: Course): Long
+
+    @Insert
+    fun insert(courses: List<Course>): List<Long>
 
     @Update
     fun update(course: Course)

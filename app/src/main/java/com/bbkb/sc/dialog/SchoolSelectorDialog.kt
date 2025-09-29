@@ -85,8 +85,8 @@ class SchoolSelectorDialog : BaseDialog<DialogSchoolSelectorBinding>() {
                     name.setTextColor(context.getColor(R.color.white))
                 } else {
                     bg.backgroundTintList = ColorStateList
-                        .valueOf(context.getColor(R.color.gray))
-                    name.setTextColor(context.getColor(R.color.black))
+                        .valueOf(context.getColor(R.color.gray_shade))
+                    name.setTextColor(context.getColor(R.color.gray))
                 }
                 val sd = list[position]
                 name.text = sd.name

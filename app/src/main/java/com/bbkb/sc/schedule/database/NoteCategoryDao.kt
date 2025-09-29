@@ -10,11 +10,17 @@ import kotlinx.coroutines.flow.Flow
 interface NoteCategoryDao {
 
     @Insert
-    fun insert(categories: List<NoteCategory>)
+    fun insert(category: NoteCategory): Long
+
+    @Insert
+    fun insert(categories: List<NoteCategory>): List<Long>
 
     @Update
     fun update(category: NoteCategory)
 
     @Query("SELECT * FROM note_categories")
     fun getAll(): Flow<List<NoteCategory>>
+
+    @Query("SELECT * FROM note_categories WHERE id = :id")
+    fun getById(id: Long): Flow<NoteCategory>
 }

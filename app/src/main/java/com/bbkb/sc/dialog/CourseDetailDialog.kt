@@ -16,8 +16,8 @@ import kotlinx.coroutines.withContext
 
 class CourseDetailDialog : BaseDialog<DialogCourseDetailBinding>() {
     override fun onViewBindingCreate() = DialogCourseDetailBinding.inflate(layoutInflater)
-    lateinit var course: Course
-    private lateinit var remark: Remark
+    var course: Course? = null
+    private var remark: Remark? = null
 
     override fun initWindowInsets(window: Window, gravity: Int, width: Int, height: Int) {
         super.initWindowInsets(
@@ -29,6 +29,10 @@ class CourseDetailDialog : BaseDialog<DialogCourseDetailBinding>() {
     }
 
     override fun initView() = binding.apply {
+        val course = course ?: run {
+            dismiss()
+            return
+        }
         name.text = course.name
         major.text = course.major
         teacher.text = course.teacher
@@ -41,16 +45,18 @@ class CourseDetailDialog : BaseDialog<DialogCourseDetailBinding>() {
             this@CourseDetailDialog.remark =
                 ScheduleUtils.getRemarkByCourseName(course.name)
             withContext(Dispatchers.Main) {
-                remark.setText(this@CourseDetailDialog.remark.content)
+                remark.setText(this@CourseDetailDialog.remark!!.content)
             }
         }
     }.let { }
 
     override fun onPause() {
-        remark.content = binding.remark.text.toString()
-        CoroutineScope(Dispatchers.IO).launch {
-            remark.copy().also {
-                RemarkDB.get().dao().update(it)
+        remark?.run {
+            content = binding.remark.text.toString()
+            CoroutineScope(Dispatchers.IO).launch {
+                copy().also {
+                    RemarkDB.get().dao().update(it)
+                }
             }
         }
         super.onPause()
