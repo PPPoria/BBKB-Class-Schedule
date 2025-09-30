@@ -44,6 +44,13 @@
     <string name="note_name_unname">未命名笔记</string>
     <string name="note_item_title_unname">空白标题</string>
     <string name="seek_hint">搜索关键字</string>
+    <string name="note_content">笔记内容</string>
+    <string name="add_picture_from">添加图片：</string>
+    <string name="from_camera">拍摄相片</string>
+    <string name="from_gallery">相册选取</string>
+
+    <!-- Camera Activity -->
+    <string name="camera_swap_selector">切换</string>
 
     <!-- Toast Messages -->
     <string name="please_bind_school">暂未绑定学校\n请前往用户设置中绑定</string>

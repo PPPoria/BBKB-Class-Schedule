@@ -11,7 +11,7 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
 import androidx.viewbinding.ViewBinding
 
-abstract class BaseDialog<T : ViewBinding> : DialogFragment() {
+abstract class BaseDialog<out T : ViewBinding> : DialogFragment() {
     val binding by lazy { onViewBindingCreate() }
 
     override fun onStart() {

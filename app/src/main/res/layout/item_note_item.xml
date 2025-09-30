@@ -33,11 +33,63 @@
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/item_bg">
 
+        <LinearLayout
+            android:id="@+id/add_picture_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_picture_from"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/from_camera_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/corner_888"
+                android:paddingHorizontal="@dimen/padding_h_3"
+                android:paddingVertical="@dimen/padding_v_3"
+                android:text="@string/from_camera"
+                android:textColor="@color/secondary"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/from_gallery_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/corner_888"
+                android:paddingHorizontal="@dimen/padding_h_3"
+                android:paddingVertical="@dimen/padding_v_3"
+                android:text="@string/from_gallery"
+                android:textColor="@color/secondary"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/content_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_2"
+            android:background="@color/transparent"
+            android:hint="@string/note_content"
+            android:maxLength="1200"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_2h"
+            app:layout_constraintTop_toBottomOf="@id/add_picture_layout" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/picture_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            android:layout_marginTop="@dimen/padding_v_2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/content_edit" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -57,7 +109,7 @@
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/padding_h_3"
+            android:layout_marginEnd="@dimen/padding_h_1"
             android:background="@color/transparent"
             android:hint="@string/note_item_title_unname"
             android:maxLength="20"

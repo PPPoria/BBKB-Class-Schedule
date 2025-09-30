@@ -1,5 +1,8 @@
 package com.bbkb.sc.activity
 
+import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.activity.viewModels
@@ -34,19 +37,20 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
     override fun onViewBindingCreate() = ActivityNoteItemListBinding.inflate(layoutInflater)
     private val vm by viewModels<SingleVM<MData>>()
     private val categoryId by lazy { intent.getLongExtra("category_id", 0L) }
-    private val newPictureAdapter: () -> SingleBindingAdapter<ItemNotePictureBinding, String> = {
-        SingleBindingAdapter(
-            itemLayoutId = R.layout.item_note_picture,
-            vbBind = ItemNotePictureBinding::bind
-        ) { binding, _, item ->
-            Glide.with(this@NoteItemListActivity)
-                .load(item)
-                .into(binding.imageView)
-            binding.imageView.setOnClickListener {
+    private val newPictureAdapter: SingleBindingAdapter<ItemNotePictureBinding, String>
+        get() {
+            return SingleBindingAdapter(
+                itemLayoutId = R.layout.item_note_picture,
+                vbBind = ItemNotePictureBinding::bind
+            ) { binding, _, item ->
+                Glide.with(this@NoteItemListActivity)
+                    .load(item)
+                    .into(binding.imageView)
+                binding.imageView.setOnClickListener {
 
+                }
             }
         }
-    }
     private val itemAdapter by lazy {
         SingleBindingAdapter<ItemNoteItemBinding, NoteItem>(
             itemLayoutId = R.layout.item_note_item,
@@ -63,27 +67,53 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                 else if (year == curDate.year) "${month}月${day}日"
                 else "${year}年${month}月${day}日"
             }
-            // 显示标题
-            binding.title.setText(item.title)
-            binding.title.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
-                override fun afterTextChanged(et: Editable?) {
-                    vm.latest()?.items?.find {
-                        it.id == item.id
-                    }?.title = et.toString()
-                }
-            })
-            // 显示图片
-            binding.itemBg.setOnClickListener {
+
+            // 显示标题，监听标题变化
+            with(binding.title) {
+                setText(item.title)
+                addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) =
+                        Unit
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
+                    override fun afterTextChanged(et: Editable?) {
+                        // 直接提交到数据库，本地保存副本，不走stateFlow
+                        CoroutineScope(Dispatchers.IO).launch {
+                            NoteItemDB.get().dao().update(item.also {
+                                it.title = et.toString()
+                            })
+                        }
+                    }
+                })
+            }
+
+            // 触发展开、收起详细内容监听器
+            binding.itemBg.setOnClickListenerWithClickAnimation {
                 binding.unfoldBtn.rotation =
                     if (binding.unfoldBtn.rotation == 90f) -90f
                     else 90f
                 if (binding.unfoldBtn.rotation == 90f) {
-                    binding.contentLayout.isGone = true
-                } else {
-                    binding.contentLayout.isGone = false
-                    binding.pictureList.layoutManager = GridLayoutManager(
+                    // 收起详细内容
+                    with(binding) {
+                        contentLayout.isGone = true
+                        itemBg.backgroundTintList = ColorStateList.valueOf(Color.WHITE)
+                        title.setTextColor(getColor(R.color.black))
+                        description.setTextColor(getColor(R.color.gray))
+                    }
+                    return@setOnClickListenerWithClickAnimation
+                }
+                // 展开详细内容
+                with(binding) {
+                    contentLayout.isGone = false
+                    itemBg.backgroundTintList = ColorStateList.valueOf(getColor(R.color.primary))
+                    title.setTextColor(getColor(R.color.white))
+                    description.setTextColor(getColor(R.color.white))
+                }
+                // 显示笔记内容
+                binding.contentEdit.setText(item.noteContent)
+                // 显示图片列表
+                with(binding.pictureList) {
+                    layoutManager = GridLayoutManager(
                         this@NoteItemListActivity,
                         when (item.picturePaths.size) {
                             in 16..Int.MAX_VALUE -> 4
@@ -92,16 +122,43 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                             else -> 1
                         }
                     )
-                    newPictureAdapter().also {
-                        binding.pictureList.adapter = it
+                    newPictureAdapter.also {
+                        adapter = it
                         it.data = item.picturePaths
                     }
+                }
+            }
+
+            // 笔记内容变化监听
+            binding.contentEdit.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) =
+                    Unit
+
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
+                override fun afterTextChanged(et: Editable?) {
+                    // 直接提交到数据库，本地保存副本，不走stateFlow
+                    CoroutineScope(Dispatchers.IO).launch {
+                        NoteItemDB.get().dao().update(item.also {
+                            it.noteContent = et.toString()
+                        })
+                    }
+                }
+            })
+
+            // 拍摄按钮监听
+            binding.fromCameraBtn.setOnClickListener {
+                Intent(
+                    this@NoteItemListActivity,
+                    CameraActivity::class.java
+                ).also {
+                    startActivity(it)
                 }
             }
         }
     }
 
     override fun initView() {
+        enableStrictMode(this::class.java, 1)
         setLightStatusBar(true)
         setLightNavigationBar(true)
         with(binding.rv) {
@@ -115,12 +172,17 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun afterTextChanged(et: Editable?) {
-                val old = vm.latest() ?: return
-                old.copy(
-                    category = old.category.copy(
-                        name = et.toString()
-                    )
-                ).also { vm.update(it) }
+                // 直接提交到数据库，本地保存副本，不走stateFlow
+                vm.latest?.run {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        NoteCategoryDB.get().dao().update(
+                            category.also {
+                                it.name = et.toString()
+                                it.timeStamp = System.currentTimeMillis()
+                            }
+                        )
+                    }
+                }
             }
         })
         addBtn.setOnClickListenerWithClickAnimation {
@@ -129,8 +191,8 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                     categoryId = categoryId,
                     timeStamp = System.currentTimeMillis(),
                     priority = 0,
-                    title = getString(R.string.note_item_title_unname),
-                    notes = emptyList(),
+                    title = "",
+                    noteContent = "",
                     picturePaths = emptyList()
                 )
                 NoteItemDB.get().dao().insert(new)
@@ -139,7 +201,7 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
     }
 
     override suspend fun refreshDataInScope() {
-        val old = vm.latest() ?: MData(
+        val old = vm.latest ?: MData(
             category = NoteCategory(
                 id = categoryId,
                 name = "Loading...",
@@ -147,17 +209,12 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                 courseNames = emptyList()
             ),
             itemsFlow = emptyFlow(),
-            items = emptyList()
         )
-        val flow = NoteItemDB.get().dao().getByCategoryId(categoryId)
         old.copy(
             category = withContext(Dispatchers.IO) {
                 NoteCategoryDB.get().dao().getById(categoryId).first()
             },
-            itemsFlow = flow,
-            items = withContext(Dispatchers.IO) {
-                flow.first()
-            }
+            itemsFlow = NoteItemDB.get().dao().getByCategoryId(categoryId)
         ).also { vm.update(it) }
     }
 
@@ -169,7 +226,7 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                 }
             }
             launch {
-                vm.latest()?.itemsFlow?.collect { list ->
+                vm.latest?.itemsFlow?.collect { list ->
                     showNoteItems(list)
                 }
             }
@@ -187,37 +244,21 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
     }
 
     private fun showNoteItems(items: List<NoteItem>) {
+        if (items.size == itemAdapter.itemCount) {
+            /*
+            * 防止重复刷新导致UI锁死
+            * 这里的itemAdapter.data = items会导致UI刷新
+            * 但是如果item的数量没有变化，说明是item内部的数据更新，
+            * 这些内部更新的数据已经在itemAdapter中保存了数据库中的副本
+            * 没有必要再次刷新列表
+            */
+            return
+        }
         itemAdapter.data = items.sortedBy { -1 * it.timeStamp }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        CoroutineScope(Dispatchers.IO).launch {
-            vm.latest()?.run {
-                NoteCategoryDB.get().dao().update(
-                    category.copy(
-                        name = category.name.ifEmpty { getString(R.string.note_name_unname) },
-                        timeStamp = System.currentTimeMillis()
-                    )
-                )
-            }
-        }
-        CoroutineScope(Dispatchers.IO).launch {
-            vm.latest()?.run {
-                NoteItemDB.get().dao().update(
-                    items.map {
-                        it.copy(
-                            title = it.title.ifEmpty { getString(R.string.note_item_title_unname) },
-                        )
-                    }
-                )
-            }
-        }
     }
 
     data class MData(
         val category: NoteCategory,
         val itemsFlow: Flow<List<NoteItem>>,
-        val items: List<NoteItem>
     )
 }

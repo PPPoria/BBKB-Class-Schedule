@@ -68,7 +68,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }
         filterBg.setOnClickListener { filterBg.isVisible = false }
         ignoreSaturdayBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
+            val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
             data.tableConfig.let {
                 it.copy(ignoreSaturday = !it.ignoreSaturday)
             }.let {
@@ -76,7 +76,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             }.also { vm.update(it) }
         }
         ignoreSundayBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
+            val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
             data.tableConfig.let {
                 it.copy(ignoreSunday = !it.ignoreSunday)
             }.let {
@@ -84,7 +84,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             }.also { vm.update(it) }
         }
         ignoreEveningBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
+            val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
             data.tableConfig.let {
                 it.copy(ignoreEvening = !it.ignoreEvening)
             }.let {
@@ -95,7 +95,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun afterTextChanged(et: Editable?) {
-                val data = vm.latest() ?: return
+                val data = vm.latest ?: return
                 data.tableConfig.copy(
                     nameFilter = et.toString()
                 ).let {
@@ -107,7 +107,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun afterTextChanged(et: Editable?) {
-                val data = vm.latest() ?: return
+                val data = vm.latest ?: return
                 data.tableConfig.copy(
                     majorFilter = et.toString()
                 ).let {
@@ -116,7 +116,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             }
         })
         tablePreBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
+            val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
             if (data.tableZC == 1) {
                 SCToast.show("已经是第一周")
                 return@setOnClickListenerWithClickAnimation
@@ -133,7 +133,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             }
         }
         tableNextBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.latest() ?: return@setOnClickListenerWithClickAnimation
+            val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
             if (data.tableZC == data.schoolData.weekNum) {
                 SCToast.show("已经是最后一周")
                 return@setOnClickListenerWithClickAnimation
@@ -152,7 +152,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     }.let { }
 
     override suspend fun refreshDataInScope() {
-        val old = vm.latest() ?: DSManager.run {
+        val old = vm.latest ?: DSManager.run {
             getString(StringKeys.SCHOOL_NAME).first()
         }.let { name ->
             School.dataList.find { it.name == name }
@@ -250,7 +250,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         courses: List<Course>,
         tableConfig: TableConfig
     ) = lifecycleScope.launch {
-        val sd = vm.latest()?.schoolData ?: return@launch
+        val sd = vm.latest?.schoolData ?: return@launch
         val cells = courses.asSequence().filter {
             if (tableConfig.ignoreSaturday) it.xq != 6
             else true
@@ -330,8 +330,8 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     }
 
     private fun onClickTableItem(cell: TableView.Cell) {
-        if (vm.latest() == null) return
-        val course = vm.latest()!!.courses.find {
+        if (vm.latest == null) return
+        val course = vm.latest!!.courses.find {
             it.name == cell.title
         }!!
         CourseDetailDialog().also {
@@ -342,7 +342,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
-        vm.latest()?.apply {
+        vm.latest?.apply {
             saveTableConfig(tableConfig.copy())
         }
     }

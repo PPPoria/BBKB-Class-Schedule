@@ -26,7 +26,7 @@ class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
     override fun initListener() = binding.apply {
         bindSchoolBtn.setOnClickListenerWithClickAnimation {
             SchoolSelectorDialog().also {
-                it.schoolName = vm.latest()?.schoolName ?: "--"
+                it.schoolName = vm.latest?.schoolName ?: "--"
                 it.show(supportFragmentManager, "SchoolSelectorDialog")
             }
         }
@@ -44,7 +44,7 @@ class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
     }
 
     override suspend fun refreshDataInScope() {
-        val old = vm.latest() ?: MData()
+        val old = vm.latest ?: MData()
         old.copy(
             schoolName = withContext(Dispatchers.IO) {
                 DSManager.getString(

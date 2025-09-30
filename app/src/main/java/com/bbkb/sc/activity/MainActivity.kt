@@ -33,22 +33,22 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     override fun initListener() = binding.apply {
-        userSettingsBtn.setOnClickListenerWithClickAnimation {
+        userSettingsBtn.setOnClickListener {
             Intent(
                 this@MainActivity,
                 UserSettingsActivity::class.java
             ).also { startActivity(it) }
         }
-        updateCoursesBtn.setOnClickListenerWithClickAnimation {
+        updateCoursesBtn.setOnClickListener {
             onUpdateCoursesBtnClick()
         }
-        myNotesLayout.setOnClickListenerWithClickAnimation {
+        myNotesLayout.setOnClickListener {
             Intent(
                 this@MainActivity,
                 NoteCategoryListActivity::class.java
             ).also { startActivity(it) }
         }
-        classScheduleLayout.setOnClickListenerWithClickAnimation {
+        classScheduleLayout.setOnClickListener {
             onClassScheduleLayoutClick()
         }
     }.let { }

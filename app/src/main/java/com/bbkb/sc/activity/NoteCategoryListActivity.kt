@@ -47,7 +47,7 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
                 else "${year}年${month}月${day}日"
             }
             // 关键字高亮
-            vm.latest()?.keywords?.also {
+            vm.latest?.keywords?.also {
                 if (it.isNotEmpty()) {
                     val spanStr = SpannableString(item.name)
                     val start = item.name.indexOf(it)
@@ -61,7 +61,7 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
                     binding.title.text = spanStr
                 }
             }
-            binding.bg.setOnClickListenerWithClickAnimation {
+            binding.bg.setOnClickListener {
                 Intent(
                     this@NoteCategoryListActivity,
                     NoteItemListActivity::class.java
@@ -87,7 +87,7 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun afterTextChanged(et: Editable?) {
-                val old = vm.latest() ?: return
+                val old = vm.latest ?: return
                 old.copy(
                     keywords = et.toString()
                 ).also { vm.update(it) }
@@ -115,7 +115,7 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
     }.let { }
 
     override suspend fun refreshDataInScope() {
-        val old = vm.latest() ?: MData("", flow { })
+        val old = vm.latest ?: MData("", flow { })
         old.copy(
             categoriesFlow = NoteCategoryDB.get().dao().getAll()
         ).also { vm.update(it) }
@@ -129,8 +129,8 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
                 }
             }
             launch {
-                vm.latest()?.categoriesFlow?.collect { list ->
-                    showList(list, vm.latest()?.keywords ?: "")
+                vm.latest?.categoriesFlow?.collect { list ->
+                    showList(list, vm.latest?.keywords ?: "")
                 }
             }
         }

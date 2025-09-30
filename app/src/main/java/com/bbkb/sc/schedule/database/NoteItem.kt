@@ -14,6 +14,6 @@ data class NoteItem(
     var timeStamp: Long,// 确定年月日，同日的优先级由priority决定
     var priority: Int,// 数字越大优先级越低
     var title: String,
-    var notes: List<String> = emptyList(),
+    var noteContent: String = "",
     var picturePaths: List<String> = emptyList()
 )
