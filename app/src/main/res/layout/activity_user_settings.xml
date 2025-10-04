@@ -41,7 +41,6 @@
             android:layout_width="@dimen/padding_h_2"
             android:layout_height="match_parent"
             android:contentDescription="@string/none"
-            android:rotation="180"
             android:src="@mipmap/ic_back_btn_1"/>
     </LinearLayout>
 
@@ -70,7 +69,6 @@
             android:layout_width="@dimen/padding_h_2"
             android:layout_height="match_parent"
             android:contentDescription="@string/none"
-            android:rotation="180"
             android:src="@mipmap/ic_back_btn_1"/>
     </LinearLayout>
 

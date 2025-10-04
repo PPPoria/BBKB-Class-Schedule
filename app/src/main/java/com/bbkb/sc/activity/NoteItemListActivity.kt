@@ -36,26 +36,41 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.util.UUID
 
 @SuppressLint("DefaultLocale")
 class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
     override fun onViewBindingCreate() = ActivityNoteItemListBinding.inflate(layoutInflater)
     private val vm by viewModels<SingleVM<MData>>()
     private val categoryId by lazy { intent.getLongExtra("category_id", 0L) }
-    private val newPictureAdapter: SingleBindingAdapter<ItemNotePictureBinding, String>
+    private val newPictureAdapter: SingleBindingAdapter<ItemNotePictureBinding, NoteItem>
         get() {
             return SingleBindingAdapter(
                 itemLayoutId = R.layout.item_note_picture,
                 vbBind = ItemNotePictureBinding::bind
             ) { binding, position, item, adapter ->
                 Glide.with(this@NoteItemListActivity)
-                    .load(item)
+                    .load(item.picturePaths.reversed()[position])
                     .into(binding.imageView)
                 binding.imageView.setOnClickListener {
-                    ImagePreviewDialog().also {
-                        it.position = position
-                        it.pathList = adapter.data
-                        it.show(supportFragmentManager, "ImagePreviewDialog")
+                    ImagePreviewDialog().apply {
+                        this.position = position
+                        pathList = item.picturePaths.reversed()
+                        changedPathsCallback = { paths ->
+                            // 图片数量变化，说明有删除操作
+                            if (paths.size != adapter.data.size) {
+                                item.picturePaths = paths.reversed()
+                                // 触发Rv更新
+                                adapter.data = item.picturePaths.map { item }
+                                // 保存到数据库
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    NoteItemDB.get().dao().update(item)
+                                }
+                            }
+                        }
+                        show(supportFragmentManager, "ImagePreviewDialog")
                     }
                 }
             }
@@ -144,7 +159,7 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                         }
                     )
                     adapter = pictureAdapter
-                    pictureAdapter.data = item.picturePaths
+                    pictureAdapter.data = item.picturePaths.map { item }
                 }
             }
 
@@ -167,51 +182,79 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                 }
             })
 
-            /*拍摄按钮监听*/
-            binding.fromCameraBtn.setOnClickListener {
-                onInsertPictureSuccess = { path ->
-                    // 更新图片列表
-                    item.picturePaths = item.picturePaths
-                        .toMutableList().also { list ->
-                            list.add(path)
-                        }
-                    binding.pictureList.layoutManager = GridLayoutManager(
-                        this@NoteItemListActivity,
-                        when (item.picturePaths.size) {
-                            in 16..Int.MAX_VALUE -> 4
-                            in 9..15 -> 3
-                            in 4..8 -> 2
-                            else -> 1
-                        }
-                    )
-                    pictureAdapter.data = item.picturePaths
-                    // 更新描述
-                    updateDescription()
-                    // 保存到数据库
-                    CoroutineScope(Dispatchers.IO).launch {
-                        NoteItemDB.get().dao().update(item)
+            /*
+            * 拍摄按钮监听
+            * 相册选取按钮监听
+            */
+            val updatePicture: (paths: List<String>) -> Unit = { paths ->
+                // 更新图片列表
+                item.picturePaths = item.picturePaths
+                    .toMutableList().also { list ->
+                        list.addAll(paths)
                     }
+                binding.pictureList.layoutManager = GridLayoutManager(
+                    this@NoteItemListActivity,
+                    when (item.picturePaths.size) {
+                        in 16..Int.MAX_VALUE -> 4
+                        in 9..15 -> 3
+                        in 4..8 -> 2
+                        else -> 1
+                    }
+                )
+                pictureAdapter.data = item.picturePaths.map { item }
+                // 更新描述
+                updateDescription()
+                // 保存到数据库
+                CoroutineScope(Dispatchers.IO).launch {
+                    NoteItemDB.get().dao().update(item)
                 }
+            }
+            binding.fromCameraBtn.setOnClickListener {
+                onInsertPictureSuccess = updatePicture
                 Intent(
                     this@NoteItemListActivity,
                     CameraActivity::class.java
                 ).also { cameraLauncher.launch(it) }
             }
+            binding.fromGalleryBtn.setOnClickListener {
+                onInsertPictureSuccess = updatePicture
+                pickImagesLauncher.launch("image/*")
+            }
         }
     }
-    private var onInsertPictureSuccess: (path: String) -> Unit = {}
+    private var onInsertPictureSuccess: (paths: List<String>) -> Unit = {}
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
         callback = { result ->
             if (result.resultCode == RESULT_OK) {
-                val path = result.data?.getStringExtra("path") ?: return@registerForActivityResult
-                onInsertPictureSuccess(path)
+                val path = result.data?.getStringExtra("path")
+                    ?: return@registerForActivityResult
+                onInsertPictureSuccess(listOf(path))
+            }
+        }
+    )
+    private val pickImagesLauncher = registerForActivityResult(
+        ActivityResultContracts.GetMultipleContents(),
+        callback = { uriList ->
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (uriList.isEmpty()) return@launch
+                val pathList = uriList.mapNotNull {
+                    contentResolver.openInputStream(it)?.use { ins ->
+                        val file = File(filesDir, "multi_pics/${UUID.randomUUID()}.jpg")
+                        file.parentFile?.mkdirs()
+                        FileOutputStream(file).use { out -> ins.copyTo(out) }
+                        file.absolutePath   // 内部路径
+                    }
+                }
+                withContext(Dispatchers.Main) {
+                    onInsertPictureSuccess(pathList)
+                }
             }
         }
     )
 
     override fun initView() {
-        enableStrictMode(this::class.java, 1)
+        //enableStrictMode(this::class.java, 1)
         setLightStatusBar(true)
         setLightNavigationBar(true)
         with(binding.rv) {
