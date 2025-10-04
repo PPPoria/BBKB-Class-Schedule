@@ -1,13 +1,16 @@
 package com.bbkb.sc.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +18,7 @@ import com.bbkb.sc.R
 import com.bbkb.sc.databinding.ActivityNoteItemListBinding
 import com.bbkb.sc.databinding.ItemNoteItemBinding
 import com.bbkb.sc.databinding.ItemNotePictureBinding
+import com.bbkb.sc.dialog.ImagePreviewDialog
 import com.bbkb.sc.schedule.database.NoteCategory
 import com.bbkb.sc.schedule.database.NoteCategoryDB
 import com.bbkb.sc.schedule.database.NoteItem
@@ -33,6 +37,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@SuppressLint("DefaultLocale")
 class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
     override fun onViewBindingCreate() = ActivityNoteItemListBinding.inflate(layoutInflater)
     private val vm by viewModels<SingleVM<MData>>()
@@ -42,12 +47,16 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
             return SingleBindingAdapter(
                 itemLayoutId = R.layout.item_note_picture,
                 vbBind = ItemNotePictureBinding::bind
-            ) { binding, _, item ->
+            ) { binding, position, item, adapter ->
                 Glide.with(this@NoteItemListActivity)
                     .load(item)
                     .into(binding.imageView)
                 binding.imageView.setOnClickListener {
-
+                    ImagePreviewDialog().also {
+                        it.position = position
+                        it.pathList = adapter.data
+                        it.show(supportFragmentManager, "ImagePreviewDialog")
+                    }
                 }
             }
         }
@@ -56,19 +65,19 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
             itemLayoutId = R.layout.item_note_item,
             vbBind = ItemNoteItemBinding::bind,
             itemId = { it.id }
-        ) { binding, _, item ->
-            // 显示时间
+        ) { binding, _, item, _ ->
+            /*显示时间*/
             val curDate = System.currentTimeMillis().toDateFormat()
             binding.date.text = item.timeStamp.toDateFormat().run {
                 if (year == curDate.year &&
                     month == curDate.month &&
                     day == curDate.day
-                ) "${hour}:${minute}"
+                ) "${String.format("%02d", hour)}:${String.format("%02d", minute)}"
                 else if (year == curDate.year) "${month}月${day}日"
                 else "${year}年${month}月${day}日"
             }
 
-            // 显示标题，监听标题变化
+            /*显示标题，监听标题变化*/
             with(binding.title) {
                 setText(item.title)
                 addTextChangedListener(object : TextWatcher {
@@ -87,7 +96,19 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                 })
             }
 
-            // 触发展开、收起详细内容监听器
+            /*显示描述*/
+            val updateDescription = {
+                binding.description.text = StringBuilder().run {
+                    append(item.noteContent.length).append("字")
+                    append(" ")
+                    append(item.picturePaths.size).append("图")
+                    toString()
+                }
+            }
+            updateDescription()
+
+            /*触发展开、收起详细内容监听器*/
+            val pictureAdapter = newPictureAdapter
             binding.itemBg.setOnClickListenerWithClickAnimation {
                 binding.unfoldBtn.rotation =
                     if (binding.unfoldBtn.rotation == 90f) -90f
@@ -122,14 +143,12 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                             else -> 1
                         }
                     )
-                    newPictureAdapter.also {
-                        adapter = it
-                        it.data = item.picturePaths
-                    }
+                    adapter = pictureAdapter
+                    pictureAdapter.data = item.picturePaths
                 }
             }
 
-            // 笔记内容变化监听
+            /*文字内容变化监听*/
             binding.contentEdit.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) =
                     Unit
@@ -141,21 +160,55 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                         NoteItemDB.get().dao().update(item.also {
                             it.noteContent = et.toString()
                         })
+                        withContext(Dispatchers.Main) {
+                            updateDescription()
+                        }
                     }
                 }
             })
 
-            // 拍摄按钮监听
+            /*拍摄按钮监听*/
             binding.fromCameraBtn.setOnClickListener {
+                onInsertPictureSuccess = { path ->
+                    // 更新图片列表
+                    item.picturePaths = item.picturePaths
+                        .toMutableList().also { list ->
+                            list.add(path)
+                        }
+                    binding.pictureList.layoutManager = GridLayoutManager(
+                        this@NoteItemListActivity,
+                        when (item.picturePaths.size) {
+                            in 16..Int.MAX_VALUE -> 4
+                            in 9..15 -> 3
+                            in 4..8 -> 2
+                            else -> 1
+                        }
+                    )
+                    pictureAdapter.data = item.picturePaths
+                    // 更新描述
+                    updateDescription()
+                    // 保存到数据库
+                    CoroutineScope(Dispatchers.IO).launch {
+                        NoteItemDB.get().dao().update(item)
+                    }
+                }
                 Intent(
                     this@NoteItemListActivity,
                     CameraActivity::class.java
-                ).also {
-                    startActivity(it)
-                }
+                ).also { cameraLauncher.launch(it) }
             }
         }
     }
+    private var onInsertPictureSuccess: (path: String) -> Unit = {}
+    private val cameraLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+        callback = { result ->
+            if (result.resultCode == RESULT_OK) {
+                val path = result.data?.getStringExtra("path") ?: return@registerForActivityResult
+                onInsertPictureSuccess(path)
+            }
+        }
+    )
 
     override fun initView() {
         enableStrictMode(this::class.java, 1)
@@ -173,10 +226,10 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun afterTextChanged(et: Editable?) {
                 // 直接提交到数据库，本地保存副本，不走stateFlow
-                vm.latest?.run {
-                    CoroutineScope(Dispatchers.IO).launch {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    vm.latest?.category?.run {
                         NoteCategoryDB.get().dao().update(
-                            category.also {
+                            this@run.also {
                                 it.name = et.toString()
                                 it.timeStamp = System.currentTimeMillis()
                             }
@@ -245,13 +298,13 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
 
     private fun showNoteItems(items: List<NoteItem>) {
         if (items.size == itemAdapter.itemCount) {
-            /*
-            * 防止重复刷新导致UI锁死
-            * 这里的itemAdapter.data = items会导致UI刷新
-            * 但是如果item的数量没有变化，说明是item内部的数据更新，
-            * 这些内部更新的数据已经在itemAdapter中保存了数据库中的副本
-            * 没有必要再次刷新列表
-            */
+            /**
+             * 防止重复刷新导致UI锁死
+             * 这里的itemAdapter.data = items会导致UI刷新
+             * 但是如果item的数量没有变化，说明是item内部的数据更新，
+             * 这些内部更新的数据已经在itemAdapter中保存了数据库中的副本
+             * 没有必要再次刷新列表
+             */
             return
         }
         itemAdapter.data = items.sortedBy { -1 * it.timeStamp }
@@ -259,6 +312,6 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
 
     data class MData(
         val category: NoteCategory,
-        val itemsFlow: Flow<List<NoteItem>>,
+        val itemsFlow: Flow<List<NoteItem>>
     )
 }

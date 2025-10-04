@@ -49,8 +49,7 @@
     <string name="from_camera">拍摄相片</string>
     <string name="from_gallery">相册选取</string>
 
-    <!-- Camera Activity -->
-    <string name="camera_swap_selector">切换</string>
+    <!-- Image Preview Dialog -->
 
     <!-- Toast Messages -->
     <string name="please_bind_school">暂未绑定学校\n请前往用户设置中绑定</string>

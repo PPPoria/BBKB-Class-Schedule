@@ -60,7 +60,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.bbkb.sc.provider.fileprovider"
+            android:authorities="com.bbkb.sc.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

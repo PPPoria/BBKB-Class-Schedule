@@ -1,5 +1,6 @@
 package com.bbkb.sc.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.text.Editable
 import android.text.Spannable
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@SuppressLint("DefaultLocale")
 class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>() {
     override fun onViewBindingCreate() = ActivityNoteCategoryListBinding.inflate(layoutInflater)
     private val vm by viewModels<SingleVM<MData>>()
@@ -36,13 +38,13 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
             itemLayoutId = R.layout.item_note_category,
             vbBind = ItemNoteCategoryBinding::bind,
             itemId = { it.id }
-        ) { binding, _, item ->
+        ) { binding, _, item, _ ->
             val curDate = System.currentTimeMillis().toDateFormat()
             binding.title.text = item.name
             binding.date.text = item.timeStamp.toDateFormat().run {
                 if (year == curDate.year &&
                     month == curDate.month &&
-                    day == curDate.day) "${hour}:${minute}"
+                    day == curDate.day) "${String.format("%02d", hour)}:${String.format("%02d", minute)}"
                 else if (year == curDate.year) "${month}月${day}日"
                 else "${year}年${month}月${day}日"
             }

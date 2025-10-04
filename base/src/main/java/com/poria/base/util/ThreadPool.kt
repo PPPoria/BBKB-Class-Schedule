@@ -12,6 +12,8 @@ object ThreadPool {
         LinkedBlockingDeque(),
     )
 
+    val executor by lazy { threadPool }
+
     fun execute(runnable: Runnable) {
         threadPool.execute(runnable)
     }

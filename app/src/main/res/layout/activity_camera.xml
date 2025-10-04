@@ -12,23 +12,65 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ImageView
+        android:id="@+id/frame_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/camera_controls_layout">
+        android:contentDescription="@string/none"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/camera_swap_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_v_2"
-            android:layout_marginEnd="@dimen/padding_h_2"
-            android:paddingHorizontal="@dimen/padding_h_3"
-            android:paddingVertical="@dimen/padding_v_3"
-            android:text="@string/camera_swap_selector"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_size_2h"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/camera_controls_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/cancel_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="@string/none"
+            android:src="@mipmap/ic_cancel"
+            app:layout_constraintBottom_toBottomOf="@id/capture_btn"
+            app:layout_constraintEnd_toStartOf="@id/capture_btn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/capture_btn" />
+
+        <FrameLayout
+            android:id="@+id/capture_btn"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="100dp"
+            android:background="@drawable/corner_888"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/padding_v_3"
+                android:background="@drawable/corner_888"
+                android:backgroundTint="@color/primary" />
+
+            <ImageView
+                android:id="@+id/ic_checkmark"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/padding_v_1"
+                android:src="@mipmap/ic_checkmark"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <ImageView
+            android:id="@+id/swap_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="@string/none"
+            android:src="@mipmap/ic_refresh"
+            app:layout_constraintBottom_toBottomOf="@id/capture_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/capture_btn"
+            app:layout_constraintTop_toTopOf="@id/capture_btn" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

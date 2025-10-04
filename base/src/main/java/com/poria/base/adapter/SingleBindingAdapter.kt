@@ -12,7 +12,7 @@ class SingleBindingAdapter<VB : ViewBinding, T : Any>(
     private val itemLayoutId: Int,
     private val vbBind: (View) -> VB,
     private val itemId: ((T) -> Long)? = null,
-    private val onBindView: ((binding: VB, position: Int, item: T) -> Unit)? = null
+    private val onBindView: ((binding: VB, position: Int, item: T, adapter: SingleBindingAdapter<VB, T>) -> Unit)? = null
 ) : RecyclerView.Adapter<SingleBindingAdapter.RVHolder<VB>>() {
     init {
         setHasStableIds(true)
@@ -59,7 +59,8 @@ class SingleBindingAdapter<VB : ViewBinding, T : Any>(
         onBindView?.invoke(
             holder.binding,
             position,
-            data[position]
+            data[position],
+            this@SingleBindingAdapter
         )
     }
 

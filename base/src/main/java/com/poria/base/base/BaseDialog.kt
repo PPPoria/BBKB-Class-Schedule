@@ -9,7 +9,9 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
+import kotlinx.coroutines.launch
 
 abstract class BaseDialog<out T : ViewBinding> : DialogFragment() {
     val binding by lazy { onViewBindingCreate() }
@@ -26,13 +28,13 @@ abstract class BaseDialog<out T : ViewBinding> : DialogFragment() {
     ) = binding.apply {
         initView()
         initListener()
-        initData()
-        initLiveData()
-        initObserver()
+        lifecycleScope.launch {
+            refreshDataInScope()
+            observeDataInScope()
+        }
     }.root
 
     abstract fun onViewBindingCreate(): T
-    open fun initView() {}
     open fun initWindowInsets(
         window: Window,
         gravity: Int = Gravity.BOTTOM,
@@ -47,9 +49,8 @@ abstract class BaseDialog<out T : ViewBinding> : DialogFragment() {
         setGravity(gravity)
         setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
     }.let { }
-
+    open fun initView() {}
     open fun initListener() {}
-    open fun initData() {}
-    open fun initLiveData() {}
-    open fun initObserver() {}
+    open suspend fun refreshDataInScope() {}
+    open suspend fun observeDataInScope() {}
 }
