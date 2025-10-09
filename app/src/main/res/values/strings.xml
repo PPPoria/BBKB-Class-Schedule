@@ -48,8 +48,11 @@
     <string name="add_picture_from">添加图片：</string>
     <string name="from_camera">拍摄相片</string>
     <string name="from_gallery">相册选取</string>
+    <string name="delete_note">将删除其包含的所有文字与图片，请确认您真的不需要该笔记</string>
 
-    <!-- Image Preview Dialog -->
+    <!-- Confirm Dialog -->
+    <string name="confirm">确认</string>
+    <string name="cancel">取消</string>
 
     <!-- Toast Messages -->
     <string name="please_bind_school">暂未绑定学校\n请前往用户设置中绑定</string>

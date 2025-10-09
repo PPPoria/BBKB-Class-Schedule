@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.icu.util.Calendar
 import android.util.TypedValue
+import java.text.DecimalFormat
 import kotlin.math.abs
 
 fun dp2px(dp: Float) = TypedValue.applyDimension(
@@ -45,6 +46,37 @@ fun hslToColor(h: Float, s: Float, l: Float): Int {
     val gg = ((g + m) * 255).toInt()
     val bb = ((b + m) * 255).toInt()
     return Color.rgb(rr, gg, bb)
+}
+
+fun Int.toChinese(): String {
+    if (this == 0) return "零"
+    val n = if (this < 0) -1 * this else this
+    val num = arrayOf("零", "一", "二", "三", "四", "五", "六", "七", "八", "九")
+    val unit = arrayOf("", "十", "百", "千", "万", "十", "百", "千", "亿", "十", "百", "千")
+    val df = DecimalFormat("#")
+    val str = df.format(n)
+    val len = str.length
+    val sb = StringBuilder().also {
+        if (this < 0) it.append("负")
+    }
+    var zeroFlag = false
+
+    for (i in 0 until len) {
+        val digit = str[i] - '0'
+        val pos = len - 1 - i
+        if (digit == 0) {
+            zeroFlag = true
+            // 万、亿位补“零”
+            if (pos % 4 == 0) sb.append(unit[pos])
+            continue
+        }
+        if (zeroFlag) {
+            sb.append(num[0])
+            zeroFlag = false
+        }
+        sb.append(num[digit]).append(unit[pos])
+    }
+    return sb.toString()
 }
 
 fun Long.toDateFormat(): DateFormat {

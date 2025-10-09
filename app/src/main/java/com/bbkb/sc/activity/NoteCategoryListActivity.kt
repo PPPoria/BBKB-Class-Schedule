@@ -8,6 +8,7 @@ import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import androidx.activity.viewModels
+import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -15,13 +16,17 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bbkb.sc.R
 import com.bbkb.sc.databinding.ActivityNoteCategoryListBinding
 import com.bbkb.sc.databinding.ItemNoteCategoryBinding
+import com.bbkb.sc.dialog.ConfirmDialog
 import com.bbkb.sc.schedule.database.NoteCategory
 import com.bbkb.sc.schedule.database.NoteCategoryDB
+import com.bbkb.sc.schedule.database.NoteItemDB
+import com.bbkb.sc.util.FileManager
 import com.poria.base.adapter.SingleBindingAdapter
 import com.poria.base.base.BaseActivity
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
 import com.poria.base.ext.toDateFormat
 import com.poria.base.viewmodel.SingleVM
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -44,7 +49,8 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
             binding.date.text = item.timeStamp.toDateFormat().run {
                 if (year == curDate.year &&
                     month == curDate.month &&
-                    day == curDate.day) "${String.format("%02d", hour)}:${String.format("%02d", minute)}"
+                    day == curDate.day
+                ) "${String.format("%02d", hour)}:${String.format("%02d", minute)}"
                 else if (year == curDate.year) "${month}月${day}日"
                 else "${year}年${month}月${day}日"
             }
@@ -71,6 +77,26 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
                     it.putExtra("category_id", item.id)
                     startActivity(it)
                 }
+            }
+            // 长按弹出菜单
+            binding.bg.setOnLongClickListener {
+                val popup = PopupMenu(binding.root.context, binding.root)
+                popup.menuInflater.inflate(com.poria.base.R.menu.menu_note_popup, popup.menu)
+                popup.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        com.poria.base.R.id.action_delete -> ConfirmDialog().also {
+                            it.title = "确认删除\"${item.name}\"?"
+                            it.content = getString(R.string.delete_note)
+                            it.confirmBgColor = getColor(R.color.tertiary)
+                            it.confirmTextColor = getColor(R.color.white)
+                            it.onConfirm = { deleteCategory(item) }
+                            it.show(supportFragmentManager, "delete_dialog")
+                        }
+                    }
+                    true
+                }
+                popup.show()
+                true
             }
         }
     }
@@ -115,6 +141,28 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
             }
         }
     }.let { }
+
+    private fun deleteCategory(category: NoteCategory) {
+        CoroutineScope(Dispatchers.IO).launch {
+            launch {
+                NoteCategoryDB.get().dao().delete(category)
+                withContext(Dispatchers.Main) {
+                    adapter.data = adapter.data.filter {
+                        it.id != category.id
+                    }
+                }
+            }
+            val items = NoteItemDB.get()
+                .dao().getByCategoryId(category.id).first()
+            for (item in items) {
+                launch {
+                    for (path in item.picturePaths) {
+                        FileManager.deleteInnerImageFromGallery(path)
+                    }
+                }
+            }
+        }
+    }
 
     override suspend fun refreshDataInScope() {
         val old = vm.latest ?: MData("", flow { })

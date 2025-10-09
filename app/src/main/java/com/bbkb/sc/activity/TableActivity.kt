@@ -23,9 +23,11 @@ import com.bbkb.sc.schedule.database.CourseDB
 import com.bbkb.sc.util.SCToast
 import com.google.gson.Gson
 import com.poria.base.base.BaseActivity
+import com.poria.base.ext.DateFormat
 import com.poria.base.ext.genMacaronColor
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
 import com.poria.base.ext.toDateFormat
+import com.poria.base.ext.toTimeStamp
 import com.poria.base.store.DSManager
 import com.poria.base.viewmodel.SingleVM
 import kotlinx.coroutines.CoroutineScope
@@ -39,22 +41,8 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     override fun onViewBindingCreate() = ActivityTableBinding.inflate(layoutInflater)
     private val vm by viewModels<SingleVM<MData>>()
 
-    override fun initWindowInsets(l: Int, t: Int, r: Int, b: Int) {
-        super.initWindowInsets(l, t, r, b)
-        binding.root.setPadding(
-            systemBarPadding[l],
-            systemBarPadding[t],
-            systemBarPadding[r],
-            0
-        )
-        binding.contentLayout.setPadding(
-            0, 0, 0,
-            systemBarPadding[b]
-        )
-    }
-
     override fun initView() {
-        setLightStatusBar(false)
+        setLightStatusBar(true)
         setLightNavigationBar(true)
     }
 
@@ -181,7 +169,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             vm.flow.collect { data ->
                 tableConfigMenuUi(data.tableConfig)
                 System.currentTimeMillis().toDateFormat().run {
-                    "${month}月${day}日"
+                    "$year/$month/$day"
                 }.also { binding.todayDate.text = it }
                 "第${data.curZC}周".also { binding.todayZc.text = it }
                 "第${data.tableZC}周".also { binding.zc.text = it }
@@ -278,7 +266,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }.toList()
         val oneDay = 86_400_000L
         val oneWeek = oneDay * 7
-        val curZcMondayTimeStamp =
+        val tableZcMondayTimeStamp =
             if (courses.isNotEmpty()) {
                 courses.first().let {
                     val offset = (it.xq - 1) * oneDay
@@ -301,30 +289,56 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             if (tableConfig.ignoreSaturday && tableConfig.ignoreSunday) 5
             else if (tableConfig.ignoreSaturday || tableConfig.ignoreSunday) 6
             else 7
+        val xAxis = ArrayList<String>().also {
+            for (i in 0 until 7) {
+                it.add(
+                    "${
+                        when (i) {
+                            0 -> "星期一"
+                            1 -> "星期二"
+                            2 -> "星期三"
+                            3 -> "星期四"
+                            4 -> "星期五"
+                            5 -> "星期六"
+                            6 -> "星期日"
+                            else -> ""
+                        }
+                    }\n${
+                        (tableZcMondayTimeStamp + oneDay * i)
+                            .toDateFormat().run { "$month.$day" }
+                    }"
+                )
+            }
+            if (tableConfig.ignoreSunday) it.removeAt(6)
+            if (tableConfig.ignoreSaturday) it.removeAt(5)
+        }
+        val yAxis = ArrayList<String>().also {
+            for (i in 0 until rows) {
+                it.add(
+                    (i + 1).toString()
+                )
+            }
+        }
         binding.table.update(
             rows = rows,
             columns = columns,
             cells = cells,
-            xAxis = mutableListOf<String>().also { list ->
-                for (i in 0 until columns) {
-                    "${
-                        if (i == 5 && tableConfig.ignoreSaturday) 7
-                        else i + 1
-                    } ${
-                        if (i == 5 && tableConfig.ignoreSaturday) {
-                            (curZcMondayTimeStamp + (i + 1) * oneDay).toDateFormat().run {
-                                "($month.$day)"
-                            }
-                        } else {
-                            (curZcMondayTimeStamp + i * oneDay).toDateFormat().run {
-                                "($month.$day)"
-                            }
-                        }
-                    }".also {
-                        list.add(it)
+            xAxis = xAxis,
+            yAxis = yAxis,
+            highlightX = vm.latest?.run {
+                if (tableZC == curZC) System.currentTimeMillis()
+                    .toDateFormat()
+                    .let { today ->
+                        val todayTimeStamp = DateFormat(
+                            year = today.year,
+                            month = today.month,
+                            day = today.day
+                        ).toTimeStamp()
+                        val offset = (todayTimeStamp - tableZcMondayTimeStamp) / oneDay
+                        (offset + 1).toInt()
                     }
-                }
-            },
+                else 0
+            } ?: 0,
             listener = this@TableActivity::onClickTableItem
         )
     }

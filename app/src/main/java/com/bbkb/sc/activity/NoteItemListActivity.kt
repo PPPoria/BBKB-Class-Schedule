@@ -8,6 +8,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isGone
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,11 +19,13 @@ import com.bbkb.sc.R
 import com.bbkb.sc.databinding.ActivityNoteItemListBinding
 import com.bbkb.sc.databinding.ItemNoteItemBinding
 import com.bbkb.sc.databinding.ItemNotePictureBinding
+import com.bbkb.sc.dialog.ConfirmDialog
 import com.bbkb.sc.dialog.ImagePreviewDialog
 import com.bbkb.sc.schedule.database.NoteCategory
 import com.bbkb.sc.schedule.database.NoteCategoryDB
 import com.bbkb.sc.schedule.database.NoteItem
 import com.bbkb.sc.schedule.database.NoteItemDB
+import com.bbkb.sc.util.FileManager
 import com.bumptech.glide.Glide
 import com.poria.base.adapter.SingleBindingAdapter
 import com.poria.base.base.BaseActivity
@@ -220,6 +223,27 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                 onInsertPictureSuccess = updatePicture
                 pickImagesLauncher.launch("image/*")
             }
+
+            /*长按弹出菜单*/
+            binding.itemBg.setOnLongClickListener {
+                val popup = PopupMenu(binding.root.context, binding.root)
+                popup.menuInflater.inflate(com.poria.base.R.menu.menu_note_popup, popup.menu)
+                popup.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        com.poria.base.R.id.action_delete -> ConfirmDialog().also {
+                            it.title = "确认删除\"${item.title}\"?"
+                            it.content = getString(R.string.delete_note)
+                            it.confirmBgColor = getColor(R.color.tertiary)
+                            it.confirmTextColor = getColor(R.color.white)
+                            it.onConfirm = { deleteItem(item) }
+                            it.show(supportFragmentManager, "delete_dialog")
+                        }
+                    }
+                    true
+                }
+                popup.show()
+                true
+            }
         }
     }
     private var onInsertPictureSuccess: (paths: List<String>) -> Unit = {}
@@ -292,6 +316,22 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                     picturePaths = emptyList()
                 )
                 NoteItemDB.get().dao().insert(new)
+            }
+        }
+    }
+
+    private fun deleteItem(item: NoteItem) {
+        CoroutineScope(Dispatchers.IO).launch {
+            launch {
+                NoteItemDB.get().dao().delete(item)
+                withContext(Dispatchers.Main) {
+                    itemAdapter.data = itemAdapter.data.filter { it.id != item.id }
+                }
+            }
+            launch {
+                for (path in item.picturePaths) {
+                    FileManager.deleteInnerImageFromGallery(path)
+                }
             }
         }
     }

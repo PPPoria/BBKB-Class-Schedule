@@ -1,6 +1,7 @@
 package com.bbkb.sc.schedule.database
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -26,4 +27,10 @@ interface NoteItemDao {
 
     @Query("SELECT * FROM note_items WHERE categoryId = :categoryId")
     fun getByCategoryId(categoryId: Long): Flow<List<NoteItem>>
+
+    @Delete
+    fun delete(item: NoteItem)
+
+    @Query("DELETE FROM note_items WHERE categoryId = :categoryId")
+    fun deleteByCategoryId(categoryId: Long)
 }
