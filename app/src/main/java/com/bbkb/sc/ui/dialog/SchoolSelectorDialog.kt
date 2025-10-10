@@ -1,4 +1,4 @@
-package com.bbkb.sc.dialog
+package com.bbkb.sc.ui.dialog
 
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bbkb.sc.R
-import com.bbkb.sc.activity.AuthActivity
+import com.bbkb.sc.ui.activity.AuthActivity
 import com.bbkb.sc.databinding.DialogSchoolSelectorBinding
 import com.bbkb.sc.databinding.ItemSchoolSelectorBinding
 import com.bbkb.sc.schedule.School

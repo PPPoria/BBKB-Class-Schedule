@@ -1,4 +1,4 @@
-package com.bbkb.sc.activity
+package com.bbkb.sc.ui.activity
 
 import android.annotation.SuppressLint
 import android.os.Handler
@@ -11,10 +11,10 @@ import com.bbkb.sc.R
 import com.bbkb.sc.databinding.ActivityAuthBinding
 import com.bbkb.sc.datastore.LongKeys
 import com.bbkb.sc.datastore.StringKeys
-import com.bbkb.sc.dialog.LoadingDialog
+import com.bbkb.sc.ui.dialog.LoadingDialog
 import com.bbkb.sc.schedule.database.Course
 import com.bbkb.sc.schedule.database.CourseDB
-import com.bbkb.sc.schedule.Gripper
+import com.bbkb.sc.schedule.gripper.Gripper
 import com.bbkb.sc.schedule.ScheduleUtils
 import com.bbkb.sc.schedule.School
 import com.bbkb.sc.util.SCLog

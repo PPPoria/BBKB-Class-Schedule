@@ -1,4 +1,4 @@
-package com.bbkb.sc.activity
+package com.bbkb.sc.ui.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -19,12 +19,13 @@ import com.bbkb.sc.R
 import com.bbkb.sc.databinding.ActivityNoteItemListBinding
 import com.bbkb.sc.databinding.ItemNoteItemBinding
 import com.bbkb.sc.databinding.ItemNotePictureBinding
-import com.bbkb.sc.dialog.ConfirmDialog
-import com.bbkb.sc.dialog.ImagePreviewDialog
+import com.bbkb.sc.ui.dialog.ConfirmDialog
+import com.bbkb.sc.ui.dialog.ImagePreviewDialog
 import com.bbkb.sc.schedule.database.NoteCategory
 import com.bbkb.sc.schedule.database.NoteCategoryDB
 import com.bbkb.sc.schedule.database.NoteItem
 import com.bbkb.sc.schedule.database.NoteItemDB
+import com.bbkb.sc.ui.dialog.RelatedCoursesDialog
 import com.bbkb.sc.util.FileManager
 import com.bumptech.glide.Glide
 import com.poria.base.adapter.SingleBindingAdapter
@@ -47,7 +48,7 @@ import java.util.UUID
 class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
     override fun onViewBindingCreate() = ActivityNoteItemListBinding.inflate(layoutInflater)
     private val vm by viewModels<SingleVM<MData>>()
-    private val categoryId by lazy { intent.getLongExtra("category_id", 0L) }
+    private val categoryId by lazy { intent.getLongExtra(KEY_CATEGORY_ID, 0L) }
     private val newPictureAdapter: SingleBindingAdapter<ItemNotePictureBinding, NoteItem>
         get() {
             return SingleBindingAdapter(
@@ -318,6 +319,12 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
                 NoteItemDB.get().dao().insert(new)
             }
         }
+        showRelatedCoursesBtn.setOnClickListenerWithClickAnimation {
+            RelatedCoursesDialog().also {
+                it.categoryId = vm.latest?.category?.id ?: return@also
+                it.show(supportFragmentManager, "related_courses_dialog")
+            }
+        }
     }
 
     private fun deleteItem(item: NoteItem) {
@@ -397,4 +404,8 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
         val category: NoteCategory,
         val itemsFlow: Flow<List<NoteItem>>
     )
+
+    companion object {
+        const val KEY_CATEGORY_ID = "category_id"
+    }
 }

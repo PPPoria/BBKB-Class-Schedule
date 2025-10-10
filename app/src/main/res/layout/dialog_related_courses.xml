@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.dialog.RelatedCoursesDialog">
+
+    <LinearLayout
+        android:id="@+id/bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_h_2"
+        android:background="@drawable/corner_24"
+        android:backgroundTint="@color/white"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/padding_h_2"
+        android:paddingVertical="@dimen/padding_v_2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/related_course"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/add_related_course_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_related_course"
+                android:textColor="@color/secondary"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/related_course_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3" />
+    </LinearLayout>
+
+</FrameLayout>

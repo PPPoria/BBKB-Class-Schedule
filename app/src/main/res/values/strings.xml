@@ -30,17 +30,23 @@
 
     <!-- Course Detail Dialog -->
     <string name="course_name">课程：</string>
-    <string name="teacher_name">授课教师：</string>
+    <string name="teacher_name">教师：</string>
     <string name="major_name">专业：</string>
     <string name="zc_name">周次：</string>
     <string name="xq_name">星期：</string>
     <string name="course_node">节次：</string>
-    <string name="classroom_name">教学场地：</string>
-    <string name="course_description">课程描述：</string>
+    <string name="classroom_name">场地：</string>
+    <string name="course_description">描述：</string>
     <string name="remark">备注：</string>
+    <string name="related_notes">关联笔记：</string>
+    <string name="add_related_note">添加关联笔记</string>
+    <string name="remove_related_note">将移除本课程与该笔记的关联，笔记不会被删除且仍能重新关联</string>
 
     <!-- Note Activity -->
-    <string name="note">笔记</string>
+    <string name="all_note">全部笔记</string>
+    <string name="related_course">关联课程：</string>
+    <string name="add_related_course">添加关联课程</string>
+    <string name="select_note_need_to_relate">选择需要关联的笔记</string>
     <string name="note_name_unname">未命名笔记</string>
     <string name="note_item_title_unname">空白标题</string>
     <string name="seek_hint">搜索关键字</string>
@@ -49,6 +55,7 @@
     <string name="from_camera">拍摄相片</string>
     <string name="from_gallery">相册选取</string>
     <string name="delete_note">将删除其包含的所有文字与图片，请确认您真的不需要该笔记</string>
+    <string name="remove_related_course">将移除本笔记与该课程的关联，课程不会被删除且仍能重新关联</string>
 
     <!-- Confirm Dialog -->
     <string name="confirm">确认</string>

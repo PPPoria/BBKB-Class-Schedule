@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".dialog.ImagePreviewDialog">
+    tools:context=".ui.dialog.ImagePreviewDialog">
 
     <Space
         android:layout_width="match_parent"

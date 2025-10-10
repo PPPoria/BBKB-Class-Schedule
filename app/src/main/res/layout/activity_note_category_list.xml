@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".activity.NoteCategoryListActivity">
+    tools:context=".ui.activity.NoteCategoryListActivity">
 
     <TextView
         android:id="@+id/title"
@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/padding_h_2"
         android:layout_marginTop="@dimen/padding_v_2"
-        android:text="@string/note"
+        android:text="@string/all_note"
         android:textColor="@color/black"
         android:textSize="@dimen/text_size_2b"
         android:textStyle="bold"

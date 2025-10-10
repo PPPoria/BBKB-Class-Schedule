@@ -1,4 +1,4 @@
-package com.bbkb.sc.dialog
+package com.bbkb.sc.ui.dialog
 
 import android.app.ActionBar.LayoutParams
 import android.content.res.ColorStateList

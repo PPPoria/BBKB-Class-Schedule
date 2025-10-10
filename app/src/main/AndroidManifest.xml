@@ -28,28 +28,28 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BBKBClassSchedule">
         <activity
-            android:name=".activity.CameraActivity"
+            android:name=".ui.activity.CameraActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.NoteItemListActivity"
+            android:name=".ui.activity.NoteItemListActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.NoteCategoryListActivity"
+            android:name=".ui.activity.NoteCategoryListActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.TableActivity"
+            android:name=".ui.activity.TableActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.AuthActivity"
+            android:name=".ui.activity.AuthActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.UserSettingsActivity"
+            android:name=".ui.activity.UserSettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".ui.activity.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.SplashActivity"
+            android:name=".ui.activity.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

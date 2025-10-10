@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/corner_t_24"
     android:orientation="vertical"
-    tools:context=".dialog.SchoolSelectorDialog">
+    tools:context=".ui.dialog.SchoolSelectorDialog">
 
     <TextView
         android:layout_width="match_parent"

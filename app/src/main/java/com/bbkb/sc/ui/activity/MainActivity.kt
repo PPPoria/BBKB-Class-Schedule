@@ -1,4 +1,4 @@
-package com.bbkb.sc.activity
+package com.bbkb.sc.ui.activity
 
 
 import android.content.Intent

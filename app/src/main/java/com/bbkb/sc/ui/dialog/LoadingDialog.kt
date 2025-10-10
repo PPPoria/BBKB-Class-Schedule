@@ -1,4 +1,4 @@
-package com.bbkb.sc.dialog
+package com.bbkb.sc.ui.dialog
 
 import android.view.Gravity
 import android.view.Window

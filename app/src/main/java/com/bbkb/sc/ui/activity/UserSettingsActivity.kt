@@ -1,11 +1,11 @@
-package com.bbkb.sc.activity
+package com.bbkb.sc.ui.activity
 
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.bbkb.sc.databinding.ActivityUserSettingsBinding
 import com.bbkb.sc.datastore.StringKeys
-import com.bbkb.sc.dialog.SchoolSelectorDialog
+import com.bbkb.sc.ui.dialog.SchoolSelectorDialog
 import com.poria.base.base.BaseActivity
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
 import com.poria.base.store.DSManager

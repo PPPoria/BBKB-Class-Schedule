@@ -1,7 +1,6 @@
 package com.bbkb.sc.schedule
 
 import com.bbkb.sc.R
-import com.bbkb.sc.schedule.gdut.GDUTGripper
 
 object School {
     val dataList = listOf(

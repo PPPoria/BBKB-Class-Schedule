@@ -1,7 +1,8 @@
-package com.bbkb.sc.activity
+package com.bbkb.sc.ui.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableString
@@ -9,18 +10,21 @@ import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
 import androidx.activity.viewModels
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bbkb.sc.R
+import com.bbkb.sc.SCApp
 import com.bbkb.sc.databinding.ActivityNoteCategoryListBinding
 import com.bbkb.sc.databinding.ItemNoteCategoryBinding
-import com.bbkb.sc.dialog.ConfirmDialog
+import com.bbkb.sc.ui.dialog.ConfirmDialog
 import com.bbkb.sc.schedule.database.NoteCategory
 import com.bbkb.sc.schedule.database.NoteCategoryDB
 import com.bbkb.sc.schedule.database.NoteItemDB
 import com.bbkb.sc.util.FileManager
+import com.bbkb.sc.util.SCToast
 import com.poria.base.adapter.SingleBindingAdapter
 import com.poria.base.base.BaseActivity
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
@@ -38,6 +42,10 @@ import kotlinx.coroutines.withContext
 class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>() {
     override fun onViewBindingCreate() = ActivityNoteCategoryListBinding.inflate(layoutInflater)
     private val vm by viewModels<SingleVM<MData>>()
+    private val mode by lazy { intent.getIntExtra(KEY_MODE, MODE_NORMAL) }
+    private val addedCourseName by lazy { intent.getStringExtra(KEY_COURSE_NAME) }
+    private val whiteStateList = ColorStateList.valueOf("#FFFFFF".toColorInt())
+    private val grayStateList = ColorStateList.valueOf(SCApp.app.getColor(R.color.gray_shade))
     private val adapter by lazy {
         SingleBindingAdapter<ItemNoteCategoryBinding, NoteCategory>(
             itemLayoutId = R.layout.item_note_category,
@@ -69,15 +77,42 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
                     binding.title.text = spanStr
                 }
             }
+
+            /**
+             * 点击事件
+             * 根据不同的mode，执行不同操作
+             */
+            binding.bg.isEnabled = if (mode == MODE_ADD_RELATED_COURSE) {
+                !item.courseNames.contains(addedCourseName)
+            } else true
+            binding.bg.backgroundTintList = if (binding.bg.isEnabled) {
+                whiteStateList
+            } else grayStateList
             binding.bg.setOnClickListener {
-                Intent(
-                    this@NoteCategoryListActivity,
-                    NoteItemListActivity::class.java
-                ).also {
-                    it.putExtra("category_id", item.id)
-                    startActivity(it)
+                if (mode == MODE_NORMAL) { // 进入笔记列表
+                    Intent(
+                        this@NoteCategoryListActivity,
+                        NoteItemListActivity::class.java
+                    ).also {
+                        it.putExtra(NoteItemListActivity.KEY_CATEGORY_ID, item.id)
+                        startActivity(it)
+                    }
+                } else if (mode == MODE_ADD_RELATED_COURSE) { // 添加关联课程，然后退出
+                    val courseNames = item.courseNames.toMutableList()
+                    if (courseNames.contains(addedCourseName)) {
+                        // 已经添加过该课程，则提示
+                        // 但是上面已经做了筛选，应该不会出现这种情况
+                        SCToast.show("该课程已经添加到该笔记")
+                    }
+                    CoroutineScope(Dispatchers.IO).launch {
+                        courseNames.add(addedCourseName ?: return@launch)
+                        val new = item.copy(courseNames = courseNames)
+                        NoteCategoryDB.get().dao().update(new)
+                        withContext(Dispatchers.Main) { finish() }
+                    }
                 }
             }
+
             // 长按弹出菜单
             binding.bg.setOnLongClickListener {
                 val popup = PopupMenu(binding.root.context, binding.root)
@@ -86,7 +121,7 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
                     when (menuItem.itemId) {
                         com.poria.base.R.id.action_delete -> ConfirmDialog().also {
                             it.title = "确认删除\"${item.name}\"?"
-                            it.content = getString(R.string.delete_note)
+                            it.content = getString(R.string.remove_related_note)
                             it.confirmBgColor = getColor(R.color.tertiary)
                             it.confirmTextColor = getColor(R.color.white)
                             it.onConfirm = { deleteCategory(item) }
@@ -104,6 +139,10 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
     override fun initView() {
         setLightStatusBar(true)
         setLightNavigationBar(true)
+        binding.title.text = when (mode) {
+            MODE_ADD_RELATED_COURSE -> getString(R.string.select_note_need_to_relate)
+            else -> getString(R.string.all_note)
+        }
         with(binding.rv) {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             adapter = this@NoteCategoryListActivity.adapter
@@ -122,22 +161,26 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
             }
         })
         addBtn.setOnClickListenerWithClickAnimation {
-            lifecycleScope.launch {
+            CoroutineScope(Dispatchers.IO).launch {
+                val (name, courseNames) = if (
+                    mode == MODE_ADD_RELATED_COURSE &&
+                    addedCourseName != null
+                ) addedCourseName!! to listOf(addedCourseName!!)
+                else getString(R.string.note_name_unname) to emptyList()
+                val newId = NoteCategory(
+                    name = name,
+                    timeStamp = System.currentTimeMillis(),
+                    courseNames = courseNames
+                ).let { NoteCategoryDB.get().dao().insert(it) }
                 Intent(
                     this@NoteCategoryListActivity,
                     NoteItemListActivity::class.java
                 ).also {
-                    withContext(Dispatchers.IO) {
-                        NoteCategory(
-                            name = getString(R.string.note_name_unname),
-                            timeStamp = System.currentTimeMillis(),
-                            courseNames = emptyList()
-                        ).let { new ->
-                            NoteCategoryDB.get().dao().insert(new)
-                        }
-                    }.also { id -> it.putExtra("category_id", id) }
+                    it.putExtra(NoteItemListActivity.KEY_CATEGORY_ID, newId)
                     startActivity(it)
                 }
+                // 如果是添加关联课程模式，则创建完笔记后退出当前页面
+                if (mode == MODE_ADD_RELATED_COURSE) finish()
             }
         }
     }.let { }
@@ -174,9 +217,7 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
     override suspend fun observeDataInScope() {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
             launch {
-                vm.flow.collect { data ->
-
-                }
+                vm.flow.collect { }
             }
             launch {
                 vm.latest?.categoriesFlow?.collect { list ->
@@ -199,4 +240,11 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
         val keywords: String,
         val categoriesFlow: Flow<List<NoteCategory>>
     )
+
+    companion object {
+        const val KEY_MODE = "mode"
+        const val KEY_COURSE_NAME = "course_name"
+        const val MODE_NORMAL = 0
+        const val MODE_ADD_RELATED_COURSE = 1
+    }
 }

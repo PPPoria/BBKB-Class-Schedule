@@ -1,7 +1,6 @@
-package com.bbkb.sc.schedule
+package com.bbkb.sc.schedule.gripper
 
 import com.bbkb.sc.schedule.database.Course
-import com.bbkb.sc.schedule.gdut.GDUTGripper
 
 abstract class Gripper {
     abstract val schoolName: String // 学校的名称

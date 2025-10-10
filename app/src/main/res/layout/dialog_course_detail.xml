@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".dialog.CourseDetailDialog">
+    tools:context=".ui.dialog.CourseDetailDialog">
 
     <LinearLayout
         android:id="@+id/bg"
@@ -16,27 +16,14 @@
         android:paddingHorizontal="@dimen/padding_h_2"
         android:paddingVertical="@dimen/padding_v_2">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="top"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/course_name"
-                android:textColor="@color/gray"
-                android:textSize="@dimen/text_size_hb" />
-
-            <TextView
-                android:id="@+id/name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/none"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_hb" />
-        </LinearLayout>
+            android:text="@string/none"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/text_size_hb"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -185,15 +172,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:maxLines="10"
+                android:maxLines="8"
                 android:text="@string/none"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_2h" />
         </LinearLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@color/gray_shade" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
             android:gravity="top"
             android:orientation="vertical">
 
@@ -208,12 +202,46 @@
                 android:id="@+id/remark"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/corner_12"
+                android:background="@drawable/corner_6"
                 android:hint="@string/none"
                 android:paddingHorizontal="@dimen/padding_h_3"
                 android:paddingVertical="@dimen/padding_v_3"
                 android:textColor="@color/black"
                 android:textSize="@dimen/text_size_2h" />
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@color/quaternary" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:gravity="top"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/related_notes"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/add_related_note_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_related_note"
+                android:textColor="@color/secondary"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/related_note_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </FrameLayout>

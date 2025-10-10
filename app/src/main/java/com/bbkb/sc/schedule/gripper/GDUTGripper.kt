@@ -1,7 +1,6 @@
-package com.bbkb.sc.schedule.gdut
+package com.bbkb.sc.schedule.gripper
 
 import com.bbkb.sc.schedule.database.Course
-import com.bbkb.sc.schedule.Gripper
 import com.bbkb.sc.util.SCLog
 import com.google.gson.GsonBuilder
 import com.poria.base.ext.DateFormat

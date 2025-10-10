@@ -1,4 +1,4 @@
-package com.bbkb.sc.widget
+package com.bbkb.sc.ui.widget
 
 import android.annotation.SuppressLint
 import android.content.Context

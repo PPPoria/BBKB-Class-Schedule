@@ -1,4 +1,4 @@
-package com.bbkb.sc.activity
+package com.bbkb.sc.ui.activity
 
 import android.content.res.ColorStateList
 import android.text.Editable
@@ -10,11 +10,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bbkb.sc.R
-import com.bbkb.sc.widget.TableView
+import com.bbkb.sc.ui.widget.TableView
 import com.bbkb.sc.databinding.ActivityTableBinding
 import com.bbkb.sc.datastore.LongKeys
 import com.bbkb.sc.datastore.StringKeys
-import com.bbkb.sc.dialog.CourseDetailDialog
+import com.bbkb.sc.ui.dialog.CourseDetailDialog
 import com.bbkb.sc.schedule.ScheduleUtils
 import com.bbkb.sc.schedule.School
 import com.bbkb.sc.schedule.TableConfig
@@ -39,6 +39,8 @@ import kotlinx.coroutines.withContext
 
 class TableActivity : BaseActivity<ActivityTableBinding>() {
     override fun onViewBindingCreate() = ActivityTableBinding.inflate(layoutInflater)
+    private val mode by lazy { intent.getIntExtra(KEY_MODE, MODE_NORMAL) }
+    private val addedCategoryId by lazy { intent.getLongExtra(KEY_NOTE_CATEGORY_ID, 0L) }
     private val vm by viewModels<SingleVM<MData>>()
 
     override fun initView() {
@@ -345,12 +347,16 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
 
     private fun onClickTableItem(cell: TableView.Cell) {
         if (vm.latest == null) return
-        val course = vm.latest!!.courses.find {
-            it.name == cell.title
-        }!!
-        CourseDetailDialog().also {
-            it.course = course
-            it.show(supportFragmentManager, "CourseDetailDialog")
+        if (mode == MODE_NORMAL) {
+            val course = vm.latest!!.courses.find {
+                it.name == cell.title
+            }!!
+            CourseDetailDialog().also {
+                it.course = course
+                it.show(supportFragmentManager, "course_detail_dialog")
+            }
+        } else if (mode == MODE_ADD_RELATED_NOTE) {
+
         }
     }
 
@@ -376,4 +382,11 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         val courses: List<Course> = emptyList(),
         val tableConfig: TableConfig = TableConfig()
     )
+
+    companion object {
+        const val KEY_MODE = "mode"
+        const val KEY_NOTE_CATEGORY_ID = "category_id"
+        const val MODE_NORMAL = 0
+        const val MODE_ADD_RELATED_NOTE = 1
+    }
 }
