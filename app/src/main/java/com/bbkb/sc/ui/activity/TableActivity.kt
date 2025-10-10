@@ -20,6 +20,7 @@ import com.bbkb.sc.schedule.School
 import com.bbkb.sc.schedule.TableConfig
 import com.bbkb.sc.schedule.database.Course
 import com.bbkb.sc.schedule.database.CourseDB
+import com.bbkb.sc.schedule.database.NoteCategoryDB
 import com.bbkb.sc.util.SCToast
 import com.google.gson.Gson
 import com.poria.base.base.BaseActivity
@@ -356,7 +357,15 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 it.show(supportFragmentManager, "course_detail_dialog")
             }
         } else if (mode == MODE_ADD_RELATED_NOTE) {
-
+            CoroutineScope(Dispatchers.IO).launch {
+                val category = NoteCategoryDB.get().dao().getById(addedCategoryId).first()
+                val courseNames = category.courseNames.toMutableList()
+                courseNames.add(cell.title!!)
+                NoteCategoryDB.get().dao().update(category.copy(courseNames = courseNames))
+                withContext(Dispatchers.Main) {
+                    finish()
+                }
+            }
         }
     }
 
