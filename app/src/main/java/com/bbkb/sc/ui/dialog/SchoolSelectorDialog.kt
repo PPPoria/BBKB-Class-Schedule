@@ -2,8 +2,6 @@ package com.bbkb.sc.ui.dialog
 
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
