@@ -11,7 +11,6 @@ import com.bbkb.sc.schedule.ScheduleUtils
 import com.bbkb.sc.schedule.School
 import com.bbkb.sc.util.SCToast
 import com.poria.base.base.BaseActivity
-import com.poria.base.ext.setOnClickListenerWithClickAnimation
 import com.poria.base.store.DSManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first

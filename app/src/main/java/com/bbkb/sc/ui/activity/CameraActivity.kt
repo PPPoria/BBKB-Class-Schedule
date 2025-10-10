@@ -152,14 +152,14 @@ class CameraActivity : BaseActivity<ActivityCameraBinding>() {
         }
     }
 
-    private fun Bitmap.rotate90(): Bitmap {
+    /*private fun Bitmap.rotate90(): Bitmap {
         val src = this
         val matrix = Matrix().apply { postRotate(90f) }
         val corrected = Bitmap.createBitmap(
             src, 0, 0, src.width, src.height, matrix, false
         )
         return corrected.cropToScreenRatio()
-    }
+    }*/
 
     //居中裁剪成屏幕比例（高:宽 = 屏幕高:屏幕宽）
     private fun Bitmap.cropToScreenRatio(context: Context = SCApp.app): Bitmap {

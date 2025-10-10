@@ -3,7 +3,6 @@ package com.bbkb.sc.ui.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -16,7 +15,7 @@ import com.bbkb.sc.R
 import com.poria.base.ext.dp2px
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
 
-private const val TAG = "TableView"
+
 
 @SuppressLint("ViewConstructor")
 class TableView : ViewGroup {

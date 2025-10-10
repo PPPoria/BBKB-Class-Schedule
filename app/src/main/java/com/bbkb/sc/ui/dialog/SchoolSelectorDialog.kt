@@ -15,9 +15,6 @@ import com.bbkb.sc.databinding.DialogSchoolSelectorBinding
 import com.bbkb.sc.databinding.ItemSchoolSelectorBinding
 import com.bbkb.sc.schedule.School
 import com.poria.base.base.BaseDialog
-import com.poria.base.ext.setOnClickListenerWithClickAnimation
-
-private const val TAG = "SchoolSelectorDialog"
 
 class SchoolSelectorDialog : BaseDialog<DialogSchoolSelectorBinding>() {
     override fun onViewBindingCreate() = DialogSchoolSelectorBinding.inflate(layoutInflater)
@@ -51,21 +48,6 @@ class SchoolSelectorDialog : BaseDialog<DialogSchoolSelectorBinding>() {
         private var position: Int = 0,
         var listener: (School.SchoolData) -> Unit = {}
     ) : RecyclerView.Adapter<Adapter.Holder>() {
-
-        fun updateList(list: List<School.SchoolData>) {
-            this.list.clear()
-            this.list.addAll(list)
-            Handler(
-                Looper.getMainLooper()
-            ).post(this::notifyDataSetChanged)
-        }
-
-        fun updatePosition(position: Int) {
-            this.position = position
-            Handler(
-                Looper.getMainLooper()
-            ).post(this::notifyDataSetChanged)
-        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             LayoutInflater
