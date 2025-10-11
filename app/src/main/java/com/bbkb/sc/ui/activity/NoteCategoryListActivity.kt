@@ -207,37 +207,40 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
     }
 
     override suspend fun refreshDataInScope() {
-        val old = vm.latest ?: MData("", flow { })
-        old.copy(
-            categoriesFlow = NoteCategoryDB.get().dao().getAll()
-        ).also { vm.update(it) }
+        val old = vm.latest ?: MData()
+        old.copy().also { vm.update(it) }
     }
 
     override suspend fun observeDataInScope() {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
             launch {
-                vm.flow.collect { }
+                vm.flow.collect { data ->
+                    showList(data.categories, data.keywords)
+                }
             }
             launch {
-                vm.latest?.categoriesFlow?.collect { list ->
-                    showList(list, vm.latest?.keywords ?: "")
+                val categoriesFlow = NoteCategoryDB.get().dao().getAll()
+                categoriesFlow.collect { list ->
+                    vm.latest?.copy(
+                        categories = list
+                    )?.let { vm.update(it) }
                 }
             }
         }
     }
 
     private fun showList(origin: List<NoteCategory>, keywords: String) {
-        adapter.data = origin.asSequence().filter {
+        adapter.data = origin.filter {
             it.name.contains(
                 keywords,
                 ignoreCase = true
             )
-        }.toList()
+        }
     }
 
     data class MData(
-        val keywords: String,
-        val categoriesFlow: Flow<List<NoteCategory>>
+        val keywords: String = "",
+        val categories: List<NoteCategory> = emptyList()
     )
 
     companion object {

@@ -13,7 +13,7 @@ import com.bbkb.sc.R
 import com.bbkb.sc.SCApp
 import com.bbkb.sc.databinding.DialogCourseDetailBinding
 import com.bbkb.sc.databinding.ItemRelatedNoteBinding
-import com.bbkb.sc.schedule.ScheduleUtils
+import com.bbkb.sc.util.ScheduleUtils
 import com.bbkb.sc.schedule.database.Course
 import com.bbkb.sc.schedule.database.NoteCategory
 import com.bbkb.sc.schedule.database.NoteCategoryDB

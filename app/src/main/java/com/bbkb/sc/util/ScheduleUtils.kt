@@ -1,10 +1,12 @@
-package com.bbkb.sc.schedule
+package com.bbkb.sc.util
 
 import com.bbkb.sc.datastore.LongKeys
 import com.bbkb.sc.datastore.StringKeys
+import com.bbkb.sc.schedule.TableConfig
 import com.bbkb.sc.schedule.database.Remark
 import com.bbkb.sc.schedule.database.RemarkDB
 import com.google.gson.Gson
+import com.poria.base.ext.toDateFormat
 import com.poria.base.store.DSManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -26,6 +28,14 @@ object ScheduleUtils {
                 }
                 ((timeStamp - first) / ONE_WEEK_TIMESTAMP + 1).toInt()
             }
+        }
+    }
+
+    // 学年学期，例如 (2025, 2) 表示 2025 学年的第二学期
+    fun getXnXq(timeStamp: Long): Pair<Int, Int> {
+        return timeStamp.toDateFormat().run {
+            if (month <= 7) (year - 1 to 2)
+            else (year to 1)
         }
     }
 

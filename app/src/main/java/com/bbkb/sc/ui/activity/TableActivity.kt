@@ -15,7 +15,7 @@ import com.bbkb.sc.databinding.ActivityTableBinding
 import com.bbkb.sc.datastore.LongKeys
 import com.bbkb.sc.datastore.StringKeys
 import com.bbkb.sc.ui.dialog.CourseDetailDialog
-import com.bbkb.sc.schedule.ScheduleUtils
+import com.bbkb.sc.util.ScheduleUtils
 import com.bbkb.sc.schedule.School
 import com.bbkb.sc.schedule.TableConfig
 import com.bbkb.sc.schedule.database.Course

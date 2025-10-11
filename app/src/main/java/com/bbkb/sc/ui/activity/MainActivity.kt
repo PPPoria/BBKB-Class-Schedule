@@ -7,7 +7,7 @@ import com.bbkb.sc.BuildConfig
 import com.bbkb.sc.R
 import com.bbkb.sc.databinding.ActivityMainBinding
 import com.bbkb.sc.datastore.StringKeys
-import com.bbkb.sc.schedule.ScheduleUtils
+import com.bbkb.sc.util.ScheduleUtils
 import com.bbkb.sc.schedule.School
 import com.bbkb.sc.util.SCToast
 import com.poria.base.base.BaseActivity

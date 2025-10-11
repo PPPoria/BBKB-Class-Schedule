@@ -2,6 +2,7 @@ package com.bbkb.sc.schedule.gripper
 
 import com.bbkb.sc.schedule.database.Course
 import com.bbkb.sc.util.SCLog
+import com.bbkb.sc.util.ScheduleUtils
 import com.google.gson.GsonBuilder
 import com.poria.base.ext.DateFormat
 import com.poria.base.ext.toTimeStamp
@@ -32,15 +33,18 @@ class GDUTGripper : Gripper() {
         return courses
     }
 
+    val xnxqdm = ScheduleUtils.getXnXq(System.currentTimeMillis())
+        .run { "${this.first}0${this.second}" }
+
     override fun getZCCourseJs(zc: Int) =
         """
 (function(){
-    const url = `https://jxfw.gdut.edu.cn/xsgrkbcx!getKbRq.action?xnxqdm=202501&zc=${zc}`;
+    const url = `https://jxfw.gdut.edu.cn/xsgrkbcx!getKbRq.action?xnxqdm=${xnxqdm}&zc=${zc}`;
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, false); // 第三个参数 false = 同步
     // 同步模式下设置请求头
     xhr.setRequestHeader('Accept', 'application/json, text/javascript, */*; q=0.01');
-    xhr.setRequestHeader('Referer', `https://jxfw.gdut.edu.cn/xsgrkbcx!xskbList.action?xnxqdm=202501&zc=${zc}`);
+    xhr.setRequestHeader('Referer', `https://jxfw.gdut.edu.cn/xsgrkbcx!xskbList.action?xnxqdm=${xnxqdm}&zc=${zc}`);
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     // 发送（这里会阻塞直到返回）
     xhr.send();
@@ -50,6 +54,7 @@ class GDUTGripper : Gripper() {
 
     override fun decodeCourseData(data: String): List<Course> {
         val gson = GsonBuilder().serializeNulls().create()
+        // 不要删掉这行，否则 gson.fromJson 会报错
         SCLog.debug(TAG, "test gson: ${gson.toJson(Item(kcmc = "test"))}")
         val items = data
             .replace("\\\"", "\"")
