@@ -12,8 +12,8 @@ android {
         applicationId = "com.bbkb.sc"
         minSdk = 31
         targetSdk = 36
-        versionCode = 110
-        versionName = "1.1.0" // 大版本号.小版本号.修订号；其中修订号为0表示正式版，非0表示测试版或预览版
+        versionCode = 111
+        versionName = "1.1.1" // 大版本号.小版本号.修订号；其中修订号为0表示正式版，非0表示测试版或修订版
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -65,7 +65,7 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version")
 
     // Gson
-    implementation("com.google.code.gson:gson:2.6.2")
+    implementation("com.google.code.gson:gson:2.11.0")
 
     // Glide
     implementation("com.github.bumptech.glide:glide:5.0.5")

@@ -25,6 +25,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         setLightNavigationBar(true)
         binding.version.text = StringBuilder().apply {
             if (BuildConfig.DEBUG) append("测试版")
+            else if (BuildConfig.VERSION_CODE % 10 != 0) append("修订版")
             else append("正式版")
             append(" v")
             append(BuildConfig.VERSION_NAME)

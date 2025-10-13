@@ -53,6 +53,7 @@ class ImagePreviewDialog : BaseDialog<DialogImagePreviewBinding>() {
     }
 
     override fun initListener() = with(binding) {
+        imageView.setOnClickListener { dismiss() }
         preBtn.setOnClickListenerWithClickAnimation {
             flow.value.run {
                 val newPosition = (imagePosition - 1 + imagePathList.size) % imagePathList.size

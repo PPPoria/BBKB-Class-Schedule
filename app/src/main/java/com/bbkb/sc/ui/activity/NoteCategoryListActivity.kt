@@ -8,6 +8,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.TextWatcher
 import android.text.style.ForegroundColorSpan
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.graphics.toColorInt
@@ -54,7 +55,15 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
             itemId = { it.id }
         ) { binding, _, item, _ ->
             val curDate = System.currentTimeMillis().toDateFormat()
-            binding.title.text = item.name
+            binding.title.apply {
+                text = item.name.ifEmpty {
+                    getString(R.string.note_name_unname)
+                }
+                setTextColor(
+                    if (item.name.isEmpty()) getColor(R.color.gray)
+                    else getColor(R.color.black)
+                )
+            }
             binding.date.text = item.timeStamp.toDateFormat().run {
                 if (year == curDate.year &&
                     month == curDate.month &&
@@ -67,15 +76,17 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
             vm.latest?.keywords?.also {
                 if (it.isNotEmpty()) {
                     val spanStr = SpannableString(item.name)
-                    val start = item.name.indexOf(it)
-                    val end = start + it.length
-                    spanStr.setSpan(
-                        ForegroundColorSpan(getColor(R.color.quaternary)),
-                        start,
-                        end,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                    )
-                    binding.title.text = spanStr
+                    val start = item.name.indexOf(it, 0, true)
+                    if (start >= 0) {
+                        val end = start + it.length
+                        spanStr.setSpan(
+                            ForegroundColorSpan(getColor(R.color.quaternary)),
+                            start,
+                            end,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                        binding.title.text = spanStr
+                    }
                 }
             }
 
@@ -151,6 +162,10 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
     }
 
     override fun initListener() = with(binding) {
+        onBackPressedDispatcher.addCallback {
+            if (searchEdit.text.toString().isEmpty()) finish()
+            else searchEdit.setText("")
+        }
         searchEdit.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit

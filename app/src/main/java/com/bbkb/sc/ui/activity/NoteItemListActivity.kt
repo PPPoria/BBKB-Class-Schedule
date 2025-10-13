@@ -292,15 +292,14 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun afterTextChanged(et: Editable?) {
-                // 直接提交到数据库，本地保存副本，不走stateFlow
                 lifecycleScope.launch(Dispatchers.IO) {
-                    vm.latest?.category?.run {
-                        NoteCategoryDB.get().dao().update(
-                            this@run.also {
-                                it.name = et.toString()
-                                it.timeStamp = System.currentTimeMillis()
-                            }
+                    vm.latest?.run {
+                        val newCategory = category.copy(
+                            name = et.toString(),
+                            timeStamp = System.currentTimeMillis()
                         )
+                        NoteCategoryDB.get().dao().update(newCategory)
+                        vm.update(copy(category = newCategory))
                     }
                 }
             }

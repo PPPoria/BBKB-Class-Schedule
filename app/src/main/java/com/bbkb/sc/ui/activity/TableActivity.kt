@@ -63,6 +63,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             data.tableConfig.let {
                 it.copy(ignoreSaturday = !it.ignoreSaturday)
             }.let {
+                saveTableConfigInBackground(it)
                 data.copy(tableConfig = it)
             }.also { vm.update(it) }
         }
@@ -71,6 +72,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             data.tableConfig.let {
                 it.copy(ignoreSunday = !it.ignoreSunday)
             }.let {
+                saveTableConfigInBackground(it)
                 data.copy(tableConfig = it)
             }.also { vm.update(it) }
         }
@@ -79,6 +81,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             data.tableConfig.let {
                 it.copy(ignoreEvening = !it.ignoreEvening)
             }.let {
+                saveTableConfigInBackground(it)
                 data.copy(tableConfig = it)
             }.also { vm.update(it) }
         }
@@ -90,6 +93,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 data.tableConfig.copy(
                     nameFilter = et.toString()
                 ).let {
+                    saveTableConfigInBackground(it)
                     data.copy(tableConfig = it)
                 }.also { vm.update(it) }
             }
@@ -102,19 +106,17 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 data.tableConfig.copy(
                     majorFilter = et.toString()
                 ).let {
+                    saveTableConfigInBackground(it)
                     data.copy(tableConfig = it)
                 }.also { vm.update(it) }
             }
         })
         tablePreBtn.setOnClickListenerWithClickAnimation {
             val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
-            if (data.tableZC == 1) {
-                SCToast.show("已经是第一周")
-                return@setOnClickListenerWithClickAnimation
-            }
             lifecycleScope.launch {
                 data.copy(
-                    tableZC = data.tableZC - 1,
+                    tableZC = (data.tableZC - 1 + data.schoolData.weekNum)
+                            % data.schoolData.weekNum,
                     courses = withContext(Dispatchers.IO) {
                         CourseDB.get().dao()
                             .getByZC(data.tableZC - 1)
@@ -125,13 +127,9 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }
         tableNextBtn.setOnClickListenerWithClickAnimation {
             val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
-            if (data.tableZC == data.schoolData.weekNum) {
-                SCToast.show("已经是最后一周")
-                return@setOnClickListenerWithClickAnimation
-            }
             lifecycleScope.launch {
                 data.copy(
-                    tableZC = data.tableZC + 1,
+                    tableZC = (data.tableZC + 1) % data.schoolData.weekNum,
                     courses = withContext(Dispatchers.IO) {
                         CourseDB.get().dao()
                             .getByZC(data.tableZC + 1)
@@ -369,14 +367,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        vm.latest?.apply {
-            saveTableConfig(tableConfig.copy())
-        }
-    }
-
-    private fun saveTableConfig(tableConfig: TableConfig) {
+    private fun saveTableConfigInBackground(tableConfig: TableConfig) {
         CoroutineScope(Dispatchers.IO).launch {
             Gson().toJson(tableConfig).also { str ->
                 DSManager.setString(StringKeys.TABLE_CONFIG, str)

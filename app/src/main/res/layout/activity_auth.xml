@@ -6,21 +6,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/primary"
+    android:background="@color/white"
     tools:context=".ui.activity.AuthActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         app:layout_constraintTop_toTopOf="parent"
         android:id="@+id/title_bar"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="wrap_content">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="@string/title_activity_authentication"
-            android:textColor="@color/white"
+            android:paddingVertical="@dimen/padding_v_3"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="@dimen/text_size_hb"/>
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -45,8 +45,8 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
     private var authSuccess = false
 
     override fun initView() {
-        setLightStatusBar(false)
-        setLightStatusBar(false)
+        setLightStatusBar(true)
+        setLightNavigationBar(true)
         showAuthView()
     }
 
@@ -112,7 +112,7 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
                     val jsList = gripper.getAllCoursesJs()
                     counter = Counter(jsList.size)
                     counter.onFinish = {
-                        lifecycleScope.launch {
+                        CoroutineScope(Dispatchers.Default).launch {
                             dialog.dismiss()
                             onImported(true)
                         }

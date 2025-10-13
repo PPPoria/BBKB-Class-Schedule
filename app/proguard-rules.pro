@@ -1,21 +1,20 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# 1. 保留 Gson 库本身
+-keep class com.google.gson.** { *; }
+-keepclassmembers class com.google.gson.** { *; }
+-dontwarn com.google.gson.**
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# 2. 保留泛型签名 —— 反序列化 List<T>、Map<K,V> 等必需
+-keepattributes Signature
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# 3. 保留注解 —— @SerializedName、@Expose 等
+-keepattributes *Annotation*
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# 4. 保留 TypeToken 的匿名子类（gson.fromJson(json, new TypeToken<List<Bean>>(){}))
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken { *; }
+
+# 5. 保留所有使用到的 JavaBean（把 com.example.your.model 换成你实际放实体类的包）
+-keep class com.bbkb.sc.schedule.** { *; }
+-keep class com.bbkb.sc.schedule.database.** { *; }
+-keep class com.bbkb.sc.schedule.gripper.** { *; }
+
