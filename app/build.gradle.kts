@@ -12,8 +12,8 @@ android {
         applicationId = "com.bbkb.sc"
         minSdk = 31
         targetSdk = 36
-        versionCode = 101
-        versionName = "1.0.1" // 大版本号.小版本号.修订号；其中修订号为0表示正式版，非0表示测试版或预览版
+        versionCode = 110
+        versionName = "1.1.0" // 大版本号.小版本号.修订号；其中修订号为0表示正式版，非0表示测试版或预览版
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -21,7 +21,6 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
-            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -29,7 +28,6 @@ android {
         }
         debug {
             isMinifyEnabled = false
-            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
