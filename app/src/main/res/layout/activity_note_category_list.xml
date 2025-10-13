@@ -24,9 +24,11 @@
     <View
         android:id="@+id/line_1"
         android:layout_width="0dp"
-        android:layout_height="1dp"
+        android:layout_height="2dp"
+        android:layout_marginStart="-2dp"
         android:layout_marginTop="@dimen/padding_v_2"
-        android:background="@color/quaternary"
+        android:background="@drawable/corner_888"
+        android:backgroundTint="@color/quaternary"
         app:layout_constraintEnd_toEndOf="@id/title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title" />
@@ -100,4 +102,15 @@
         android:src="@mipmap/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/no_note_tips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/no_note_tips"
+        android:textColor="@color/gray"
+        android:textSize="@dimen/text_size_hb"
+        app:layout_constraintBottom_toTopOf="@id/add_btn"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

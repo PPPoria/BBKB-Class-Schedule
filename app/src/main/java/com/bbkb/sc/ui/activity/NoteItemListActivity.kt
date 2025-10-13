@@ -279,7 +279,6 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
     )
 
     override fun initView() {
-        //enableStrictMode(this::class.java, 1)
         setLightStatusBar(true)
         setLightNavigationBar(true)
         with(binding.rv) {
@@ -345,20 +344,11 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
 
     override suspend fun refreshDataInScope() {
         val old = vm.latest ?: MData(
-            category = NoteCategory(
-                id = categoryId,
-                name = "Loading...",
-                timeStamp = System.currentTimeMillis(),
-                courseNames = emptyList()
-            ),
-            itemsFlow = emptyFlow(),
-        )
-        old.copy(
             category = withContext(Dispatchers.IO) {
                 NoteCategoryDB.get().dao().getById(categoryId).first()
             },
-            itemsFlow = NoteItemDB.get().dao().getByCategoryId(categoryId)
-        ).also { vm.update(it) }
+        )
+        old.copy().also { vm.update(it) }
     }
 
     override suspend fun observeDataInScope() {
@@ -366,11 +356,16 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
             launch {
                 vm.flow.collect { data ->
                     showCategoryAndNoteInfo(data.category)
+                    showNoteItems(data.items)
+                    binding.noNoteTips.isGone = data.items.isNotEmpty()
                 }
             }
             launch {
-                vm.latest?.itemsFlow?.collect { list ->
-                    showNoteItems(list)
+                val itemsFlow = NoteItemDB.get().dao().getByCategoryId(categoryId)
+                itemsFlow.collect { list ->
+                    vm.latest?.copy(
+                        items = list
+                    )?.let { vm.update(it) }
                 }
             }
         }
@@ -402,7 +397,7 @@ class NoteItemListActivity : BaseActivity<ActivityNoteItemListBinding>() {
 
     data class MData(
         val category: NoteCategory,
-        val itemsFlow: Flow<List<NoteItem>>
+        val items: List<NoteItem> = emptyList(),
     )
 
     companion object {

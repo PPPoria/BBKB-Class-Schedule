@@ -23,12 +23,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun initView() {
         setLightStatusBar(true)
         setLightNavigationBar(true)
-        "${
-            if (BuildConfig.DEBUG) "测试版"
-            else "正式版"
-        } v${BuildConfig.VERSION_NAME}".also {
-            binding.version.text = it
-        }
+        binding.version.text = StringBuilder().apply {
+            if (BuildConfig.DEBUG) append("测试版")
+            else append("正式版")
+            append(" v")
+            append(BuildConfig.VERSION_NAME)
+        }.toString()
     }
 
     override fun initListener() = binding.apply {

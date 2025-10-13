@@ -11,7 +11,9 @@ import android.text.style.ForegroundColorSpan
 import androidx.activity.viewModels
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.graphics.toColorInt
+import androidx.core.view.isGone
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bbkb.sc.R
@@ -153,6 +155,9 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit
             override fun afterTextChanged(et: Editable?) {
+                lifecycleScope.launch {
+                    binding.spaceEdit.text = et
+                }
                 val old = vm.latest ?: return
                 old.copy(
                     keywords = et.toString()
@@ -216,6 +221,7 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
             launch {
                 vm.flow.collect { data ->
                     showList(data.categories, data.keywords)
+                    binding.noNoteTips.isGone = data.categories.isNotEmpty()
                 }
             }
             launch {
@@ -235,7 +241,7 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
                 keywords,
                 ignoreCase = true
             )
-        }
+        }.sortedBy { -1 * it.timeStamp }
     }
 
     data class MData(

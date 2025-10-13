@@ -4,21 +4,22 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical"
     tools:context=".ui.activity.UserSettingsActivity">
 
     <LinearLayout
         android:id="@+id/bind_school_btn"
-        android:layout_marginTop="@dimen/padding_v_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingVertical="@dimen/padding_v_2"
-        android:paddingHorizontal="@dimen/padding_h_2"
         android:layout_marginHorizontal="@dimen/padding_h_2"
+        android:layout_marginTop="@dimen/padding_v_1"
         android:background="@drawable/corner_12"
+        android:backgroundTint="#FFFFFF"
         android:gravity="center_vertical"
-        android:backgroundTint="@color/white">
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/padding_h_2"
+        android:paddingVertical="@dimen/padding_v_2">
 
         <TextView
             android:layout_width="0dp"
@@ -26,7 +27,7 @@
             android:layout_weight="1"
             android:text="@string/binding_school"
             android:textColor="@color/black"
-            android:textSize="@dimen/text_size_2h"/>
+            android:textSize="@dimen/text_size_2h" />
 
         <TextView
             android:id="@+id/bind_school_name"
@@ -34,27 +35,27 @@
             android:layout_height="wrap_content"
             android:text="@string/none"
             android:textColor="@color/gray"
-            android:textSize="@dimen/text_size_2h"/>
+            android:textSize="@dimen/text_size_2h" />
 
         <ImageView
             android:layout_width="@dimen/padding_h_2"
             android:layout_height="match_parent"
             android:contentDescription="@string/none"
-            android:src="@mipmap/ic_back_btn_1"/>
+            android:src="@mipmap/ic_back_btn_1" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/privacy_policy_btn"
-        android:layout_marginTop="@dimen/padding_v_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingVertical="@dimen/padding_v_2"
-        android:paddingHorizontal="@dimen/padding_h_2"
         android:layout_marginHorizontal="@dimen/padding_h_2"
+        android:layout_marginTop="@dimen/padding_v_1"
         android:background="@drawable/corner_12"
+        android:backgroundTint="#FFFFFF"
         android:gravity="center_vertical"
-        android:backgroundTint="@color/white">
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/padding_h_2"
+        android:paddingVertical="@dimen/padding_v_2">
 
         <TextView
             android:layout_width="0dp"
@@ -62,13 +63,13 @@
             android:layout_weight="1"
             android:text="@string/privacy_policy"
             android:textColor="@color/black"
-            android:textSize="@dimen/text_size_2h"/>
+            android:textSize="@dimen/text_size_2h" />
 
         <ImageView
             android:layout_width="@dimen/padding_h_2"
             android:layout_height="match_parent"
             android:contentDescription="@string/none"
-            android:src="@mipmap/ic_back_btn_1"/>
+            android:src="@mipmap/ic_back_btn_1" />
     </LinearLayout>
 
 </LinearLayout>

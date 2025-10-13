@@ -7,6 +7,8 @@
     <string name="update_zc_courses">更新课表</string>
     <string name="my_notes">我的笔记</string>
     <string name="class_schedule">课表详细</string>
+    <string name="my_enter_notes">我的\n笔记</string>
+    <string name="class_enter_schedule">课表\n详细</string>
 
     <!-- Authentication Activity -->
     <string name="title_activity_authentication">认证</string>
@@ -56,6 +58,7 @@
     <string name="from_gallery">相册选取</string>
     <string name="delete_note">将删除其包含的所有文字与图片，请确认您真的不需要该笔记</string>
     <string name="remove_related_course">将移除本笔记与该课程的关联，课程不会被删除且仍能重新关联</string>
+    <string name="no_note_tips">暂无笔记\n点击右下角新建笔记</string>
 
     <!-- Confirm Dialog -->
     <string name="confirm">确认</string>

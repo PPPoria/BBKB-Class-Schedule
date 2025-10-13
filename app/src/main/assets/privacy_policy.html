@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>“帮帮咔邦”隐私协议</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"
+          rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        neutral: '#F3F4F6',
+                        dark: '#1F2937'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .bg-gradient {
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            }
+            .section-fade {
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+            .section-fade:hover {
+                transform: translateY(-5px);
+                opacity: 0.95;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800">
+<!-- 顶部导航 -->
+<header class="bg-white shadow-md sticky top-0 z-50 transition-all duration-300">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <i class="fa fa-shield text-primary text-2xl"></i>
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800">“帮帮咔邦”隐私协议</h1>
+        </div>
+        <nav class="hidden md:block">
+            <ul class="flex space-x-6">
+                <li><a href="#core-principles"
+                       class="text-gray-600 hover:text-primary transition-colors">核心原则</a></li>
+                <li><a href="#terms"
+                       class="text-gray-600 hover:text-primary transition-colors">术语</a></li>
+                <li><a href="#data-collection"
+                       class="text-gray-600 hover:text-primary transition-colors">数据收集</a></li>
+                <li><a href="#user-rights"
+                       class="text-gray-600 hover:text-primary transition-colors">用户权利</a></li>
+            </ul>
+        </nav>
+        <button class="md:hidden text-gray-600 hover:text-primary" id="menuToggle">
+            <i class="fa fa-bars text-xl"></i>
+        </button>
+    </div>
+    <!-- 移动端菜单 -->
+    <div id="mobileMenu" class="hidden md:hidden bg-white shadow-lg absolute w-full">
+        <div class="container mx-auto px-4 py-2">
+            <ul class="space-y-3 py-3">
+                <li><a href="#core-principles"
+                       class="block text-gray-600 hover:text-primary transition-colors py-2">核心原则</a>
+                </li>
+                <li><a href="#terms"
+                       class="block text-gray-600 hover:text-primary transition-colors py-2">术语</a>
+                </li>
+                <li><a href="#data-collection"
+                       class="block text-gray-600 hover:text-primary transition-colors py-2">数据收集</a>
+                </li>
+                <li><a href="#third-party"
+                       class="block text-gray-600 hover:text-primary transition-colors py-2">第三方依赖</a>
+                </li>
+                <li><a href="#user-rights"
+                       class="block text-gray-600 hover:text-primary transition-colors py-2">用户权利</a>
+                </li>
+                <li><a href="#limitation"
+                       class="block text-gray-600 hover:text-primary transition-colors py-2">责任限制</a>
+                </li>
+                <li><a href="#changes"
+                       class="block text-gray-600 hover:text-primary transition-colors py-2">协议变更</a>
+                </li>
+                <li><a href="#contact"
+                       class="block text-gray-600 hover:text-primary transition-colors py-2">联系与争议</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+<!-- 主要内容 -->
+<main class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- 标题部分 -->
+    <div class="text-center mb-12 section-fade">
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-gray-800">隐私协议</h1>
+        <p class="text-gray-500 italic">(适用于学生本地部署/自托管版本)</p>
+        <div class="mt-6 flex flex-wrap justify-center gap-4 text-sm text-gray-600">
+            <div class="flex items-center">
+                <i class="fa fa-calendar-check-o mr-2 text-primary"></i>
+                <span>生效日期：2025-10-13</span>
+            </div>
+            <div class="flex items-center">
+                <i class="fa fa-refresh mr-2 text-primary"></i>
+                <span>最后更新：2025-10-13</span>
+            </div>
+        </div>
+        <div class="mt-8 p-4 bg-blue-50 border-l-4 border-primary rounded-r">
+            <p class="text-gray-700">本协议仅适用于「开源课表软件」（以下简称"本软件"）的<strong>学生本地部署/自托管版本</strong>。如您下载、安装、编译或以其他方式使用本软件，即视为已阅读并同意本协议全部内容。
+            </p>
+        </div>
+    </div>
+
+    <!-- 核心原则 -->
+    <section id="core-principles" class="mb-12 bg-white rounded-lg shadow-md p-6 section-fade">
+        <h2 class="text-2xl font-bold mb-4 flex items-center">
+            <i class="fa fa-compass text-primary mr-3"></i>
+            一、核心原则
+        </h2>
+        <ul class="space-y-3 text-gray-700 pl-5">
+            <li class="flex items-start">
+                <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">1</span>
+                <div><strong>数据不出本地</strong>：所有身份凭据、课表数据、笔记内容均默认保存在用户本人设备或自己搭建的服务器上，开发者及任何第三方均无法接触。
+                </div>
+            </li>
+            <li class="flex items-start">
+                <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">2</span>
+                <div><strong>代码可验证</strong>：软件以 GPL-3.0 协议开源，任何数据处理逻辑均可通过源代码审计。
+                </div>
+            </li>
+            <li class="flex items-start">
+                <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">3</span>
+                <div><strong>最小可用</strong>：仅抓取展示课表所必须的字段，不采集、不上传、不统计任何可用于身份追溯的额外信息。
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <!-- 术语 -->
+    <section id="terms" class="mb-12 bg-white rounded-lg shadow-md p-6 section-fade">
+        <h2 class="text-2xl font-bold mb-4 flex items-center">
+            <i class="fa fa-book text-primary mr-3"></i>
+            二、术语
+        </h2>
+        <ul class="space-y-4 text-gray-700">
+            <li class="flex items-start">
+                <i class="fa fa-angle-right text-primary mt-1 mr-3"></i>
+                <div><strong>学校教务系统</strong>：指学生所在院校提供的官方教学管理网站。</div>
+            </li>
+            <li class="flex items-start">
+                <i class="fa fa-angle-right text-primary mt-1 mr-3"></i>
+                <div><strong>身份凭据</strong>：学生输入的学号、密码、验证码、Cookie 等用于登录教务系统的信息。
+                </div>
+            </li>
+            <li class="flex items-start">
+                <i class="fa fa-angle-right text-primary mt-1 mr-3"></i>
+                <div><strong>课表数据</strong>：从教务系统解析得到的课程名称、上课时间、地点、教师、周次等原始字段。
+                </div>
+            </li>
+            <li class="flex items-start">
+                <i class="fa fa-angle-right text-primary mt-1 mr-3"></i>
+                <div><strong>笔记数据</strong>：用户在软件内撰写的文本、图片、关联关系等。</div>
+            </li>
+        </ul>
+    </section>
+
+    <!-- 数据收集与使用 -->
+    <section id="data-collection" class="mb-12 bg-white rounded-lg shadow-md p-6 section-fade">
+        <h2 class="text-2xl font-bold mb-4 flex items-center">
+            <i class="fa fa-database text-primary mr-3"></i>
+            三、我们如何收集与使用数据
+        </h2>
+
+        <div class="overflow-x-auto mb-6">
+            <table class="min-w-full border-collapse">
+                <thead>
+                <tr class="bg-gray-100">
+                    <th class="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        数据类型
+                    </th>
+                    <th class="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        收集方式
+                    </th>
+                    <th class="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        存储位置
+                    </th>
+                    <th class="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        使用目的
+                    </th>
+                    <th class="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        是否上传
+                    </th>
+                    <th class="border border-gray-300 px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        保留期限
+                    </th>
+                </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                <tr class="hover:bg-gray-50">
+                    <td class="border border-gray-300 px-4 py-3 text-sm">身份凭据</td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">用户本地输入</td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">
+                        本地配置文件/用户指定数据库
+                    </td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">
+                        模拟登录教务系统并抓取课表
+                    </td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm font-medium text-red-600">
+                        否
+                    </td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">用户自行删除即销毁</td>
+                </tr>
+                <tr class="hover:bg-gray-50 bg-gray-50">
+                    <td class="border border-gray-300 px-4 py-3 text-sm">课表数据</td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">本地解析教务网页</td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">同上</td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">渲染课表、建立与笔记的索引
+                    </td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm font-medium text-red-600">
+                        否
+                    </td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">用户自行删除即销毁</td>
+                </tr>
+                <tr class="hover:bg-gray-50">
+                    <td class="border border-gray-300 px-4 py-3 text-sm">笔记数据</td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">用户本地创建</td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">同上</td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">记录学习笔记、双向索引课程
+                    </td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm font-medium text-red-600">
+                        否
+                    </td>
+                    <td class="border border-gray-300 px-4 py-3 text-sm">用户自行删除即销毁</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+            <h3 class="font-bold text-yellow-800 mb-2 flex items-center">
+                <i class="fa fa-exclamation-circle mr-2"></i>特别说明：
+            </h3>
+            <ul class="space-y-2 text-yellow-700 pl-6 list-disc">
+                <li>软件<strong>不会</strong>在后台静默上传任何数据；</li>
+                <li>软件<strong>不会</strong>采集设备唯一标识、GPS 位置、通讯录等无关信息；</li>
+                <li>如用户自行修改代码或接入第三方同步服务（如
+                    Nextcloud、GitHub、公有云盘），由此产生的数据流转与本协议无关，请自行评估风险。
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 第三方依赖与合规提示 -->
+    <section id="third-party" class="mb-12 bg-white rounded-lg shadow-md p-6 section-fade">
+        <h2 class="text-2xl font-bold mb-4 flex items-center">
+            <i class="fa fa-puzzle-piece text-primary mr-3"></i>
+            四、第三方依赖与合规提示
+        </h2>
+        <ol class="space-y-3 text-gray-700 pl-5 list-decimal">
+            <li>开源组件：可能引用 <code
+                    class="bg-gray-100 px-1 py-0.5 rounded text-primary">Gilde</code>、<code
+                    class="bg-gray-100 px-1 py-0.5 rounded text-primary">Gson</code>等
+            </li>
+            <li>
+                教务系统合规：用户应确保其抓取行为符合所在院校网络管理办法；若学校禁止自动化访问，请停止使用或事先获得书面授权。
+            </li>
+            <li>
+                跨境传输：本软件默认不涉及跨境数据传输；若用户自行将数据托管到境外服务器，请遵守当地数据出境法规。
+            </li>
+        </ol>
+    </section>
+
+    <!-- 用户权利 -->
+    <section id="user-rights" class="mb-12 bg-white rounded-lg shadow-md p-6 section-fade">
+        <h2 class="text-2xl font-bold mb-4 flex items-center">
+            <i class="fa fa-user-circle text-primary mr-3"></i>
+            五、用户权利
+        </h2>
+        <div class="grid md:grid-cols-3 gap-4">
+            <div class="bg-red-50 p-4 rounded-lg border border-red-100">
+                <div class="text-red-500 text-2xl mb-2">
+                    <i class="fa fa-trash"></i>
+                </div>
+                <h3 class="font-bold mb-1">随时删除</h3>
+                <p class="text-sm text-gray-700">在设置界面点击「清除所有本地数据」即可彻底擦除。</p>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg border border-green-100">
+                <div class="text-green-500 text-2xl mb-2">
+                    <i class="fa fa-code"></i>
+                </div>
+                <h3 class="font-bold mb-1">修改源代码</h3>
+                <p class="text-sm text-gray-700">
+                    可自由删除或替换任何与隐私相关的模块（如登录、解析、存储）。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 责任限制 -->
+    <section id="limitation" class="mb-12 bg-white rounded-lg shadow-md p-6 section-fade">
+        <h2 class="text-2xl font-bold mb-4 flex items-center">
+            <i class="fa fa-exclamation-triangle text-primary mr-3"></i>
+            六、责任限制
+        </h2>
+        <ol class="space-y-3 text-gray-700 pl-5 list-decimal">
+            <li>开发者仅提供源代码，<strong>不运营任何中央服务器</strong>，因此对用户自行部署后产生的数据泄露、丢失、滥用不承担责任。
+            </li>
+            <li>
+                用户自行共享、反编译、二次分发时，须在显著位置注明「本版本与原始作者无关」，并自行向后续用户提供隐私说明。
+            </li>
+        </ol>
+    </section>
+
+    <!-- 协议变更 -->
+    <section id="changes" class="mb-12 bg-white rounded-lg shadow-md p-6 section-fade">
+        <h2 class="text-2xl font-bold mb-4 flex items-center">
+            <i class="fa fa-history text-primary mr-3"></i>
+            七、协议变更
+        </h2>
+        <ol class="space-y-3 text-gray-700 pl-5 list-decimal">
+            <li>后续版本若新增「可选云同步」功能，将在 CHANGELOG 与 README
+                中醒目提示，并同步更新本协议；
+            </li>
+            <li>若用户升级后不同意变更内容，可继续停留在旧版本，或 fork 代码后自行维护。</li>
+        </ol>
+    </section>
+
+    <!-- 联系与争议 -->
+    <section id="contact" class="mb-12 bg-white rounded-lg shadow-md p-6 section-fade">
+        <h2 class="text-2xl font-bold mb-4 flex items-center">
+            <i class="fa fa-envelope text-primary mr-3"></i>
+            八、联系与争议
+        </h2>
+        <ul class="space-y-3 text-gray-700">
+            <li class="flex items-start">
+                <i class="fa fa-github text-gray-700 mt-1 mr-3"></i>
+                <div>源代码仓库：<a href="https://github.com/PPPoria/BBKB-Class-Schedule"
+                                   target="_blank"
+                                   class="text-blue-500 hover:text-primary underline">https://github.com/PPPoria/BBKB-Class-Schedule</a>（或在
+                    <a href="https://github.com/search?q=BBKB-Class-Schedule%20&type=repositories" target="_blank"
+                       class="text-blue-500 hover:text-primary underline">Github
+                        搜索「BBKB-Class-Schedule」</a>）
+                </div>
+            </li>
+            <li class="flex items-start">
+                <i class="fa fa-envelope-o text-gray-700 mt-1 mr-3"></i>
+                <div>邮件：ppporia@foxmail.com</div>
+            </li>
+            <li class="flex items-start">
+                <i class="fa fa-balance-scale text-gray-700 mt-1 mr-3"></i>
+                <div>若发生争议，优先协商；协商不成，任一方可向开发者所在地人民法院提起诉讼。</div>
+            </li>
+        </ul>
+
+        <div class="mt-6 p-4 bg-primary/10 border-l-4 border-primary rounded-r">
+            <p class="text-gray-800 font-medium">
+                再次提醒：本软件「默认无云、默认无收集」。请妥善保管好您的本地设备与自托管服务器，防止他人物理接触或远程越权访问。</p>
+        </div>
+    </section>
+</main>
+
+<!-- 页脚 -->
+<footer class="bg-gray-800 text-white py-8">
+    <div class="container mx-auto px-4 max-w-4xl">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <div class="flex items-center">
+                    <i class="fa fa-shield text-primary text-2xl mr-2"></i>
+                    <span class="font-bold text-lg">“帮帮咔邦”隐私协议</span>
+                </div>
+                <p class="text-gray-400 text-sm mt-1">最后更新：2025-10-13</p>
+            </div>
+            <div class="flex space-x-4">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fa fa-github text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fa fa-envelope text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fa fa-question-circle text-xl"></i>
+                </a>
+            </div>
+        </div>
+        <div class="mt-6 pt-6 border-t border-gray-700 text-center text-gray-400 text-sm">
+            <p>© 2025 帮帮咔邦项目组. 保留所有权利.</p>
+        </div>
+    </div>
+</footer>
+
+<!-- 返回顶部按钮 -->
+<button id="backToTop"
+        class="fixed bottom-6 right-6 bg-primary text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center opacity-0 invisible transition-all duration-300 hover:bg-primary/90">
+    <i class="fa fa-arrow-up"></i>
+</button>
+
+<script>
+    // 移动端菜单切换
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    menuToggle.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // 点击移动菜单中的链接后关闭菜单
+    const mobileLinks = mobileMenu.querySelectorAll('a');
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+        });
+    });
+
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80, // 考虑固定导航的高度
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // 返回顶部按钮
+    const backToTopButton = document.getElementById('backToTop');
+
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            backToTopButton.classList.remove('opacity-0', 'invisible');
+            backToTopButton.classList.add('opacity-100', 'visible');
+        } else {
+            backToTopButton.classList.remove('opacity-100', 'visible');
+            backToTopButton.classList.add('opacity-0', 'invisible');
+        }
+
+        // 导航栏滚动效果
+        const header = document.querySelector('header');
+        if (window.pageYOffset > 50) {
+            header.classList.add('py-2');
+            header.classList.remove('py-4');
+        } else {
+            header.classList.add('py-4');
+            header.classList.remove('py-2');
+        }
+    });
+
+    backToTopButton.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+
+    // 为各部分添加进入动画
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('opacity-100', 'translate-y-0');
+                entry.target.classList.remove('opacity-0', 'translate-y-4');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('section').forEach(section => {
+        section.classList.add('opacity-0', 'translate-y-4', 'transition-all', 'duration-500');
+        observer.observe(section);
+    });
+</script>
+</body>
+</html>

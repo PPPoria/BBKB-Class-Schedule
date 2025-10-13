@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
@@ -8,20 +9,29 @@
     android:orientation="vertical"
     tools:context=".ui.activity.MainActivity">
 
+    <!-- App name and version -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/app_name_and_version_layout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding_h_2"
+        android:layout_marginStart="-30dp"
         android:layout_marginTop="@dimen/padding_v_2"
+        android:background="@drawable/corner_888"
         android:gravity="bottom"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/padding_h_1"
+        android:paddingVertical="@dimen/padding_v_3"
+        android:translationZ="@dimen/translation_z_1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_h_1"
             android:text="@string/app_name"
             android:textColor="@color/black"
-            android:textSize="@dimen/text_size_2b"
+            android:textSize="@dimen/text_size_hb"
             android:textStyle="bold" />
 
         <TextView
@@ -35,108 +45,129 @@
             tools:ignore="HardcodedText" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/user_settings_layout"
-        android:layout_width="match_parent"
+    <!-- User settings -->
+    <TextView
+        android:id="@+id/user_settings_btn"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_v_1"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/user_settings_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/padding_h_2"
-            android:background="@drawable/corner_12"
-            android:backgroundTint="@color/secondary"
-            android:gravity="end"
-            android:paddingHorizontal="@dimen/padding_h_3"
-            android:paddingVertical="@dimen/padding_v_3"
-            android:text="@string/user_settings"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_size_hb"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/update_courses_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/padding_h_3"
-            android:background="@drawable/corner_12"
-            android:backgroundTint="@color/primary"
-            android:gravity="end"
-            android:paddingHorizontal="@dimen/padding_h_3"
-            android:paddingVertical="@dimen/padding_v_3"
-            android:text="@string/update_zc_courses"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_size_hb"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding_h_2"
+        android:layout_marginStart="@dimen/padding_h_2"
         android:layout_marginTop="@dimen/padding_v_2"
-        android:orientation="horizontal">
+        android:background="@drawable/corner_888"
+        android:backgroundTint="@color/secondary"
+        android:gravity="end"
+        android:paddingHorizontal="@dimen/padding_h_2"
+        android:paddingVertical="@dimen/padding_v_3"
+        android:text="@string/user_settings"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_2h"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/app_name_and_version_layout" />
 
-        <LinearLayout
-            android:id="@+id/my_notes_layout"
-            android:layout_width="0dp"
+    <!-- Update courses -->
+    <TextView
+        android:id="@+id/update_courses_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_h_3"
+        android:background="@drawable/corner_888"
+        android:backgroundTint="@color/primary"
+        android:gravity="end"
+        android:paddingHorizontal="@dimen/padding_h_2"
+        android:paddingVertical="@dimen/padding_v_3"
+        android:text="@string/update_zc_courses"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_2h"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/user_settings_btn"
+        app:layout_constraintTop_toTopOf="@id/user_settings_btn" />
+
+    <!-- My notes -->
+    <com.bbkb.sc.ui.widget.RoundConstraintLayout
+        android:id="@+id/my_notes_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_h_2"
+        android:layout_marginTop="@dimen/padding_v_2"
+        android:layout_marginEnd="5dp"
+        android:layout_weight="1"
+        android:background="@drawable/corner_12"
+        android:backgroundTint="@color/quaternary"
+        android:translationZ="@dimen/translation_z_1"
+        app:cornerRadius="12dp"
+        app:layout_constraintEnd_toStartOf="@id/class_schedule_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/user_settings_btn">
+
+        <TextView
+            android:id="@+id/my_notes_btn"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/corner_12"
-            android:backgroundTint="@color/quaternary"
-            android:gravity="end"
-            android:orientation="vertical"
-            android:paddingHorizontal="@dimen/padding_h_3"
-            android:paddingVertical="@dimen/padding_v_3">
+            android:layout_marginHorizontal="@dimen/padding_h_3"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:text="@string/my_enter_notes"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_5b"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/my_notes_icon"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/my_notes"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_size_hb"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:contentDescription="@string/none"
-                android:src="@mipmap/ic_tips" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="@dimen/padding_h_3"
-            android:layout_height="match_parent" />
-
-        <LinearLayout
-            android:id="@+id/class_schedule_layout"
+        <ImageView
+            android:id="@+id/my_notes_icon"
             android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="-20dp"
+            android:layout_marginBottom="-20dp"
+            android:alpha="0.3"
+            android:contentDescription="@string/none"
+            android:src="@mipmap/ic_tips"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="h,1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintWidth_percent="0.6" />
+    </com.bbkb.sc.ui.widget.RoundConstraintLayout>
+
+    <!-- Class schedule -->
+    <com.bbkb.sc.ui.widget.RoundConstraintLayout
+        android:id="@+id/class_schedule_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="@dimen/padding_h_2"
+        android:layout_weight="1"
+        android:background="@drawable/corner_12"
+        android:backgroundTint="@color/tertiary"
+        android:translationZ="@dimen/translation_z_1"
+        app:cornerRadius="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/my_notes_layout"
+        app:layout_constraintTop_toTopOf="@id/my_notes_layout">
+
+        <TextView
+            android:id="@+id/class_schedule_btn"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/corner_12"
-            android:backgroundTint="@color/tertiary"
-            android:gravity="end"
-            android:orientation="vertical"
-            android:paddingHorizontal="@dimen/padding_h_3"
-            android:paddingVertical="@dimen/padding_v_3">
+            android:layout_marginHorizontal="@dimen/padding_h_3"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:text="@string/class_enter_schedule"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_5b"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/class_schedule_icon"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/class_schedule"
-                android:textColor="@color/white"
-                android:textSize="@dimen/text_size_hb"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:contentDescription="@string/none"
-                android:padding="1dp"
-                android:src="@mipmap/ic_table" />
-        </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+        <ImageView
+            android:id="@+id/class_schedule_icon"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginEnd="-20dp"
+            android:layout_marginBottom="-20dp"
+            android:alpha="0.3"
+            android:contentDescription="@string/none"
+            android:src="@mipmap/ic_table"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="h,1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintWidth_percent="0.6" />
+    </com.bbkb.sc.ui.widget.RoundConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

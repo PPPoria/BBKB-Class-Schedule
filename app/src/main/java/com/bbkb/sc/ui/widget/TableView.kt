@@ -37,7 +37,7 @@ class TableView : ViewGroup {
     private val white = context.getColor(R.color.white)
     private val whiteStateList = ColorStateList.valueOf(white)
     private val black = context.getColor(R.color.black)
-    private val highlightColor = context.getColor(R.color.secondary)
+    private val highlightColor = context.getColor(R.color.primary)
 
     private val yW = dp2px(35f)
     private val xH = dp2px(41f)

@@ -16,7 +16,7 @@
         android:background="@color/transparent"
         android:hint="@string/note_name_unname"
         android:maxLength="60"
-        android:paddingHorizontal="@dimen/padding_h_2"
+        android:paddingHorizontal="@dimen/padding_h_3"
         android:text="@string/note_name_unname"
         android:textColor="@color/black"
         android:textSize="@dimen/text_size_2b"
@@ -27,17 +27,17 @@
         android:id="@+id/name_length_limit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/padding_h_2"
+        android:layout_marginStart="@dimen/padding_h_3"
         android:text="0/60"
         android:textColor="@color/gray"
         android:textSize="@dimen/text_size_2h"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/name" />
 
     <View
         android:id="@+id/line_1"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="2dp"
         android:layout_marginTop="@dimen/padding_v_3"
         android:background="@color/gray_shade"
         app:layout_constraintTop_toBottomOf="@id/name_length_limit" />
@@ -95,4 +95,15 @@
         android:src="@mipmap/ic_table"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/no_note_tips"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/no_note_tips"
+        android:textColor="@color/gray"
+        android:textSize="@dimen/text_size_hb"
+        app:layout_constraintBottom_toTopOf="@id/add_btn"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

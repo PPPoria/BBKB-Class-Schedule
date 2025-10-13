@@ -13,19 +13,22 @@ fun dp2px(dp: Float) = TypedValue.applyDimension(
     Resources.getSystem().displayMetrics
 )
 
-fun String.genMacaronColor(): Int {
-    val str = this
-    val h = (str.hashCode() and Int.MAX_VALUE) % 360          // 0..359
-    val s = 35 + (str.hashCode() shr 8) % 16                 // 35-40 %
-    val l = 80 + (str.hashCode() shr 16) % 16                // 80-95 %
-    return hslToColor(h.toFloat(), s / 100f, l / 100f)
+fun Any.scrambleHash(): Int {
+    var h = hashCode().toLong()
+    // MurmurHash3 32-bit finalizer
+    h = h xor (h ushr 16)
+    h *= 0xf07a3ecb
+    h = h xor (h ushr 13)
+    h *= 0xc2b2ae35
+    h = h xor (h ushr 16)
+    return h.toInt()
 }
 
-fun String.genColor(): Int {
-    val str = this
-    val h = str.hashCode() % 360  // 0..359
-    val s = 55 + (str.hashCode() shr 8) % 20   // 55-75  饱和度
-    val l = 65 + (str.hashCode() shr 16) % 15  // 65-80 亮度
+fun Any.genMacaronColor(): Int {
+    val code = scrambleHash()
+    val h = (code and Int.MAX_VALUE) % 360  // 0..359
+    val s = 28 + (code and ((1 shl 16) - 1)) % 11 // 饱和度
+    val l = 82 + (code shr 16) % 11 // 亮度
     return hslToColor(h.toFloat(), s / 100f, l / 100f)
 }
 
@@ -46,37 +49,6 @@ fun hslToColor(h: Float, s: Float, l: Float): Int {
     val gg = ((g + m) * 255).toInt()
     val bb = ((b + m) * 255).toInt()
     return Color.rgb(rr, gg, bb)
-}
-
-fun Int.toChinese(): String {
-    if (this == 0) return "零"
-    val n = if (this < 0) -1 * this else this
-    val num = arrayOf("零", "一", "二", "三", "四", "五", "六", "七", "八", "九")
-    val unit = arrayOf("", "十", "百", "千", "万", "十", "百", "千", "亿", "十", "百", "千")
-    val df = DecimalFormat("#")
-    val str = df.format(n)
-    val len = str.length
-    val sb = StringBuilder().also {
-        if (this < 0) it.append("负")
-    }
-    var zeroFlag = false
-
-    for (i in 0 until len) {
-        val digit = str[i] - '0'
-        val pos = len - 1 - i
-        if (digit == 0) {
-            zeroFlag = true
-            // 万、亿位补“零”
-            if (pos % 4 == 0) sb.append(unit[pos])
-            continue
-        }
-        if (zeroFlag) {
-            sb.append(num[0])
-            zeroFlag = false
-        }
-        sb.append(num[digit]).append(unit[pos])
-    }
-    return sb.toString()
 }
 
 fun Long.toDateFormat(): DateFormat {

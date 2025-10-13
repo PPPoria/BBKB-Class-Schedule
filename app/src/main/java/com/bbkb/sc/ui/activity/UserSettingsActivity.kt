@@ -31,7 +31,7 @@ class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
             }
         }
         privacyPolicyBtn.setOnClickListenerWithClickAnimation {
-
+            WebActivity.startPrivacyPolicy(this@UserSettingsActivity)
         }
     }.let { }
 
