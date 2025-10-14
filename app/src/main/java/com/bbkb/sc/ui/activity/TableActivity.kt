@@ -43,6 +43,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     private val mode by lazy { intent.getIntExtra(KEY_MODE, MODE_NORMAL) }
     private val addedCategoryId by lazy { intent.getLongExtra(KEY_NOTE_CATEGORY_ID, 0L) }
     private val vm by viewModels<SingleVM<MData>>()
+    private val coursesMap = HashMap<Int, List<Course>>()
 
     override fun initView() {
         setLightStatusBar(true)
@@ -117,7 +118,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 data.copy(
                     tableZC = (data.tableZC - 2 + data.schoolData.weekNum)
                             % data.schoolData.weekNum + 1,
-                    courses = withContext(Dispatchers.IO) {
+                    curCourses = withContext(Dispatchers.IO) {
                         CourseDB.get().dao()
                             .getByZC(data.tableZC - 1)
                             .first()
@@ -130,7 +131,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             lifecycleScope.launch {
                 data.copy(
                     tableZC = (data.tableZC) % data.schoolData.weekNum + 1,
-                    courses = withContext(Dispatchers.IO) {
+                    curCourses = withContext(Dispatchers.IO) {
                         CourseDB.get().dao()
                             .getByZC(data.tableZC + 1)
                             .first()
@@ -139,6 +140,15 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             }
         }
     }.let { }
+
+    private suspend fun getCoursesByZC(zc: Int): List<Course> {
+        if (coursesMap.containsKey(zc)) return coursesMap[zc]!!
+        return withContext(Dispatchers.IO) {
+            CourseDB.get().dao()
+                .getByZC(zc)
+                .first()
+        }.also { coursesMap[zc] = it }
+    }
 
     override suspend fun refreshDataInScope() {
         val old = vm.latest ?: DSManager.run {
@@ -153,15 +163,18 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }.let { MData(schoolData = it!!.copy()) }
         val curZC = ScheduleUtils.getZC(System.currentTimeMillis())
         val tableZC = if (old.tableZC == 0) curZC else old.tableZC
+        val preZC = (tableZC - 2 + old.schoolData.weekNum) %
+                old.schoolData.weekNum + 1
+        val nextZC = (tableZC) % old.schoolData.weekNum + 1
         old.copy(
             curZC = curZC,
             tableZC = tableZC,
-            courses = withContext(Dispatchers.IO) {
-                CourseDB.get().dao().getByZC(tableZC).first()
-            },
             tableConfig = withContext(Dispatchers.IO) {
                 ScheduleUtils.getTableConfig()
-            }
+            },
+            preCourses = getCoursesByZC(preZC),
+            curCourses = getCoursesByZC(tableZC),
+            nextCourses = getCoursesByZC(nextZC)
         ).also { vm.update(it) }
     }
 
@@ -175,9 +188,11 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 "第${data.curZC}周".also { binding.todayZc.text = it }
                 "第${data.tableZC}周".also { binding.zc.text = it }
                 showTable(
-                    data.tableZC,
-                    data.courses,
-                    data.tableConfig
+                    tableZC = data.tableZC,
+                    preCourses = data.preCourses,
+                    curCourses = data.curCourses,
+                    nextCourses = data.nextCourses,
+                    tableConfig = data.tableConfig
                 )
             }
         }
@@ -236,40 +251,48 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
 
     private fun showTable(
         tableZC: Int,
-        courses: List<Course>,
+        preCourses: List<Course>,
+        curCourses: List<Course>,
+        nextCourses: List<Course>,
         tableConfig: TableConfig
     ) = lifecycleScope.launch {
         val sd = vm.latest?.schoolData ?: return@launch
-        val cells = courses.asSequence().filter {
-            if (tableConfig.ignoreSaturday) it.xq != 6
-            else true
-        }.filter {
-            if (tableConfig.ignoreSunday) it.xq != 7
-            else true
-        }.filter {
-            if (tableConfig.ignoreEvening) it.startNode < (sd.nodesPerDay - sd.nodesInEvening)
-            else true
-        }.filter {
-            tableConfig.nameFilter.isEmpty() || it.name.contains(tableConfig.nameFilter)
-        }.filter {
-            tableConfig.majorFilter.isEmpty() || it.major.contains(tableConfig.majorFilter)
-        }.mapIndexed { index, course ->
-            TableView.Cell(
-                id = index,
-                title = course.name,
-                content = course.run {
-                    "$teacher\n$classroom"
-                },
-                color = course.name.genMacaronColor(),
-                row = course.run { startNode to endNode },
-                column = course.run { xq to xq }
-            )
-        }.toList()
+        var cellId = 0
+        val filterToCells: (List<Course>) -> List<TableView.Cell> = { courses ->
+            courses.asSequence().filter {
+                if (tableConfig.ignoreSaturday) it.xq != 6
+                else true
+            }.filter {
+                if (tableConfig.ignoreSunday) it.xq != 7
+                else true
+            }.filter {
+                if (tableConfig.ignoreEvening) it.startNode < (sd.nodesPerDay - sd.nodesInEvening)
+                else true
+            }.filter {
+                tableConfig.nameFilter.isEmpty() || it.name.contains(tableConfig.nameFilter)
+            }.filter {
+                tableConfig.majorFilter.isEmpty() || it.major.contains(tableConfig.majorFilter)
+            }.map { course ->
+                TableView.Cell(
+                    id = cellId++,
+                    title = course.name,
+                    content = course.run {
+                        "$teacher\n$classroom"
+                    },
+                    color = course.name.genMacaronColor(),
+                    row = course.run { startNode to endNode },
+                    column = course.run { xq to xq }
+                )
+            }.toList()
+        }
+        val preCells = filterToCells(preCourses)
+        val curCells = filterToCells(curCourses)
+        val nextCells = filterToCells(nextCourses)
         val oneDay = 86_400_000L
         val oneWeek = oneDay * 7
         val tableZcMondayTimeStamp =
-            if (courses.isNotEmpty()) {
-                courses.first().let {
+            if (curCourses.isNotEmpty()) {
+                curCourses.first().let {
                     val offset = (it.xq - 1) * oneDay
                     it.timeStamp - offset
                 }
@@ -323,7 +346,9 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         binding.table.update(
             rows = rows,
             columns = columns,
-            cells = cells,
+            preCells = preCells,
+            curCells = curCells,
+            nextCells = nextCells,
             xAxis = xAxis,
             yAxis = yAxis,
             highlightX = vm.latest?.run {
@@ -340,14 +365,16 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                     }
                 else 0
             } ?: 0,
-            listener = this@TableActivity::onClickTableItem
+            onClickCell = this@TableActivity::onClickTableItem,
+            onScrollToPre = this@TableActivity::onScrollToTablePre,
+            onScrollToNext = this@TableActivity::onScrollToTableNext
         )
     }
 
     private fun onClickTableItem(cell: TableView.Cell) {
         if (vm.latest == null) return
         if (mode == MODE_NORMAL) {
-            val course = vm.latest!!.courses.find {
+            val course = vm.latest!!.curCourses.find {
                 it.name == cell.title
             }!!
             CourseDetailDialog().also {
@@ -367,6 +394,38 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }
     }
 
+    private fun onScrollToTablePre(cells: List<TableView.Cell>) {
+        lifecycleScope.launch {
+            val old = vm.latest ?: return@launch
+            val zc = ((old.tableZC - 2 + old.schoolData.weekNum) %
+                    old.schoolData.weekNum + 1)
+            val courses = getCoursesByZC(
+                ((zc - 2 + old.schoolData.weekNum) %
+                        old.schoolData.weekNum + 1)
+            )
+            old.copy(
+                tableZC = zc,
+                preCourses = courses,
+                curCourses = old.preCourses,
+                nextCourses = old.curCourses
+            ).also { vm.update(it) }
+        }
+    }
+
+    private fun onScrollToTableNext(cells: List<TableView.Cell>) {
+        lifecycleScope.launch {
+            val old = vm.latest ?: return@launch
+            val zc = (old.tableZC) % old.schoolData.weekNum + 1
+            val courses = getCoursesByZC((zc) % old.schoolData.weekNum + 1)
+            old.copy(
+                tableZC = zc,
+                preCourses = old.curCourses,
+                curCourses = old.nextCourses,
+                nextCourses = courses
+            ).also { vm.update(it) }
+        }
+    }
+
     private fun saveTableConfigInBackground(tableConfig: TableConfig) {
         CoroutineScope(Dispatchers.IO).launch {
             Gson().toJson(tableConfig).also { str ->
@@ -379,8 +438,10 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         val schoolData: School.SchoolData,
         val curZC: Int = 0,
         val tableZC: Int = 0,
-        val courses: List<Course> = emptyList(),
-        val tableConfig: TableConfig = TableConfig()
+        val tableConfig: TableConfig = TableConfig(),
+        val preCourses: List<Course> = emptyList(),
+        val curCourses: List<Course> = emptyList(),
+        val nextCourses: List<Course> = emptyList(),
     )
 
     companion object {
