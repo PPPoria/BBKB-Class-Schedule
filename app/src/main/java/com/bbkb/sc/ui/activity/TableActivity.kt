@@ -115,8 +115,8 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
             lifecycleScope.launch {
                 data.copy(
-                    tableZC = (data.tableZC - 1 + data.schoolData.weekNum)
-                            % data.schoolData.weekNum,
+                    tableZC = (data.tableZC - 2 + data.schoolData.weekNum)
+                            % data.schoolData.weekNum + 1,
                     courses = withContext(Dispatchers.IO) {
                         CourseDB.get().dao()
                             .getByZC(data.tableZC - 1)
@@ -129,7 +129,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
             lifecycleScope.launch {
                 data.copy(
-                    tableZC = (data.tableZC + 1) % data.schoolData.weekNum,
+                    tableZC = (data.tableZC) % data.schoolData.weekNum + 1,
                     courses = withContext(Dispatchers.IO) {
                         CourseDB.get().dao()
                             .getByZC(data.tableZC + 1)

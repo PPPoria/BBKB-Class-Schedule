@@ -68,8 +68,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }.let { it!!.id }
         val zc = ScheduleUtils.getZC(System.currentTimeMillis())
         Intent(this@MainActivity, AuthActivity::class.java).apply {
-            putExtra("update_zc", zc)
-            putExtra("school_id", id)
+            putExtra(AuthActivity.KEY_UPDATE_ZC, zc)
+            putExtra(AuthActivity.KEY_SCHOOL_ID, id)
             startActivity(this)
         }
     }

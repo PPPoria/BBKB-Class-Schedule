@@ -31,12 +31,12 @@ private const val TAG = "AuthActivity"
 
 class AuthActivity : BaseActivity<ActivityAuthBinding>() {
     override fun onViewBindingCreate() = ActivityAuthBinding.inflate(layoutInflater)
-    private val schoolId by lazy { intent.getIntExtra("school_id", 0) }
+    private val schoolId by lazy { intent.getIntExtra(KEY_SCHOOL_ID, 0) }
     private val sd by lazy { School.dataList.find { schoolId == it.id }!! }
     private val gripper: Gripper by lazy { Gripper.getGripperBySchoolId(schoolId) }
     private val updateZC by lazy {
         // 0表示更新全部
-        intent.getIntExtra("update_zc", 0)
+        intent.getIntExtra(KEY_UPDATE_ZC, 0)
             .coerceIn(0, sd.weekNum)
     }
     private lateinit var dialog: LoadingDialog
@@ -223,5 +223,10 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
                 onFinish?.invoke()
             }
         }
+    }
+
+    companion object {
+        const val KEY_SCHOOL_ID = "school_id"
+        const val KEY_UPDATE_ZC = "update_zc"
     }
 }
