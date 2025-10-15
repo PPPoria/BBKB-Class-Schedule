@@ -1,6 +1,5 @@
 package com.bbkb.sc.ui.activity
 
-
 import android.content.Intent
 import androidx.lifecycle.lifecycleScope
 import com.bbkb.sc.BuildConfig
@@ -9,9 +8,14 @@ import com.bbkb.sc.databinding.ActivityMainBinding
 import com.bbkb.sc.datastore.StringKeys
 import com.bbkb.sc.util.ScheduleUtils
 import com.bbkb.sc.schedule.School
+import com.bbkb.sc.schedule.database.CourseDB
+import com.bbkb.sc.ui.appwidget.TableWidget
+import com.bbkb.sc.ui.appwidget.TableWidgetManager
 import com.bbkb.sc.util.SCToast
 import com.poria.base.base.BaseActivity
+import com.poria.base.ext.toDayOfWeek
 import com.poria.base.store.DSManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -91,6 +95,31 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 this@MainActivity,
                 TableActivity::class.java
             ).also { startActivity(it) }
+        }
+    }
+
+    override suspend fun refreshDataInScope() {
+        refreshTableWidget()
+    }
+
+    private suspend fun refreshTableWidget() {
+        val oneDay = ScheduleUtils.ONE_DAY_TIMESTAMP
+        val curTime = System.currentTimeMillis()
+        val zc = ScheduleUtils.getZC(curTime)
+        if (zc != -1) {
+            val courses = withContext(Dispatchers.IO) {
+                CourseDB.get().dao().getByZC(zc).first()
+            }.filter {
+                curTime in it.timeStamp..(it.timeStamp + oneDay)
+            }.ifEmpty { // 空则添加一个空课程用来提示用户
+                TableWidgetManager.noneCourse.copy(
+                    zc = zc,
+                    xq = curTime.toDayOfWeek(),
+                    name = "暂无课程",
+                    classroom = "--"
+                ).let { listOf(it) }
+            }
+            TableWidgetManager.updateTable(this, courses)
         }
     }
 }

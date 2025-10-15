@@ -8,4 +8,5 @@ object LongKeys {
 object StringKeys {
     const val SCHOOL_NAME = "school_name"
     const val TABLE_CONFIG = "table_config"
+    const val TODAY_COURSE_LIST_JSON = "today_course_list"
 }

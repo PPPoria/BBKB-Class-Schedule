@@ -51,6 +51,14 @@ fun hslToColor(h: Float, s: Float, l: Float): Int {
     return Color.rgb(rr, gg, bb)
 }
 
+fun Long.toDayOfWeek(): Int {
+    val cal = Calendar.getInstance().apply {
+        timeInMillis = this@toDayOfWeek
+        firstDayOfWeek = Calendar.MONDAY
+    }
+    return cal.get(Calendar.DAY_OF_WEEK)
+}
+
 fun Long.toDateFormat(): DateFormat {
     val cal = Calendar.getInstance().apply {
         timeInMillis = this@toDateFormat

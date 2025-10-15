@@ -1,0 +1,799 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.BBKBClassSchedule.AppWidget.Container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/corner_12"
+    android:backgroundTint="@color/white"
+    android:orientation="vertical"
+    android:theme="@style/Theme.BBKBClassSchedule.AppWidgetContainer">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/today_zc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/none"
+            android:textColor="@color/gray"
+            android:textSize="@dimen/text_size_2h" />
+
+        <TextView
+            android:id="@+id/today_xq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_h_3"
+            android:text="@string/none"
+            android:textColor="@color/gray"
+            android:textSize="@dimen/text_size_2h" />
+    </LinearLayout>
+
+    <!-- Table container -->
+    <LinearLayout
+        android:id="@+id/table_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/cell_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/cell_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_11"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_13"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_13"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_13"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_13"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_17"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_18"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_18"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_18"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_18"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_19"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_19"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_19"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_19"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/cell_20"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:background="@drawable/corner_6"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_h_2">
+
+            <TextView
+                android:id="@+id/name_20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/none"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/node_20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <TextView
+                android:id="@+id/room_20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/none"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
