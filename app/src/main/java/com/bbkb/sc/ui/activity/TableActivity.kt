@@ -43,7 +43,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     private val mode by lazy { intent.getIntExtra(KEY_MODE, MODE_NORMAL) }
     private val addedCategoryId by lazy { intent.getLongExtra(KEY_NOTE_CATEGORY_ID, 0L) }
     private val vm by viewModels<SingleVM<MData>>()
-    private val coursesMap = HashMap<Int, List<Course>>()
+    private val coursesCacheMap = HashMap<Int, List<Course>>()
 
     override fun initView() {
         setLightStatusBar(true)
@@ -142,12 +142,12 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     }.let { }
 
     private suspend fun getCoursesByZC(zc: Int): List<Course> {
-        if (coursesMap.containsKey(zc)) return coursesMap[zc]!!
+        if (coursesCacheMap.containsKey(zc)) return coursesCacheMap[zc]!!
         return withContext(Dispatchers.IO) {
             CourseDB.get().dao()
                 .getByZC(zc)
                 .first()
-        }.also { coursesMap[zc] = it }
+        }.also { coursesCacheMap[zc] = it }
     }
 
     override suspend fun refreshDataInScope() {
@@ -186,7 +186,12 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                     "$year/$month/$day"
                 }.also { binding.todayDate.text = it }
                 "第${data.curZC}周".also { binding.todayZc.text = it }
+                val preZC = (data.tableZC - 2 + data.schoolData.weekNum) %
+                        data.schoolData.weekNum + 1
+                val nextZC = (data.tableZC) % data.schoolData.weekNum + 1
                 "第${data.tableZC}周".also { binding.zc.text = it }
+                "第${preZC}周".also { binding.tablePreBtn.text = it }
+                "第${nextZC}周".also { binding.tableNextBtn.text = it }
                 showTable(
                     tableZC = data.tableZC,
                     preCourses = data.preCourses,
@@ -290,22 +295,23 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         val nextCells = filterToCells(nextCourses)
         val oneDay = 86_400_000L
         val oneWeek = oneDay * 7
-        val tableZcMondayTimeStamp =
-            if (curCourses.isNotEmpty()) {
+        val tableZcMondayTimeStamp = when (curCourses.isNotEmpty()) {
+            true -> {
                 curCourses.first().let {
                     val offset = (it.xq - 1) * oneDay
                     it.timeStamp - offset
                 }
-            } else {
-                runBlocking {
-                    DSManager.getLong(
-                        LongKeys.FIRST_ZC_MONDAY_TIME_STAMP,
-                        System.currentTimeMillis()
-                    ).first().let {
-                        (tableZC - 1) * oneWeek + it
-                    }
+            }
+
+            else -> runBlocking {
+                DSManager.getLong(
+                    LongKeys.FIRST_ZC_MONDAY_TIME_STAMP,
+                    System.currentTimeMillis()
+                ).first().let {
+                    (tableZC - 1) * oneWeek + it
                 }
             }
+        }
         val rows =
             if (tableConfig.ignoreEvening) sd.nodesPerDay - sd.nodesInEvening
             else sd.nodesPerDay
@@ -313,9 +319,9 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             if (tableConfig.ignoreSaturday && tableConfig.ignoreSunday) 5
             else if (tableConfig.ignoreSaturday || tableConfig.ignoreSunday) 6
             else 7
-        val xAxis = ArrayList<String>().also {
+        val xAxis = ArrayList<String>().apply {
             for (i in 0 until 7) {
-                it.add(
+                add(
                     "${
                         when (i) {
                             0 -> "星期一"
@@ -333,16 +339,28 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                     }"
                 )
             }
-            if (tableConfig.ignoreSunday) it.removeAt(6)
-            if (tableConfig.ignoreSaturday) it.removeAt(5)
+            if (tableConfig.ignoreSunday) removeAt(6)
+            if (tableConfig.ignoreSaturday) removeAt(5)
         }
-        val yAxis = ArrayList<String>().also {
+        val yAxis = ArrayList<String>().apply {
             for (i in 0 until rows) {
-                it.add(
-                    (i + 1).toString()
-                )
+                add((i + 1).toString())
             }
         }
+        val highlightX = vm.latest?.run {
+            if (tableZC == curZC) System.currentTimeMillis()
+                .toDateFormat()
+                .let { today ->
+                    val todayTimeStamp = DateFormat(
+                        year = today.year,
+                        month = today.month,
+                        day = today.day
+                    ).toTimeStamp()
+                    val offset = (todayTimeStamp - tableZcMondayTimeStamp) / oneDay
+                    (offset + 1).toInt()
+                }
+            else 0
+        } ?: 0
         binding.table.update(
             rows = rows,
             columns = columns,
@@ -351,20 +369,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             nextCells = nextCells,
             xAxis = xAxis,
             yAxis = yAxis,
-            highlightX = vm.latest?.run {
-                if (tableZC == curZC) System.currentTimeMillis()
-                    .toDateFormat()
-                    .let { today ->
-                        val todayTimeStamp = DateFormat(
-                            year = today.year,
-                            month = today.month,
-                            day = today.day
-                        ).toTimeStamp()
-                        val offset = (todayTimeStamp - tableZcMondayTimeStamp) / oneDay
-                        (offset + 1).toInt()
-                    }
-                else 0
-            } ?: 0,
+            highlightX = highlightX,
             onClickCell = this@TableActivity::onClickTableItem,
             onScrollToPre = this@TableActivity::onScrollToTablePre,
             onScrollToNext = this@TableActivity::onScrollToTableNext

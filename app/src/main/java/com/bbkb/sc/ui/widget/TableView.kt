@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import android.widget.OverScroller
 import androidx.core.animation.doOnEnd
 import androidx.core.graphics.toColorInt
@@ -318,13 +319,14 @@ class TableView : ViewGroup {
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private val minFling = ViewConfiguration.get(context).scaledMinimumFlingVelocity
     private val maxFling = ViewConfiguration.get(context).scaledMaximumFlingVelocity
+    private val thresholdsScaleWithWidth = 0.7f
     private var downX = 0f
     private var lastX = 0f
     private var offsetX = 0f
     private var velocityTracker: VelocityTracker? = null
     private var activePointerId = MotionEvent.INVALID_POINTER_ID
 
-    /* ==== 滚动事件 ==== */
+    /* ==== 事件拦截 ==== */
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
         ev ?: return false
         when (ev.actionMasked) {
@@ -338,6 +340,7 @@ class TableView : ViewGroup {
 
             MotionEvent.ACTION_MOVE -> {
                 val dx = ev.x - downX
+                lastX = ev.x
                 if (abs(dx) > touchSlop) return true
             }
 
@@ -374,7 +377,7 @@ class TableView : ViewGroup {
                 velocityTracker?.apply {
                     computeCurrentVelocity(1000, maxFling.toFloat())
                     val xVel = getXVelocity(activePointerId)
-                    if (abs(xVel) > 400) fling(xVel)
+                    if (abs(xVel) >= minFling) fling(xVel)
                     else absorbPage()
                     recycle()
                     velocityTracker = null
@@ -403,11 +406,13 @@ class TableView : ViewGroup {
         if (!scroller.isFinished && scroller.computeScrollOffset()) {
             val cellCount = preCells.size + curCells.size + nextCells.size
             offsetX = scroller.currX.toFloat()
-            if (abs(scroller.currVelocity) < minFling || abs(offsetX).toInt() == width) {
+            val curVel = scroller.currVelocity
+            if (abs(curVel) < minFling ||
+                abs(offsetX) > width * thresholdsScaleWithWidth
+            ) {
                 scroller.abortAnimation()
-                absorbPage()
+                absorbPage(curVel)
             } else {
-
                 for (i in 0 until cellCount) {
                     itemViews[i].translationX = offsetX
                 }
@@ -416,9 +421,10 @@ class TableView : ViewGroup {
         }
     }
 
+    /* ==== 吸附归位 ==== */
     @SuppressLint("Recycle")
-    private fun absorbPage() {
-        val thresholds = width * 0.7f
+    private fun absorbPage(curVel: Float = 0f) {
+        val thresholds = width * thresholdsScaleWithWidth
         SCLog.debug("absorbPage", "offsetX=$offsetX")
         SCLog.debug("absorbPage", "thresholds=$thresholds")
         val targetX = when (offsetX) {
@@ -428,7 +434,7 @@ class TableView : ViewGroup {
         }.toFloat()
         val cellCount = preCells.size + curCells.size + nextCells.size
         ValueAnimator.ofFloat(offsetX, targetX).apply {
-            duration = 300
+            duration = 300L
             interpolator = DecelerateInterpolator()
             addUpdateListener {
                 val value = it.animatedValue as Float
