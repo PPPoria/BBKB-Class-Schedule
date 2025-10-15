@@ -44,6 +44,8 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     private val addedCategoryId by lazy { intent.getLongExtra(KEY_NOTE_CATEGORY_ID, 0L) }
     private val vm by viewModels<SingleVM<MData>>()
     private val coursesCacheMap = HashMap<Int, List<Course>>()
+    private val xAxisCacheMap = HashMap<Int, List<String>>()
+    private val mondayTimeStampList = ArrayList<Long>()
 
     override fun initView() {
         setLightStatusBar(true)
@@ -140,15 +142,6 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             }
         }
     }.let { }
-
-    private suspend fun getCoursesByZC(zc: Int): List<Course> {
-        if (coursesCacheMap.containsKey(zc)) return coursesCacheMap[zc]!!
-        return withContext(Dispatchers.IO) {
-            CourseDB.get().dao()
-                .getByZC(zc)
-                .first()
-        }.also { coursesCacheMap[zc] = it }
-    }
 
     override suspend fun refreshDataInScope() {
         val old = vm.latest ?: DSManager.run {
@@ -293,25 +286,6 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         val preCells = filterToCells(preCourses)
         val curCells = filterToCells(curCourses)
         val nextCells = filterToCells(nextCourses)
-        val oneDay = 86_400_000L
-        val oneWeek = oneDay * 7
-        val tableZcMondayTimeStamp = when (curCourses.isNotEmpty()) {
-            true -> {
-                curCourses.first().let {
-                    val offset = (it.xq - 1) * oneDay
-                    it.timeStamp - offset
-                }
-            }
-
-            else -> runBlocking {
-                DSManager.getLong(
-                    LongKeys.FIRST_ZC_MONDAY_TIME_STAMP,
-                    System.currentTimeMillis()
-                ).first().let {
-                    (tableZC - 1) * oneWeek + it
-                }
-            }
-        }
         val rows =
             if (tableConfig.ignoreEvening) sd.nodesPerDay - sd.nodesInEvening
             else sd.nodesPerDay
@@ -319,48 +293,12 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             if (tableConfig.ignoreSaturday && tableConfig.ignoreSunday) 5
             else if (tableConfig.ignoreSaturday || tableConfig.ignoreSunday) 6
             else 7
-        val xAxis = ArrayList<String>().apply {
-            for (i in 0 until 7) {
-                add(
-                    "${
-                        when (i) {
-                            0 -> "星期一"
-                            1 -> "星期二"
-                            2 -> "星期三"
-                            3 -> "星期四"
-                            4 -> "星期五"
-                            5 -> "星期六"
-                            6 -> "星期日"
-                            else -> ""
-                        }
-                    }\n${
-                        (tableZcMondayTimeStamp + oneDay * i)
-                            .toDateFormat().run { "$month.$day" }
-                    }"
-                )
-            }
-            if (tableConfig.ignoreSunday) removeAt(6)
-            if (tableConfig.ignoreSaturday) removeAt(5)
-        }
+        val (xAxis, highlightX) = getXAxisAndHighlightXByZC(tableZC, tableConfig)
         val yAxis = ArrayList<String>().apply {
             for (i in 0 until rows) {
                 add((i + 1).toString())
             }
         }
-        val highlightX = vm.latest?.run {
-            if (tableZC == curZC) System.currentTimeMillis()
-                .toDateFormat()
-                .let { today ->
-                    val todayTimeStamp = DateFormat(
-                        year = today.year,
-                        month = today.month,
-                        day = today.day
-                    ).toTimeStamp()
-                    val offset = (todayTimeStamp - tableZcMondayTimeStamp) / oneDay
-                    (offset + 1).toInt()
-                }
-            else 0
-        } ?: 0
         binding.table.update(
             rows = rows,
             columns = columns,
@@ -374,6 +312,79 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             onScrollToPre = this@TableActivity::onScrollToTablePre,
             onScrollToNext = this@TableActivity::onScrollToTableNext
         )
+    }
+
+    private suspend fun getCoursesByZC(zc: Int): List<Course> {
+        if (coursesCacheMap.containsKey(zc)) return coursesCacheMap[zc]!!
+        return withContext(Dispatchers.IO) {
+            CourseDB.get().dao()
+                .getByZC(zc)
+                .first()
+        }.also { coursesCacheMap[zc] = it }
+    }
+
+    private suspend fun getXAxisAndHighlightXByZC(
+        zc: Int,
+        tableConfig: TableConfig,
+        timeStamp: Long = System.currentTimeMillis()
+    ): Pair<List<String>, Int> {
+        val oneDay = 86_400_000L
+        val oneWeek = oneDay * 7
+        /**
+         * 原本想要使用 mondayTimeStampList by lazy{} 这样的形式，
+         * 但是涉及 DataStore，能不阻塞就不阻塞了。
+         * 故放在这里判断是否为空，为空再初始化
+         */
+        val tableZcMondayTimeStamp = mondayTimeStampList.ifEmpty {
+            val first = withContext(Dispatchers.IO) {
+                DSManager.getLong(
+                    LongKeys.FIRST_ZC_MONDAY_TIME_STAMP,
+                    System.currentTimeMillis()
+                ).first()
+            }
+            for (i in -1 until 40) {
+                mondayTimeStampList.add(i * oneWeek + first)
+            }
+            return@ifEmpty mondayTimeStampList
+        }[zc]
+        val xAxis = if (xAxisCacheMap.containsKey(zc)) xAxisCacheMap[zc]!!
+        else {
+            val xAxis = ArrayList<String>().apply {
+                for (i in 0 until 7) {
+                    add(
+                        "${
+                            when (i) {
+                                0 -> "星期一"
+                                1 -> "星期二"
+                                2 -> "星期三"
+                                3 -> "星期四"
+                                4 -> "星期五"
+                                5 -> "星期六"
+                                6 -> "星期日"
+                                else -> ""
+                            }
+                        }\n${
+                            (tableZcMondayTimeStamp + oneDay * i)
+                                .toDateFormat().run { "$month.$day" }
+                        }"
+                    )
+                }
+                if (tableConfig.ignoreSunday) removeAt(6)
+                if (tableConfig.ignoreSaturday) removeAt(5)
+            }
+            xAxis.also { xAxisCacheMap[zc] = it }
+        }
+        val highlightX = if (tableZcMondayTimeStamp + oneWeek >= timeStamp) {
+            val theDay = timeStamp.toDateFormat()
+            DateFormat(
+                theDay.year,
+                theDay.month,
+                theDay.day,
+            ).toTimeStamp().let { it - tableZcMondayTimeStamp }.let {
+                (it / oneDay) + 1
+            }.toInt()
+        } else 0
+        return xAxis to highlightX
     }
 
     private fun onClickTableItem(cell: TableView.Cell) {

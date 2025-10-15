@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import android.view.animation.LinearInterpolator
 import android.widget.OverScroller
 import androidx.core.animation.doOnEnd
 import androidx.core.graphics.toColorInt
@@ -325,6 +324,7 @@ class TableView : ViewGroup {
     private var offsetX = 0f
     private var velocityTracker: VelocityTracker? = null
     private var activePointerId = MotionEvent.INVALID_POINTER_ID
+    private var scrollAnimator: ValueAnimator? = null
 
     /* ==== 事件拦截 ==== */
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
@@ -365,6 +365,10 @@ class TableView : ViewGroup {
                 lastX = event.x
                 offsetX += dx
                 offsetX = offsetX.coerceIn(-width.toFloat(), width.toFloat())
+                scrollAnimator?.apply {
+                    cancel()
+                    scrollAnimator = null
+                }
                 val cellCount = preCells.size + curCells.size + nextCells.size
                 for (i in 0 until cellCount) {
                     val view = itemViews[i]
@@ -411,7 +415,7 @@ class TableView : ViewGroup {
                 abs(offsetX) > width * thresholdsScaleWithWidth
             ) {
                 scroller.abortAnimation()
-                absorbPage(curVel)
+                absorbPage()
             } else {
                 for (i in 0 until cellCount) {
                     itemViews[i].translationX = offsetX
@@ -423,7 +427,7 @@ class TableView : ViewGroup {
 
     /* ==== 吸附归位 ==== */
     @SuppressLint("Recycle")
-    private fun absorbPage(curVel: Float = 0f) {
+    private fun absorbPage() {
         val thresholds = width * thresholdsScaleWithWidth
         SCLog.debug("absorbPage", "offsetX=$offsetX")
         SCLog.debug("absorbPage", "thresholds=$thresholds")
@@ -433,7 +437,7 @@ class TableView : ViewGroup {
             else -> 0
         }.toFloat()
         val cellCount = preCells.size + curCells.size + nextCells.size
-        ValueAnimator.ofFloat(offsetX, targetX).apply {
+        scrollAnimator = ValueAnimator.ofFloat(offsetX, targetX).apply {
             duration = 300L
             interpolator = DecelerateInterpolator()
             addUpdateListener {
@@ -444,6 +448,7 @@ class TableView : ViewGroup {
                 }
             }
             doOnEnd {
+                scrollAnimator = null
                 when (offsetX.toInt()) {
                     width -> onScrollToPre(preCells)
                     -width -> onScrollToNext(nextCells)
