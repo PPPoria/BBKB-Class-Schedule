@@ -30,6 +30,8 @@
     <string name="ignore_evening">不看晚上</string>
     <string name="name_filter">课名筛选：</string>
     <string name="major_filter">专业筛选：</string>
+    <string name="change_background_img">更换背景图片</string>
+    <string name="cancel_background_img">取消背景图片</string>
 
     <!-- Course Detail Dialog -->
     <string name="course_name">课程：</string>

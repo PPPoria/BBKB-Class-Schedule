@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/corner_12"
-    android:backgroundTint="@color/white_alpha_90"
+    android:backgroundTint="@color/black_shade"
     android:paddingHorizontal="@dimen/padding_h_3"
     android:paddingVertical="@dimen/padding_v_3"
     tools:context=".ui.fragment.TableConfigFragment">
@@ -35,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/name_filter"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/text_size_2h" />
 
             <EditText
@@ -43,11 +43,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@color/gray_shade"
+                android:background="@color/gray"
                 android:hint="--"
                 android:paddingHorizontal="@dimen/padding_h_3"
                 android:paddingVertical="@dimen/padding_v_3"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/text_size_2h" />
         </LinearLayout>
 
@@ -68,7 +68,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/major_filter"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/text_size_2h" />
 
             <EditText
@@ -76,11 +76,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@color/gray_shade"
+                android:background="@color/gray"
                 android:hint="--"
                 android:paddingHorizontal="@dimen/padding_h_3"
                 android:paddingVertical="@dimen/padding_v_3"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/text_size_2h" />
         </LinearLayout>
 
@@ -90,7 +90,7 @@
             android:layout_width="2dp"
             android:layout_height="0dp"
             android:layout_marginEnd="@dimen/padding_h_3"
-            android:background="@color/gray_shade"
+            android:background="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/ignore_btn_layout"
             app:layout_constraintTop_toTopOf="parent" />
@@ -109,11 +109,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/corner_888"
-                android:backgroundTint="@color/gray_shade"
+                android:backgroundTint="@color/gray"
                 android:gravity="center"
                 android:paddingVertical="@dimen/padding_v_3"
                 android:text="@string/ignore_saturday"
-                android:textColor="@color/gray"
+                android:textColor="@color/black"
                 android:textSize="@dimen/text_size_2h" />
 
             <TextView
@@ -122,11 +122,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/padding_v_3"
                 android:background="@drawable/corner_888"
-                android:backgroundTint="@color/gray_shade"
+                android:backgroundTint="@color/gray"
                 android:gravity="center"
                 android:paddingVertical="@dimen/padding_v_3"
                 android:text="@string/ignore_sunday"
-                android:textColor="@color/gray"
+                android:textColor="@color/black"
                 android:textSize="@dimen/text_size_2h" />
 
             <TextView
@@ -134,11 +134,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/corner_888"
-                android:backgroundTint="@color/gray_shade"
+                android:backgroundTint="@color/gray"
                 android:gravity="center"
                 android:paddingVertical="@dimen/padding_v_3"
                 android:text="@string/ignore_evening"
-                android:textColor="@color/gray"
+                android:textColor="@color/black"
                 android:textSize="@dimen/text_size_2h" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -159,7 +159,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/cancel_background_img"
-        android:textColor="@color/gray"
+        android:textColor="@color/white"
         android:textSize="@dimen/text_size_2h"
         android:textStyle="italic"
         android:layout_marginStart="@dimen/padding_h_2"

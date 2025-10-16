@@ -76,6 +76,7 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
             onClickCell = this@TableFragment::onClickTableItem
             onScrollToPre = { onScrollToTablePre() }
             onScrollToNext = { onScrollToTableNext() }
+            onScrollListener = this@TableFragment::onScrollListener
         }
     }
 
@@ -319,4 +320,8 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
             nextCourses = courses
         ).also { vm.update(it) }
     }
+
+    private fun onScrollListener(offsetX: Float, width: Float) = lifecycleScope.launch {
+
+    }.let { }
 }

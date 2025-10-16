@@ -16,6 +16,7 @@ import android.widget.OverScroller
 import androidx.core.animation.doOnEnd
 import androidx.core.view.isGone
 import com.bbkb.sc.R
+import com.bbkb.sc.SCApp
 import com.bbkb.sc.databinding.ItemTableCellBinding
 import com.bbkb.sc.databinding.ItemTableXBinding
 import com.bbkb.sc.databinding.ItemTableYBinding
@@ -186,7 +187,9 @@ class TableView : ViewGroup {
     // 颜色相关
     private val white = context.getColor(R.color.white)
     private val black = context.getColor(R.color.black)
+    private val blackShade = context.getColor(R.color.black_shade)
     private val highlightColor = context.getColor(R.color.primary)
+    private val transparent = context.getColor(android.R.color.transparent)
     private fun View.layout(l: Float, t: Float, r: Float, b: Float) {
         layout(l.toInt(), t.toInt(), r.toInt(), b.toInt())
     }
@@ -203,7 +206,12 @@ class TableView : ViewGroup {
             with(ItemTableCellBinding.bind(view)) {
                 bg.isEnabled = true
                 bg.setOnClickListenerWithClickAnimation { onClickCell(cell) }
-                bg.backgroundTintList = ColorStateList.valueOf(cell.color)
+                if (title.textColors.defaultColor != black) {
+                    title.setTextColor(cell.color)
+                    content.setTextColor(cell.color)
+                } else {
+                    bg.backgroundTintList = ColorStateList.valueOf(cell.color)
+                }
                 title.text = cell.title
                 content.text = cell.content
             }
@@ -253,9 +261,14 @@ class TableView : ViewGroup {
                     dayOfWeek.setTextColor(white)
                     date.setTextColor(white)
                 } else {
-                    bg.backgroundTintList = ColorStateList.valueOf(white)
-                    dayOfWeek.setTextColor(black)
-                    date.setTextColor(black)
+                    bg.backgroundTintList = ColorStateList.valueOf(transparent)
+                    if (dayOfWeek.textColors.defaultColor != black) {
+                        dayOfWeek.setTextColor(white)
+                        date.setTextColor(white)
+                    } else {
+                        dayOfWeek.setTextColor(black)
+                        date.setTextColor(black)
+                    }
                 }
             }
         }
@@ -298,10 +311,11 @@ class TableView : ViewGroup {
                 bg.isEnabled = false
                 nodeNumber.text = item.nodeNumber
                 time.text = item.time
-                time.setTextColor(
+
+                /*time.setTextColor(
                     if (item.id in highlightYIds) highlightColor
-                    else black
-                )
+                    else
+                )*/
             }
             view.layout(
                 0f,
@@ -324,6 +338,7 @@ class TableView : ViewGroup {
     private var velocityTracker: VelocityTracker? = null
     private var activePointerId = MotionEvent.INVALID_POINTER_ID
     private var scrollAnimator: ValueAnimator? = null
+    var onScrollListener: (offsetX: Float, width: Float) -> Unit = { _, _ -> }
 
     /* ==== 事件拦截 ==== */
     override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
@@ -375,6 +390,7 @@ class TableView : ViewGroup {
                 for (i in 0 until columns * 3) {
                     xAxisViews[i].translationX = offsetX
                 }
+                onScrollListener(offsetX, width.toFloat())
                 invalidate()
             }
 
@@ -408,6 +424,7 @@ class TableView : ViewGroup {
     }
 
     override fun computeScroll() {
+        onScrollListener(offsetX, width.toFloat())
         if (!scroller.isFinished && scroller.computeScrollOffset()) {
             offsetX = scroller.currX.toFloat()
             val curVel = scroller.currVelocity

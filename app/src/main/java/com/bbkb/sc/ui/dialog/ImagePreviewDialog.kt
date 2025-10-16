@@ -96,7 +96,7 @@ class ImagePreviewDialog : BaseDialog<DialogImagePreviewBinding>() {
             lifecycleScope.launch {
                 val deletePosition = flow.value.imagePosition
                 val path = flow.value.imagePathList[deletePosition]
-                val result = FileManager.deleteInnerImageFromGallery(path)
+                val result = FileManager.deleteInnerImage(path)
                 if (result) {
                     val newList = flow.value.imagePathList.toMutableList()
                     newList.removeAt(deletePosition)

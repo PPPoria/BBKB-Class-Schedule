@@ -1,7 +1,6 @@
 package com.bbkb.sc.util
 
 import android.content.ContentValues
-import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
@@ -35,7 +34,7 @@ object FileManager {
         }
     }
 
-    suspend fun deleteInnerImageFromGallery(
+    suspend fun deleteInnerImage(
         absolutePath: String
     ): Boolean {
         return withContext(Dispatchers.IO) {

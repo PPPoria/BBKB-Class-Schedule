@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/black"
     android:orientation="vertical"
     tools:context=".ui.activity.TableActivity">
 
@@ -22,7 +22,7 @@
         android:id="@+id/bg_mask"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white_alpha_90"
+        android:background="@color/black_alpha_50"
         android:visibility="invisible" />
 
     <!-- main layout -->
@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="2025/10/1"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/text_size_2b"
                 android:textStyle="bold" />
 
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="第1周"
-                android:textColor="@color/gray"
+                android:textColor="@color/white"
                 android:textSize="@dimen/text_size_2h" />
         </LinearLayout>
 

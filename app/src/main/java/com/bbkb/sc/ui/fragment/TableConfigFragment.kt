@@ -1,22 +1,22 @@
 package com.bbkb.sc.ui.fragment
 
 import android.content.res.ColorStateList
-import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bbkb.sc.R
 import com.bbkb.sc.SCApp
 import com.bbkb.sc.databinding.FragmentTableConfigBinding
+import com.bbkb.sc.datastore.IntKeys
 import com.bbkb.sc.datastore.StringKeys
 import com.bbkb.sc.schedule.TableConfig
 import com.bbkb.sc.ui.activity.TableActivity
+import com.bbkb.sc.util.FileManager
 import com.google.gson.Gson
 import com.poria.base.base.BaseFragment
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
@@ -24,12 +24,46 @@ import com.poria.base.store.DSManager
 import com.poria.base.viewmodel.SingleVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.util.UUID
 
 
 class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
     override fun onViewBindingCreate() = FragmentTableConfigBinding.inflate(layoutInflater)
     private val vm by activityViewModels<SingleVM<TableActivity.MData>>()
+    private val pickImagesLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent(),
+        callback = { uri ->
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (uri == null) return@launch
+                val path = requireContext().contentResolver.openInputStream(uri)?.use { ins ->
+                    val file =
+                        File(requireContext().filesDir, "multi_pics/${UUID.randomUUID()}.jpg")
+                    file.parentFile?.mkdirs()
+                    FileOutputStream(file).use { out -> ins.copyTo(out) }
+                    file.absolutePath   // 内部路径
+                } ?: return@launch
+                CoroutineScope(Dispatchers.Default).launch {
+                    val oldPath = DSManager.getString(
+                        StringKeys.TABLE_BACKGROUND_IMG_PATH,
+                        ""
+                    ).first()
+                    if (oldPath.isNotEmpty() && oldPath.isNotBlank()) {
+                        FileManager.deleteInnerImage(oldPath)
+                    }
+                    DSManager.setString(StringKeys.TABLE_BACKGROUND_IMG_PATH, path)
+                    vm.latest?.copy(
+                        bgImgPath = path
+                    )?.let { vm.update(it) }
+                    toDarkMode()
+                }
+            }
+        }
+    )
 
     override fun initListener() = with(binding) {
         ignoreSaturdayBtn.setOnClickListenerWithClickAnimation {
@@ -85,11 +119,26 @@ class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
                 }.also { vm.update(it) }
             }
         })
+        changeBackgroundImgBtn.setOnClickListener {
+            pickImagesLauncher.launch("image/*")
+        }
+        cancelBackgroundImgBtn.setOnClickListener {
+            CoroutineScope(Dispatchers.Default).launch {
+                val oldPath = DSManager.getString(
+                    StringKeys.TABLE_BACKGROUND_IMG_PATH,
+                    ""
+                ).first()
+                if (oldPath.isNotEmpty() && oldPath.isNotBlank()) {
+                    FileManager.deleteInnerImage(oldPath)
+                }
+                DSManager.setString(StringKeys.TABLE_BACKGROUND_IMG_PATH, "")
+                vm.latest?.copy(
+                    bgImgPath = ""
+                )?.let { vm.update(it) }
+                normalMode()
+            }
+        }
     }.let { }
-
-    override suspend fun refreshDataInScope() {
-        
-    }
 
     override suspend fun observeDataInScope() {
         repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -108,10 +157,17 @@ class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
                     SCApp.app.getColor(R.color.primary)
                 )
             } else {
-                it.setTextColor(SCApp.app.getColor(R.color.black))
-                it.backgroundTintList = ColorStateList.valueOf(
-                    SCApp.app.getColor(R.color.white_dim)
-                )
+                if (SCApp.isDarkTheme) {
+                    it.setTextColor(SCApp.app.getColor(R.color.black))
+                    it.backgroundTintList = ColorStateList.valueOf(
+                        SCApp.app.getColor(R.color.gray)
+                    )
+                } else {
+                    it.setTextColor(SCApp.app.getColor(R.color.gray))
+                    it.backgroundTintList = ColorStateList.valueOf(
+                        SCApp.app.getColor(R.color.white_dim)
+                    )
+                }
             }
         }
         binding.ignoreSundayBtn.also {
@@ -121,10 +177,17 @@ class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
                     SCApp.app.getColor(R.color.primary)
                 )
             } else {
-                it.setTextColor(SCApp.app.getColor(R.color.black))
-                it.backgroundTintList = ColorStateList.valueOf(
-                    SCApp.app.getColor(R.color.white_dim)
-                )
+                if (SCApp.isDarkTheme) {
+                    it.setTextColor(SCApp.app.getColor(R.color.black))
+                    it.backgroundTintList = ColorStateList.valueOf(
+                        SCApp.app.getColor(R.color.gray)
+                    )
+                } else {
+                    it.setTextColor(SCApp.app.getColor(R.color.gray))
+                    it.backgroundTintList = ColorStateList.valueOf(
+                        SCApp.app.getColor(R.color.white_dim)
+                    )
+                }
             }
         }
         binding.ignoreEveningBtn.also {
@@ -134,10 +197,17 @@ class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
                     SCApp.app.getColor(R.color.primary)
                 )
             } else {
-                it.setTextColor(SCApp.app.getColor(R.color.black))
-                it.backgroundTintList = ColorStateList.valueOf(
-                    SCApp.app.getColor(R.color.white_dim)
-                )
+                if (SCApp.isDarkTheme) {
+                    it.setTextColor(SCApp.app.getColor(R.color.black))
+                    it.backgroundTintList = ColorStateList.valueOf(
+                        SCApp.app.getColor(R.color.gray)
+                    )
+                } else {
+                    it.setTextColor(SCApp.app.getColor(R.color.gray))
+                    it.backgroundTintList = ColorStateList.valueOf(
+                        SCApp.app.getColor(R.color.white_dim)
+                    )
+                }
             }
         }
         binding.nameFilter.apply {
@@ -155,6 +225,29 @@ class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
             Gson().toJson(tableConfig).also { str ->
                 DSManager.setString(StringKeys.TABLE_CONFIG, str)
             }
+        }
+    }
+
+    private fun normalMode() {
+        MainScope().launch {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            DSManager.setInt(IntKeys.NIGHT_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            recreate()
+        }
+    }
+
+    private fun toDarkMode() {
+        MainScope().launch {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            DSManager.setInt(IntKeys.NIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES)
+            recreate()
+        }
+    }
+
+    private fun recreate() {
+        if (Lifecycle.State.RESUMED == lifecycle.currentState) {
+            startActivity(requireActivity().intent)
+            requireActivity().finish()
         }
     }
 }

@@ -3,7 +3,6 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -21,6 +20,7 @@
             android:gravity="center"
             android:maxLines="3"
             android:text="title"
+            android:textColor="@color/black"
             android:textSize="9sp"
             android:textStyle="bold" />
 
@@ -32,6 +32,7 @@
             android:gravity="center"
             android:maxLines="2"
             android:text="12:00\n13:00"
+            android:textColor="@color/black"
             android:textSize="8sp" />
     </LinearLayout>
 </LinearLayout>

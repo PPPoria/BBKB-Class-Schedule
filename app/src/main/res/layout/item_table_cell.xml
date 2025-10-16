@@ -12,7 +12,6 @@
         android:layout_margin="1dp"
         android:layout_weight="5"
         android:background="@drawable/corner_6"
-        android:backgroundTint="@color/gray"
         android:orientation="vertical"
         android:paddingHorizontal="3dp"
         android:paddingVertical="5dp">

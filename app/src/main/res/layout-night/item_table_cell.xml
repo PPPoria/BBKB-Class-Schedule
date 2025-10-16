@@ -9,18 +9,20 @@
         android:id="@+id/bg"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_margin="1dp"
         android:layout_weight="5"
-        android:background="@drawable/corner_12"
-        android:backgroundTint="@color/transparent"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:background="@drawable/corner_6_s_white"
+        android:orientation="vertical"
+        android:paddingHorizontal="3dp"
+        android:paddingVertical="5dp">
 
         <TextView
-            android:id="@+id/day_of_week"
+            android:id="@+id/title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:ellipsize="end"
-            android:gravity="center"
+            android:gravity="top"
             android:maxLines="3"
             android:text="title"
             android:textColor="@color/white"
@@ -28,11 +30,12 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/date"
+            android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:ellipsize="end"
-            android:gravity="center"
+            android:gravity="bottom"
             android:maxLines="3"
             android:text="content"
             android:textColor="@color/white"

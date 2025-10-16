@@ -7,6 +7,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.lifecycle.lifecycleScope
 import com.bbkb.sc.R
+import com.bbkb.sc.SCApp
 import com.bbkb.sc.databinding.ActivityAuthBinding
 import com.bbkb.sc.datastore.LongKeys
 import com.bbkb.sc.datastore.StringKeys
@@ -45,6 +46,10 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
     private var authSuccess = false
 
     override fun initView() {
+        if (SCApp.isDarkTheme) {
+            setLightStatusBar(false)
+            setLightNavigationBar(false)
+        }
         setLightStatusBar(true)
         setLightNavigationBar(true)
         showAuthView()

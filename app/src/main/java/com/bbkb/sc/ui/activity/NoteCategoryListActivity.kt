@@ -34,9 +34,7 @@ import com.poria.base.ext.toDateFormat
 import com.poria.base.viewmodel.SingleVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -219,7 +217,7 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
             for (item in items) {
                 launch {
                     for (path in item.picturePaths) {
-                        FileManager.deleteInnerImageFromGallery(path)
+                        FileManager.deleteInnerImage(path)
                     }
                 }
             }
