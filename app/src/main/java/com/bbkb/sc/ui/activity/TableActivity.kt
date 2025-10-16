@@ -45,7 +45,19 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     private val vm by viewModels<SingleVM<MData>>()
     private val coursesCacheMap = HashMap<Int, List<Course>>()
     private val xAxisCacheMap = HashMap<Int, List<String>>()
-    private val mondayTimeStampList = ArrayList<Long>()
+    private val mondayTimeStampList by lazy {
+        ArrayList<Long>().apply {
+            val first = runBlocking {
+                DSManager.getLong(
+                    LongKeys.FIRST_ZC_MONDAY_TIME_STAMP,
+                    System.currentTimeMillis()
+                ).first()
+            }
+            for (i in -1 until 40) {
+                add(i * ScheduleUtils.ONE_WEEK_TIMESTAMP + first)
+            }
+        }
+    }
 
     override fun initView() {
         setLightStatusBar(true)
@@ -293,12 +305,16 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             if (tableConfig.ignoreSaturday && tableConfig.ignoreSunday) 5
             else if (tableConfig.ignoreSaturday || tableConfig.ignoreSunday) 6
             else 7
-        val (xAxis, highlightX) = getXAxisAndHighlightXByZC(tableZC, tableConfig)
+        val xAxis = getXAxisByZC(tableZC).toMutableList().apply {
+            if (tableConfig.ignoreSunday) removeAt(6)
+            if (tableConfig.ignoreSaturday) removeAt(5)
+        }
         val yAxis = ArrayList<String>().apply {
             for (i in 0 until rows) {
                 add((i + 1).toString())
             }
         }
+        val highlightX = getHighlightXByZC(tableZC, System.currentTimeMillis())
         binding.table.update(
             rows = rows,
             columns = columns,
@@ -309,8 +325,8 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             yAxis = yAxis,
             highlightX = highlightX,
             onClickCell = this@TableActivity::onClickTableItem,
-            onScrollToPre = this@TableActivity::onScrollToTablePre,
-            onScrollToNext = this@TableActivity::onScrollToTableNext
+            onScrollToPre = { onScrollToTablePre() },
+            onScrollToNext = { onScrollToTableNext() }
         )
     }
 
@@ -323,68 +339,45 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }.also { coursesCacheMap[zc] = it }
     }
 
-    private suspend fun getXAxisAndHighlightXByZC(
-        zc: Int,
-        tableConfig: TableConfig,
-        timeStamp: Long = System.currentTimeMillis()
-    ): Pair<List<String>, Int> {
-        val oneDay = 86_400_000L
-        val oneWeek = oneDay * 7
-        /**
-         * 原本想要使用 mondayTimeStampList by lazy{} 这样的形式，
-         * 但是涉及 DataStore，能不阻塞就不阻塞了。
-         * 故放在这里判断是否为空，为空再初始化
-         */
-        val tableZcMondayTimeStamp = mondayTimeStampList.ifEmpty {
-            val first = withContext(Dispatchers.IO) {
-                DSManager.getLong(
-                    LongKeys.FIRST_ZC_MONDAY_TIME_STAMP,
-                    System.currentTimeMillis()
-                ).first()
+    private suspend fun getXAxisByZC(zc: Int): List<String> {
+        val tableZcMondayTimeStamp = mondayTimeStampList[zc]
+        return if (xAxisCacheMap.containsKey(zc)) xAxisCacheMap[zc]!!
+        else withContext(Dispatchers.Default) {
+            val list = ArrayList<String>()
+            for (i in 0 until 7) {
+                when (i) {
+                    0 -> "星期一"
+                    1 -> "星期二"
+                    2 -> "星期三"
+                    3 -> "星期四"
+                    4 -> "星期五"
+                    5 -> "星期六"
+                    6 -> "星期日"
+                    else -> ""
+                }.let {
+                    val date = (tableZcMondayTimeStamp + ScheduleUtils.ONE_DAY_TIMESTAMP * i)
+                        .toDateFormat().run { "$month.$day" }
+                    "${it}\n${date}"
+                }.let { list.add(it) }
             }
-            for (i in -1 until 40) {
-                mondayTimeStampList.add(i * oneWeek + first)
-            }
-            return@ifEmpty mondayTimeStampList
-        }[zc]
-        val xAxis = if (xAxisCacheMap.containsKey(zc)) xAxisCacheMap[zc]!!
-        else {
-            val xAxis = ArrayList<String>().apply {
-                for (i in 0 until 7) {
-                    add(
-                        "${
-                            when (i) {
-                                0 -> "星期一"
-                                1 -> "星期二"
-                                2 -> "星期三"
-                                3 -> "星期四"
-                                4 -> "星期五"
-                                5 -> "星期六"
-                                6 -> "星期日"
-                                else -> ""
-                            }
-                        }\n${
-                            (tableZcMondayTimeStamp + oneDay * i)
-                                .toDateFormat().run { "$month.$day" }
-                        }"
-                    )
-                }
-                if (tableConfig.ignoreSunday) removeAt(6)
-                if (tableConfig.ignoreSaturday) removeAt(5)
-            }
-            xAxis.also { xAxisCacheMap[zc] = it }
-        }
-        val highlightX = if (tableZcMondayTimeStamp + oneWeek >= timeStamp) {
+            list
+        }.also { xAxisCacheMap[zc] = it }
+    }
+
+    private suspend fun getHighlightXByZC(zc: Int, timeStamp: Long): Int {
+        val tableZcMondayTimeStamp = mondayTimeStampList[zc]
+        return if (tableZcMondayTimeStamp +
+            ScheduleUtils.ONE_WEEK_TIMESTAMP >= timeStamp
+        ) withContext(Dispatchers.Default) {
             val theDay = timeStamp.toDateFormat()
             DateFormat(
                 theDay.year,
                 theDay.month,
                 theDay.day,
             ).toTimeStamp().let { it - tableZcMondayTimeStamp }.let {
-                (it / oneDay) + 1
+                (it / ScheduleUtils.ONE_DAY_TIMESTAMP) + 1
             }.toInt()
         } else 0
-        return xAxis to highlightX
     }
 
     private fun onClickTableItem(cell: TableView.Cell) {
@@ -410,36 +403,32 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }
     }
 
-    private fun onScrollToTablePre(cells: List<TableView.Cell>) {
-        lifecycleScope.launch {
-            val old = vm.latest ?: return@launch
-            val zc = ((old.tableZC - 2 + old.schoolData.weekNum) %
+    private fun onScrollToTablePre() = lifecycleScope.launch {
+        val old = vm.latest ?: return@launch
+        val zc = ((old.tableZC - 2 + old.schoolData.weekNum) %
+                old.schoolData.weekNum + 1)
+        val courses = getCoursesByZC(
+            ((zc - 2 + old.schoolData.weekNum) %
                     old.schoolData.weekNum + 1)
-            val courses = getCoursesByZC(
-                ((zc - 2 + old.schoolData.weekNum) %
-                        old.schoolData.weekNum + 1)
-            )
-            old.copy(
-                tableZC = zc,
-                preCourses = courses,
-                curCourses = old.preCourses,
-                nextCourses = old.curCourses
-            ).also { vm.update(it) }
-        }
+        )
+        old.copy(
+            tableZC = zc,
+            preCourses = courses,
+            curCourses = old.preCourses,
+            nextCourses = old.curCourses
+        ).also { vm.update(it) }
     }
 
-    private fun onScrollToTableNext(cells: List<TableView.Cell>) {
-        lifecycleScope.launch {
-            val old = vm.latest ?: return@launch
-            val zc = (old.tableZC) % old.schoolData.weekNum + 1
-            val courses = getCoursesByZC((zc) % old.schoolData.weekNum + 1)
-            old.copy(
-                tableZC = zc,
-                preCourses = old.curCourses,
-                curCourses = old.nextCourses,
-                nextCourses = courses
-            ).also { vm.update(it) }
-        }
+    private fun onScrollToTableNext() = lifecycleScope.launch {
+        val old = vm.latest ?: return@launch
+        val zc = (old.tableZC) % old.schoolData.weekNum + 1
+        val courses = getCoursesByZC((zc) % old.schoolData.weekNum + 1)
+        old.copy(
+            tableZC = zc,
+            preCourses = old.curCourses,
+            curCourses = old.nextCourses,
+            nextCourses = courses
+        ).also { vm.update(it) }
     }
 
     private fun saveTableConfigInBackground(tableConfig: TableConfig) {

@@ -67,12 +67,7 @@ internal fun updateWidget(
             )
             list
         } else TableWidgetManager.noneCourse.copy(
-            zc = 1,
-            xq = System.currentTimeMillis().toDayOfWeek(),
-            startNode = 0,
-            endNode = 0,
             name = "还未绑定学校",
-            classroom = "--"
         ).let { listOf(it) }
     }.sortedBy { it.startNode }
     setTextViewText(R.id.today_zc, "第${list.first().zc}周")
@@ -106,10 +101,10 @@ object TableWidgetManager {
         teacher = "--",
         major = "--",
         classroom = "--",
-        zc = 1,
-        xq = 1,
-        startNode = 1,
-        endNode = 1,
+        zc = 0,
+        xq = 0,
+        startNode = 0,
+        endNode = 0,
         timeStamp = 0,
         description = "--",
     )

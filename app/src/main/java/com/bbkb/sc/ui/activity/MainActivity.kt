@@ -102,6 +102,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         refreshTableWidget()
     }
 
+    // 刷新课表小部件
     private suspend fun refreshTableWidget() {
         val oneDay = ScheduleUtils.ONE_DAY_TIMESTAMP
         val curTime = System.currentTimeMillis()
