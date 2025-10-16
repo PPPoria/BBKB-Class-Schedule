@@ -77,4 +77,8 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:${camerax_version}")
     implementation("androidx.camera:camera-view:${camerax_version}")
     implementation("androidx.camera:camera-extensions:${camerax_version}")
+
+    // Fragment
+    val fragment_version = "1.8.9"
+    implementation("androidx.fragment:fragment-ktx:$fragment_version")
 }

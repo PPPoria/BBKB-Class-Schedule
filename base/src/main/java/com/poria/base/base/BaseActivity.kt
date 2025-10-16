@@ -36,10 +36,13 @@ abstract class BaseActivity<out T : ViewBinding> : AppCompatActivity() {
             initWindowInsets()
             insets
         }
+
         initView()
+
         initListener()
         lifecycleScope.launch {
             refreshDataInScope()
+            if (savedInstanceState == null) addFragment()
             observeDataInScope()
         }
     }
@@ -67,6 +70,7 @@ abstract class BaseActivity<out T : ViewBinding> : AppCompatActivity() {
     }
 
     open fun initView() {}
+    open fun addFragment() {}
     open fun initListener() {}
     open suspend fun refreshDataInScope() {}
     open suspend fun observeDataInScope() {}
@@ -112,7 +116,7 @@ abstract class BaseActivity<out T : ViewBinding> : AppCompatActivity() {
     * release版本请停止调用！！！
     * release版本请停止调用！！！
     */
-    fun enableStrictMode(activityClass: Class<out BaseActivity<*>>,instanceLimit: Int = 1) {
+    fun enableStrictMode(activityClass: Class<out BaseActivity<*>>, instanceLimit: Int = 1) {
         //开启Thread策略模式
         StrictMode.setThreadPolicy(
             ThreadPolicy.Builder().detectNetwork() //监测主线程使用网络io
@@ -127,7 +131,10 @@ abstract class BaseActivity<out T : ViewBinding> : AppCompatActivity() {
         StrictMode.setVmPolicy(
             VmPolicy.Builder().detectLeakedSqlLiteObjects() //监测sqlite泄露
                 .detectLeakedClosableObjects() //监测没有关闭IO对象
-                .setClassInstanceLimit(activityClass, instanceLimit) // 设置某个类的同时处于内存中的实例上限，可以协助检查内存泄露
+                .setClassInstanceLimit(
+                    activityClass,
+                    instanceLimit
+                ) // 设置某个类的同时处于内存中的实例上限，可以协助检查内存泄露
                 .detectActivityLeaks()
                 .penaltyLog() //写入日志
                 .penaltyDeath() //出现上述情况异常终止

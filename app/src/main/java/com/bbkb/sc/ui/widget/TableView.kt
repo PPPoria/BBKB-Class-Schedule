@@ -52,7 +52,7 @@ class TableView : ViewGroup {
     private var xAxisViews: ArrayList<View> = ArrayList()
     private var yAxisViews: ArrayList<View> = ArrayList()
     private val yW = dp2px(35f)
-    private val xH = dp2px(51f)
+    private val xH = dp2px(43f)
     private var rows: Int = 0
     private var columns: Int = 0
     private var preCells: List<Cell> = emptyList()
@@ -184,6 +184,7 @@ class TableView : ViewGroup {
     }
 
     // 颜色相关
+    private val white = context.getColor(R.color.white)
     private val black = context.getColor(R.color.black)
     private val highlightColor = context.getColor(R.color.primary)
     private fun View.layout(l: Float, t: Float, r: Float, b: Float) {
@@ -247,10 +248,15 @@ class TableView : ViewGroup {
                 bg.isEnabled = false
                 dayOfWeek.text = item.dayOfWeek
                 date.text = item.date
-                date.setTextColor(
-                    if (item.id in highlightXIds) highlightColor
-                    else black
-                )
+                if (item.id in highlightXIds) {
+                    bg.backgroundTintList = ColorStateList.valueOf(highlightColor)
+                    dayOfWeek.setTextColor(white)
+                    date.setTextColor(white)
+                } else {
+                    bg.backgroundTintList = ColorStateList.valueOf(white)
+                    dayOfWeek.setTextColor(black)
+                    date.setTextColor(black)
+                }
             }
         }
         for (i in 0 until columns) {
@@ -364,8 +370,10 @@ class TableView : ViewGroup {
                 }
                 val cellCount = preCells.size + curCells.size + nextCells.size
                 for (i in 0 until cellCount) {
-                    val view = courseViews[i]
-                    view.translationX = offsetX
+                    courseViews[i].translationX = offsetX
+                }
+                for (i in 0 until columns * 3) {
+                    xAxisViews[i].translationX = offsetX
                 }
                 invalidate()
             }
@@ -401,7 +409,6 @@ class TableView : ViewGroup {
 
     override fun computeScroll() {
         if (!scroller.isFinished && scroller.computeScrollOffset()) {
-            val cellCount = preCells.size + curCells.size + nextCells.size
             offsetX = scroller.currX.toFloat()
             val curVel = scroller.currVelocity
             if (abs(curVel) < minFling ||
@@ -410,8 +417,12 @@ class TableView : ViewGroup {
                 scroller.abortAnimation()
                 absorbPage()
             } else {
+                val cellCount = preCells.size + curCells.size + nextCells.size
                 for (i in 0 until cellCount) {
                     courseViews[i].translationX = offsetX
+                }
+                for (i in 0 until columns * 3) {
+                    xAxisViews[i].translationX = offsetX
                 }
                 invalidate()
             }
@@ -431,13 +442,16 @@ class TableView : ViewGroup {
         }.toFloat()
         val cellCount = preCells.size + curCells.size + nextCells.size
         scrollAnimator = ValueAnimator.ofFloat(offsetX, targetX).apply {
-            duration = 200L
+            duration = 200L // 200ms 在手机竖屏上操控的手感最好
             interpolator = DecelerateInterpolator()
             addUpdateListener {
                 val value = it.animatedValue as Float
                 offsetX = value
                 for (i in 0 until cellCount) {
                     courseViews[i].translationX = value
+                }
+                for (i in 0 until columns * 3) {
+                    xAxisViews[i].translationX = value
                 }
             }
             doOnEnd {

@@ -30,8 +30,8 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="center"
-            android:maxLines="3"
-            android:text="content"
+            android:maxLines="2"
+            android:text="12:00\n13:00"
             android:textSize="8sp" />
     </LinearLayout>
 </LinearLayout>

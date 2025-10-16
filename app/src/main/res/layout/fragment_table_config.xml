@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/corner_12"
+    android:backgroundTint="@color/white"
+    android:orientation="horizontal"
+    android:paddingHorizontal="@dimen/padding_h_3"
+    android:paddingVertical="@dimen/padding_v_3"
+    tools:context=".ui.fragment.TableConfigFragment">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/name_filter"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <EditText
+                android:id="@+id/name_filter"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/white_dim"
+                android:hint="--"
+                android:paddingHorizontal="@dimen/padding_h_3"
+                android:paddingVertical="@dimen/padding_v_3"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_v_3"
+            android:gravity="top"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/major_filter"
+                android:textColor="@color/gray"
+                android:textSize="@dimen/text_size_2h" />
+
+            <EditText
+                android:id="@+id/major_filter"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/white_dim"
+                android:hint="--"
+                android:paddingHorizontal="@dimen/padding_h_3"
+                android:paddingVertical="@dimen/padding_v_3"
+                android:textColor="@color/black"
+                android:textSize="@dimen/text_size_2h" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- line -->
+    <View
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="@dimen/padding_h_3"
+        android:background="@color/white_dim" />
+
+    <LinearLayout
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/ignore_saturday_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/corner_888"
+            android:backgroundTint="@color/white_dim"
+            android:gravity="center"
+            android:paddingVertical="@dimen/padding_v_3"
+            android:text="@string/ignore_saturday"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_2h" />
+
+        <TextView
+            android:id="@+id/ignore_sunday_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/padding_v_3"
+            android:background="@drawable/corner_888"
+            android:backgroundTint="@color/white_dim"
+            android:gravity="center"
+            android:paddingVertical="@dimen/padding_v_3"
+            android:text="@string/ignore_sunday"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_2h" />
+
+        <TextView
+            android:id="@+id/ignore_evening_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/corner_888"
+            android:backgroundTint="@color/white_dim"
+            android:gravity="center"
+            android:paddingVertical="@dimen/padding_v_3"
+            android:text="@string/ignore_evening"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_2h" />
+    </LinearLayout>
+
+</LinearLayout>

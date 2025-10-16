@@ -54,60 +54,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/cur_date_layout" />
 
-    <LinearLayout
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/table_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/padding_v_3"
-        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cur_date_layout">
+        app:layout_constraintTop_toBottomOf="@id/cur_date_layout" />
 
-        <!-- table zc pre or next -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_v_3"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/table_pre_btn"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_vertical|end"
-                android:text="@string/none"
-                android:textColor="@color/gray"
-                android:textSize="@dimen/text_size_2h" />
-
-            <TextView
-                android:id="@+id/zc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:paddingVertical="@dimen/padding_v_3"
-                android:text="@string/none"
-                android:textColor="@color/black"
-                android:textSize="@dimen/text_size_hb" />
-
-            <TextView
-                android:id="@+id/table_next_btn"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_vertical|start"
-                android:text="@string/none"
-                android:textColor="@color/gray"
-                android:textSize="@dimen/text_size_2h" />
-        </LinearLayout>
-
-        <!-- table -->
-        <com.bbkb.sc.ui.widget.TableView
-            android:id="@+id/table"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white" />
-    </LinearLayout>
 
     <!-- filter menu -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -116,129 +70,12 @@
         android:layout_height="match_parent"
         android:visibility="invisible">
 
-        <LinearLayout
-            android:id="@+id/filter_layout"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/table_config_fragment_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_h_2"
             android:layout_marginTop="50dp"
-            android:background="@drawable/corner_12"
-            android:backgroundTint="@color/white"
-            android:orientation="horizontal"
-            android:paddingHorizontal="@dimen/padding_h_3"
-            android:paddingVertical="@dimen/padding_v_3"
-            android:translationZ="@dimen/translation_z_1"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/name_filter"
-                        android:textColor="@color/gray"
-                        android:textSize="@dimen/text_size_2h" />
-
-                    <EditText
-                        android:id="@+id/name_filter"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@color/white_dim"
-                        android:hint="--"
-                        android:paddingHorizontal="@dimen/padding_h_3"
-                        android:paddingVertical="@dimen/padding_v_3"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/text_size_2h" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/padding_v_3"
-                    android:gravity="top"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/major_filter"
-                        android:textColor="@color/gray"
-                        android:textSize="@dimen/text_size_2h" />
-
-                    <EditText
-                        android:id="@+id/major_filter"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:background="@color/white_dim"
-                        android:hint="--"
-                        android:paddingHorizontal="@dimen/padding_h_3"
-                        android:paddingVertical="@dimen/padding_v_3"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/text_size_2h" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- line -->
-            <View
-                android:layout_width="2dp"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="@dimen/padding_h_3"
-                android:background="@color/white_dim" />
-
-            <LinearLayout
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/ignore_saturday_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/corner_888"
-                    android:backgroundTint="@color/white_dim"
-                    android:gravity="center"
-                    android:paddingVertical="@dimen/padding_v_3"
-                    android:text="@string/ignore_saturday"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_2h" />
-
-                <TextView
-                    android:id="@+id/ignore_sunday_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginVertical="@dimen/padding_v_3"
-                    android:background="@drawable/corner_888"
-                    android:backgroundTint="@color/white_dim"
-                    android:gravity="center"
-                    android:paddingVertical="@dimen/padding_v_3"
-                    android:text="@string/ignore_sunday"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_2h" />
-
-                <TextView
-                    android:id="@+id/ignore_evening_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/corner_888"
-                    android:backgroundTint="@color/white_dim"
-                    android:gravity="center"
-                    android:paddingVertical="@dimen/padding_v_3"
-                    android:text="@string/ignore_evening"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/text_size_2h" />
-            </LinearLayout>
-        </LinearLayout>
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
