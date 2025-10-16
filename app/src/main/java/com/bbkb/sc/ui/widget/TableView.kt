@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.util.AttributeSet
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.VelocityTracker
@@ -15,10 +14,11 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.OverScroller
 import androidx.core.animation.doOnEnd
-import androidx.core.graphics.toColorInt
-import com.bbkb.sc.databinding.ItemTableBinding
 import androidx.core.view.isGone
 import com.bbkb.sc.R
+import com.bbkb.sc.databinding.ItemTableCellBinding
+import com.bbkb.sc.databinding.ItemTableXBinding
+import com.bbkb.sc.databinding.ItemTableYBinding
 import com.bbkb.sc.util.SCLog
 import com.poria.base.ext.dp2px
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
@@ -42,36 +42,41 @@ class TableView : ViewGroup {
         defStyleRes: Int
     ) : super(context, attrs, defStyleAttr, defStyleRes)
 
+    // 回调
+    var onClickCell: (Cell) -> Unit = {}
+    var onScrollToPre: (List<Cell>) -> Unit = {}
+    var onScrollToNext: (List<Cell>) -> Unit = {}
+
     // 尺寸、位置相关
+    private var courseViews: ArrayList<View> = ArrayList()
+    private var xAxisViews: ArrayList<View> = ArrayList()
+    private var yAxisViews: ArrayList<View> = ArrayList()
     private val yW = dp2px(35f)
-    private val xH = dp2px(41f)
+    private val xH = dp2px(51f)
     private var rows: Int = 0
     private var columns: Int = 0
     private var preCells: List<Cell> = emptyList()
     private var curCells: List<Cell> = emptyList()
     private var nextCells: List<Cell> = emptyList()
-    private var itemViews: ArrayList<View> = ArrayList()
-    private var onClickCell: (Cell) -> Unit = {}
-    private var onScrollToPre: (List<Cell>) -> Unit = {}
-    private var onScrollToNext: (List<Cell>) -> Unit = {}
-    private var xAxis: List<String> = emptyList()
-    private var yAxis: List<String> = emptyList()
-    private var highlightX: Int = 0
-    private var highlightY: Int = 0
+    private var preXAxis: List<XItem> = emptyList()
+    private var curXAxis: List<XItem> = emptyList()
+    private var nextXAxis: List<XItem> = emptyList()
+    private var yAxis: List<YItem> = emptyList()
+    private var highlightXIds: List<Long> = emptyList()
+    private var highlightYIds: List<Long> = emptyList()
 
-    fun update(
+    fun updateData(
         rows: Int,
         columns: Int,
         preCells: List<Cell> = emptyList(),
         curCells: List<Cell> = emptyList(),
         nextCells: List<Cell> = emptyList(),
-        xAxis: List<String> = emptyList(),
-        yAxis: List<String> = emptyList(),
-        highlightX: Int = 0,
-        highlightY: Int = 0,
-        onClickCell: (Cell) -> Unit = {},
-        onScrollToPre: (List<Cell>) -> Unit = {},
-        onScrollToNext: (List<Cell>) -> Unit = {}
+        preXAxis: List<XItem> = emptyList(),
+        curXAxis: List<XItem> = emptyList(),
+        nextXAxis: List<XItem> = emptyList(),
+        yAxis: List<YItem> = emptyList(),
+        highlightXIds: List<Long> = emptyList(),
+        highlightYIds: List<Long> = emptyList(),
     ) {
         if (rows <= 0 || columns <= 0)
             throw IllegalArgumentException("rows and columns must be positive")
@@ -80,30 +85,44 @@ class TableView : ViewGroup {
         this.preCells = preCells
         this.curCells = curCells
         this.nextCells = nextCells
-        this.onClickCell = onClickCell
-        this.onScrollToPre = onScrollToPre
-        this.onScrollToNext = onScrollToNext
-        this.xAxis = xAxis
+        this.preXAxis = preXAxis
+        this.curXAxis = curXAxis
+        this.nextXAxis = nextXAxis
         this.yAxis = yAxis
-        this.highlightX = highlightX
-        this.highlightY = highlightY
-        val sum = (rows + columns + 1 + // 多一个原点的View
-                preCells.size + curCells.size + nextCells.size)
-        while (itemViews.size < sum) {
-            LayoutInflater.from(context)
-                .inflate(R.layout.item_table, this, false)
-                .also {
-                    itemViews.add(it)
-                    addView(it)
-                }
+        this.highlightXIds = highlightXIds
+        this.highlightYIds = highlightYIds
+        val dealViews = { list: ArrayList<View>, count: Int, id: Int ->
+            while (list.size < count) {
+                LayoutInflater.from(context)
+                    .inflate(id, this, false)
+                    .also {
+                        list.add(it)
+                        addView(it)
+                    }
+            }
+            for (i in 0 until count) {
+                list[i].isGone = false
+                list[i].translationX = 0f
+            }
+            for (i in count until list.size) {
+                list[i].isGone = true
+            }
         }
-        for (i in 0 until sum) {
-            itemViews[i].isGone = false
-            itemViews[i].translationX = 0f
-        }
-        for (i in sum until itemViews.size) {
-            itemViews[i].isGone = true
-        }
+        dealViews(
+            courseViews,
+            preCells.size + curCells.size + nextCells.size,
+            R.layout.item_table_cell
+        )
+        dealViews(
+            xAxisViews,
+            columns * 3,
+            R.layout.item_table_x
+        )
+        dealViews(
+            yAxisViews,
+            rows,
+            R.layout.item_table_y
+        )
         offsetX = 0f
         requestLayout()
         invalidate()
@@ -111,21 +130,15 @@ class TableView : ViewGroup {
 
     /* ==== 测量每个cell的尺寸 ==== */
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        // 1. 父容器先给自己定尺寸
         val width = MeasureSpec.getSize(widthMeasureSpec)
         val height = MeasureSpec.getSize(heightMeasureSpec)
         setMeasuredDimension(width, height)
-
-        // 2. 把子 View 当成 MATCH_PARENT 测一次（以格子大小为约束）
         if (columns <= 0 || rows <= 0) return
         val w = (width - yW) / columns
         val h = (height - xH) / rows
         val makeMeasureSpec = { size: Float, mode: Int ->
             MeasureSpec.makeMeasureSpec(size.toInt(), mode)
         }
-
-        // 让子 View 按“格子大小”走一遍 measure
-        var indexOffset = 0
         val measureCell = { cell: Cell, view: View ->
             val cw = w * (cell.column.second - cell.column.first + 1)
             val ch = h * (cell.row.second - cell.row.first + 1)
@@ -137,55 +150,42 @@ class TableView : ViewGroup {
         }
         // 顺序 pre - cur - next
         for (i in preCells.indices) {
-            val child = getChildAt(i)
+            val child = courseViews[i]
             val cell = preCells[i]
             measureCell(cell, child)
         }
-        indexOffset += preCells.size
         for (i in curCells.indices) {
-            val child = getChildAt(i + indexOffset)
+            val child = courseViews[i + preCells.size]
             val cell = curCells[i]
             measureCell(cell, child)
         }
-        indexOffset += curCells.size
         for (i in nextCells.indices) {
-            val child = getChildAt(i + indexOffset)
+            val child = courseViews[i + preCells.size + curCells.size]
             val cell = nextCells[i]
             measureCell(cell, child)
         }
-        indexOffset += nextCells.size
         // 横坐标
-        for (i in 0 until columns) {
-            val child = getChildAt(i + indexOffset)
+        for (i in 0 until columns * 3) {
+            val child = xAxisViews[i]
             measureChild(
                 child,
                 makeMeasureSpec(w, MeasureSpec.EXACTLY),
-                makeMeasureSpec(xH * 2, MeasureSpec.EXACTLY)
+                makeMeasureSpec(xH, MeasureSpec.EXACTLY)
             )
         }
-        indexOffset += columns
         for (i in 0 until rows) {
-            val child = getChildAt(i + indexOffset)
+            val child = yAxisViews[i]
             measureChild(
                 child,
                 makeMeasureSpec(yW, MeasureSpec.EXACTLY),
-                makeMeasureSpec(h * 2, MeasureSpec.EXACTLY)
+                makeMeasureSpec(h, MeasureSpec.EXACTLY)
             )
         }
-        indexOffset += rows
-        measureChild(
-            getChildAt(indexOffset),
-            makeMeasureSpec(yW, MeasureSpec.EXACTLY),
-            makeMeasureSpec(xH, MeasureSpec.EXACTLY)
-        )
     }
 
     // 颜色相关
-    private val white = context.getColor(R.color.white)
-    private val whiteStateList = ColorStateList.valueOf(white)
     private val black = context.getColor(R.color.black)
     private val highlightColor = context.getColor(R.color.primary)
-
     private fun View.layout(l: Float, t: Float, r: Float, b: Float) {
         layout(l.toInt(), t.toInt(), r.toInt(), b.toInt())
     }
@@ -196,30 +196,21 @@ class TableView : ViewGroup {
         if (columns <= 0 || rows <= 0) return
         val w = (r - l - yW) / columns
         val h = (b - t - xH) / rows
-        // 绘制Cells
-        val bindCell = { view: View, cell: Cell ->
-            with(ItemTableBinding.bind(view)) {
-                container.backgroundTintList = ColorStateList
-                    .valueOf("#00000000".toColorInt())
+
+        // 绘制course
+        val bindCourse = { view: View, cell: Cell ->
+            with(ItemTableCellBinding.bind(view)) {
                 bg.isEnabled = true
                 bg.setOnClickListenerWithClickAnimation { onClickCell(cell) }
-                bg.backgroundTintList = ColorStateList.valueOf(
-                    if (cell.color == 0) white
-                    else cell.color
-                )
-                title.gravity = Gravity.TOP
-                title.text = cell.title ?: ""
-                title.setTextColor(black)
-                content.gravity = Gravity.BOTTOM
+                bg.backgroundTintList = ColorStateList.valueOf(cell.color)
+                title.text = cell.title
                 content.text = cell.content
-                content.setTextColor(black)
             }
         }
-        var indexOffset = 0
         for (i in preCells.indices) {
             val cell = preCells[i]
-            val view = getChildAt(i)
-            bindCell(view, cell)
+            val view = courseViews[i]
+            bindCourse(view, cell)
             view.layout(
                 (cell.column.first - 1) * w + yW - width,
                 (cell.row.first - 1) * h + xH,
@@ -227,11 +218,10 @@ class TableView : ViewGroup {
                 (cell.row.second) * h + xH
             )
         }
-        indexOffset += preCells.size
         for (i in curCells.indices) {
             val cell = curCells[i]
-            val view = getChildAt(i + indexOffset)
-            bindCell(view, cell)
+            val view = courseViews[i + preCells.size]
+            bindCourse(view, cell)
             view.layout(
                 (cell.column.first - 1) * w + yW,
                 (cell.row.first - 1) * h + xH,
@@ -239,11 +229,10 @@ class TableView : ViewGroup {
                 (cell.row.second) * h + xH
             )
         }
-        indexOffset += curCells.size
         for (i in nextCells.indices) {
             val cell = nextCells[i]
-            val view = getChildAt(i + indexOffset)
-            bindCell(view, cell)
+            val view = courseViews[i + preCells.size + curCells.size]
+            bindCourse(view, cell)
             view.layout(
                 (cell.column.first - 1) * w + yW + width,
                 (cell.row.first - 1) * h + xH,
@@ -251,48 +240,62 @@ class TableView : ViewGroup {
                 (cell.row.second) * h + xH
             )
         }
-        indexOffset += nextCells.size
+
         // 绘制横坐标
-        for (i in 0 until columns) {
-            val view = getChildAt(i + indexOffset)
-            with(ItemTableBinding.bind(view)) {
-                container.backgroundTintList = whiteStateList
+        val bindXAxis = { view: View, item: XItem ->
+            with(ItemTableXBinding.bind(view)) {
                 bg.isEnabled = false
-                bg.backgroundTintList = whiteStateList
-                title.gravity = Gravity.CENTER
-                title.text = xAxis.let {
-                    if (i < it.size) it[i]
-                    else (i + 1).toString()
-                }
-                title.setTextColor(black)
-                if (i + 1 == highlightX) {
-                    title.setTextColor(highlightColor)
-                }
+                dayOfWeek.text = item.dayOfWeek
+                date.text = item.date
+                date.setTextColor(
+                    if (item.id in highlightXIds) highlightColor
+                    else black
+                )
             }
+        }
+        for (i in 0 until columns) {
+            val view = xAxisViews[i]
+            bindXAxis(view, preXAxis[i])
+            view.layout(
+                i * w + yW - width,
+                0f,
+                (i + 1) * w + yW - width,
+                xH
+            )
+        }
+        for (i in 0 until columns) {
+            val view = xAxisViews[i + columns]
+            bindXAxis(view, curXAxis[i])
             view.layout(
                 i * w + yW,
-                -1f,
+                0f,
                 (i + 1) * w + yW,
                 xH
             )
         }
-        indexOffset += columns
+        for (i in 0 until columns) {
+            val view = xAxisViews[i + columns * 2]
+            bindXAxis(view, nextXAxis[i])
+            view.layout(
+                i * w + yW + width,
+                0f,
+                (i + 1) * w + yW + width,
+                xH
+            )
+        }
+
         // 绘制纵坐标
         for (i in 0 until rows) {
-            val view = getChildAt(i + indexOffset)
-            with(ItemTableBinding.bind(view)) {
-                container.backgroundTintList = whiteStateList
+            val view = yAxisViews[i]
+            val item = yAxis[i]
+            with(ItemTableYBinding.bind(view)) {
                 bg.isEnabled = false
-                bg.backgroundTintList = whiteStateList
-                title.gravity = Gravity.CENTER
-                title.text = yAxis.let { list ->
-                    if (i < list.size) list[i]
-                    else (i + 1).toString()
-                }
-                title.setTextColor(black)
-                if (i + 1 == highlightY) {
-                    title.setTextColor(highlightColor)
-                }
+                nodeNumber.text = item.nodeNumber
+                time.text = item.time
+                time.setTextColor(
+                    if (item.id in highlightYIds) highlightColor
+                    else black
+                )
             }
             view.layout(
                 0f,
@@ -300,16 +303,6 @@ class TableView : ViewGroup {
                 yW,
                 (i + 1) * h + xH
             )
-        }
-        indexOffset += rows
-        // 绘制原点
-        with(ItemTableBinding.bind(getChildAt(indexOffset))) {
-            container.backgroundTintList = whiteStateList
-            bg.isEnabled = false
-            bg.backgroundTintList = whiteStateList
-            title.text = ""
-            content.text = ""
-            root.layout(0f, 0f, yW, xH)
         }
     }
 
@@ -371,7 +364,7 @@ class TableView : ViewGroup {
                 }
                 val cellCount = preCells.size + curCells.size + nextCells.size
                 for (i in 0 until cellCount) {
-                    val view = itemViews[i]
+                    val view = courseViews[i]
                     view.translationX = offsetX
                 }
                 invalidate()
@@ -418,7 +411,7 @@ class TableView : ViewGroup {
                 absorbPage()
             } else {
                 for (i in 0 until cellCount) {
-                    itemViews[i].translationX = offsetX
+                    courseViews[i].translationX = offsetX
                 }
                 invalidate()
             }
@@ -438,13 +431,13 @@ class TableView : ViewGroup {
         }.toFloat()
         val cellCount = preCells.size + curCells.size + nextCells.size
         scrollAnimator = ValueAnimator.ofFloat(offsetX, targetX).apply {
-            duration = 300L
+            duration = 200L
             interpolator = DecelerateInterpolator()
             addUpdateListener {
                 val value = it.animatedValue as Float
                 offsetX = value
                 for (i in 0 until cellCount) {
-                    itemViews[i].translationX = value
+                    courseViews[i].translationX = value
                 }
             }
             doOnEnd {
@@ -460,12 +453,23 @@ class TableView : ViewGroup {
     }
 
     data class Cell(
-        val id: Int,
-        val title: String? = null,
+        val id: Long,
+        val title: String,
         val content: String,
-        val postscript: String? = null,
         val color: Int = 0,
         val row: Pair<Int, Int>,
         val column: Pair<Int, Int>
+    )
+
+    data class XItem(
+        val id: Long,
+        val dayOfWeek: String,
+        val date: String,
+    )
+
+    data class YItem(
+        val id: Long,
+        val nodeNumber: String,
+        val time: String,
     )
 }

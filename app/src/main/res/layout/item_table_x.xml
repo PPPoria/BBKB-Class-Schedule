@@ -3,40 +3,33 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray"
-    android:backgroundTint="@color/white"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="1dp"
-        android:background="@drawable/corner_6"
-        android:backgroundTint="@color/gray"
-        android:orientation="vertical"
-        android:paddingHorizontal="3dp"
-        android:paddingVertical="5dp">
+        android:gravity="center"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/day_of_week"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:gravity="top"
+            android:gravity="center"
             android:maxLines="3"
             android:text="title"
             android:textSize="9sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/content"
+            android:id="@+id/date"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:gravity="bottom"
+            android:gravity="center"
             android:maxLines="3"
             android:text="content"
             android:textSize="8sp" />

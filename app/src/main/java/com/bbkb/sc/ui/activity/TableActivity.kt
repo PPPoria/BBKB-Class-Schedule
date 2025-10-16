@@ -24,11 +24,9 @@ import com.bbkb.sc.schedule.database.NoteCategoryDB
 import com.bbkb.sc.util.SCToast
 import com.google.gson.Gson
 import com.poria.base.base.BaseActivity
-import com.poria.base.ext.DateFormat
 import com.poria.base.ext.genMacaronColor
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
 import com.poria.base.ext.toDateFormat
-import com.poria.base.ext.toTimeStamp
 import com.poria.base.store.DSManager
 import com.poria.base.viewmodel.SingleVM
 import kotlinx.coroutines.CoroutineScope
@@ -44,7 +42,20 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     private val addedCategoryId by lazy { intent.getLongExtra(KEY_NOTE_CATEGORY_ID, 0L) }
     private val vm by viewModels<SingleVM<MData>>()
     private val coursesCacheMap = HashMap<Int, List<Course>>()
-    private val xAxisCacheMap = HashMap<Int, List<String>>()
+    private val xAxisCacheMap = HashMap<Int, List<TableView.XItem>>()
+    private val yAxis by lazy {
+        ArrayList<TableView.YItem>().apply {
+            for (i in 1..30) {
+                i.toString().let {
+                    TableView.YItem(
+                        id = unitId,
+                        nodeNumber = it,
+                        time = ""
+                    )
+                }.let { add(it) }
+            }
+        }
+    }
     private val mondayTimeStampList by lazy {
         ArrayList<Long>().apply {
             val first = runBlocking {
@@ -58,10 +69,17 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             }
         }
     }
+    private var unitId: Long = 0
+        get() = field++
 
     override fun initView() {
         setLightStatusBar(true)
         setLightNavigationBar(true)
+        with(binding.table) {
+            onClickCell = this@TableActivity::onClickTableItem
+            onScrollToPre = { onScrollToTablePre() }
+            onScrollToNext = { onScrollToTableNext() }
+        }
     }
 
     override fun initListener() = with(binding) {
@@ -197,8 +215,10 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 "第${data.tableZC}周".also { binding.zc.text = it }
                 "第${preZC}周".also { binding.tablePreBtn.text = it }
                 "第${nextZC}周".also { binding.tableNextBtn.text = it }
-                showTable(
+                updateTableData(
+                    preZC = preZC,
                     tableZC = data.tableZC,
+                    nextZC = nextZC,
                     preCourses = data.preCourses,
                     curCourses = data.curCourses,
                     nextCourses = data.nextCourses,
@@ -259,15 +279,16 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }
     }
 
-    private fun showTable(
+    private fun updateTableData(
+        preZC: Int,
         tableZC: Int,
+        nextZC: Int,
         preCourses: List<Course>,
         curCourses: List<Course>,
         nextCourses: List<Course>,
         tableConfig: TableConfig
     ) = lifecycleScope.launch {
         val sd = vm.latest?.schoolData ?: return@launch
-        var cellId = 0
         val filterToCells: (List<Course>) -> List<TableView.Cell> = { courses ->
             courses.asSequence().filter {
                 if (tableConfig.ignoreSaturday) it.xq != 6
@@ -284,7 +305,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 tableConfig.majorFilter.isEmpty() || it.major.contains(tableConfig.majorFilter)
             }.map { course ->
                 TableView.Cell(
-                    id = cellId++,
+                    id = unitId,
                     title = course.name,
                     content = course.run {
                         "$teacher\n$classroom"
@@ -298,35 +319,40 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         val preCells = filterToCells(preCourses)
         val curCells = filterToCells(curCourses)
         val nextCells = filterToCells(nextCourses)
-        val rows =
-            if (tableConfig.ignoreEvening) sd.nodesPerDay - sd.nodesInEvening
-            else sd.nodesPerDay
-        val columns =
-            if (tableConfig.ignoreSaturday && tableConfig.ignoreSunday) 5
-            else if (tableConfig.ignoreSaturday || tableConfig.ignoreSunday) 6
-            else 7
-        val xAxis = getXAxisByZC(tableZC).toMutableList().apply {
-            if (tableConfig.ignoreSunday) removeAt(6)
-            if (tableConfig.ignoreSaturday) removeAt(5)
+        val rows = when (tableConfig.ignoreEvening) {
+            true -> sd.nodesPerDay - sd.nodesInEvening
+            else -> sd.nodesPerDay
         }
-        val yAxis = ArrayList<String>().apply {
-            for (i in 0 until rows) {
-                add((i + 1).toString())
-            }
+        val columns = when {
+            tableConfig.ignoreSaturday && tableConfig.ignoreSunday -> 5
+            tableConfig.ignoreSaturday || tableConfig.ignoreSunday -> 6
+            else -> 7
         }
-        val highlightX = getHighlightXByZC(tableZC, System.currentTimeMillis())
-        binding.table.update(
+        val zcToXAxisAndHighlightXId: suspend (Int) -> Pair<List<TableView.XItem>, Long> = {
+            val (ori, id) = getXAxisAndHighlightXIdByZC(it)
+            ori.toMutableList().apply {
+                if (tableConfig.ignoreSunday) removeAt(6)
+                if (tableConfig.ignoreSaturday) removeAt(5)
+            } to id
+        }
+        val preXAxisAndHighlightXId = zcToXAxisAndHighlightXId(preZC)
+        val curXAxisAndHighlightXId = zcToXAxisAndHighlightXId(tableZC)
+        val nextXAxisAndHighlightXId = zcToXAxisAndHighlightXId(nextZC)
+        binding.table.updateData(
             rows = rows,
             columns = columns,
             preCells = preCells,
             curCells = curCells,
             nextCells = nextCells,
-            xAxis = xAxis,
+            preXAxis = preXAxisAndHighlightXId.first,
+            curXAxis = curXAxisAndHighlightXId.first,
+            nextXAxis = nextXAxisAndHighlightXId.first,
             yAxis = yAxis,
-            highlightX = highlightX,
-            onClickCell = this@TableActivity::onClickTableItem,
-            onScrollToPre = { onScrollToTablePre() },
-            onScrollToNext = { onScrollToTableNext() }
+            highlightXIds = listOf(
+                preXAxisAndHighlightXId.second,
+                curXAxisAndHighlightXId.second,
+                nextXAxisAndHighlightXId.second
+            ),
         )
     }
 
@@ -339,11 +365,14 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }.also { coursesCacheMap[zc] = it }
     }
 
-    private suspend fun getXAxisByZC(zc: Int): List<String> {
-        val tableZcMondayTimeStamp = mondayTimeStampList[zc]
-        return if (xAxisCacheMap.containsKey(zc)) xAxisCacheMap[zc]!!
+    private suspend fun getXAxisAndHighlightXIdByZC(zc: Int): Pair<List<TableView.XItem>, Long> {
+        val monday = mondayTimeStampList[zc]
+        val curTime = System.currentTimeMillis()
+        val oneDay = ScheduleUtils.ONE_DAY_TIMESTAMP
+        val oneWeek = ScheduleUtils.ONE_WEEK_TIMESTAMP
+        val xAxis = if (xAxisCacheMap.containsKey(zc)) xAxisCacheMap[zc]!!
         else withContext(Dispatchers.Default) {
-            val list = ArrayList<String>()
+            val list = ArrayList<TableView.XItem>()
             for (i in 0 until 7) {
                 when (i) {
                     0 -> "星期一"
@@ -354,30 +383,22 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                     5 -> "星期六"
                     6 -> "星期日"
                     else -> ""
-                }.let {
-                    val date = (tableZcMondayTimeStamp + ScheduleUtils.ONE_DAY_TIMESTAMP * i)
-                        .toDateFormat().run { "$month.$day" }
-                    "${it}\n${date}"
+                }.let { dayOfWeek ->
+                    val date = (monday + oneDay * i)
+                        .toDateFormat().run { "$month.${this@run.day}" }
+                    TableView.XItem(
+                        id = unitId,
+                        dayOfWeek = dayOfWeek,
+                        date = date
+                    )
                 }.let { list.add(it) }
             }
             list
         }.also { xAxisCacheMap[zc] = it }
-    }
-
-    private suspend fun getHighlightXByZC(zc: Int, timeStamp: Long): Int {
-        val tableZcMondayTimeStamp = mondayTimeStampList[zc]
-        return if (tableZcMondayTimeStamp +
-            ScheduleUtils.ONE_WEEK_TIMESTAMP >= timeStamp
-        ) withContext(Dispatchers.Default) {
-            val theDay = timeStamp.toDateFormat()
-            DateFormat(
-                theDay.year,
-                theDay.month,
-                theDay.day,
-            ).toTimeStamp().let { it - tableZcMondayTimeStamp }.let {
-                (it / ScheduleUtils.ONE_DAY_TIMESTAMP) + 1
-            }.toInt()
-        } else 0
+        val id = if (curTime in monday..(monday + oneWeek)) {
+            xAxis[((curTime - monday) / oneDay).toInt()].id
+        } else -1L
+        return xAxis to id
     }
 
     private fun onClickTableItem(cell: TableView.Cell) {
