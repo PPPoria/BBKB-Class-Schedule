@@ -4,7 +4,6 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.icu.util.Calendar
 import android.util.TypedValue
-import java.text.DecimalFormat
 import kotlin.math.abs
 
 fun dp2px(dp: Float) = TypedValue.applyDimension(
@@ -24,12 +23,16 @@ fun Any.scrambleHash(): Int {
     return h.toInt()
 }
 
-fun Any.genMacaronColor(): Int {
+fun Any.genColor(hOffset: Int = 0, sBase: Int = 60, lBase: Int = 85): Int {
     val code = scrambleHash()
-    val h = (code and Int.MAX_VALUE) % 360  // 0..359
-    val s = 28 + (code and ((1 shl 16) - 1)) % 11 // 饱和度
-    val l = 82 + (code shr 16) % 11 // 亮度
-    return hslToColor(h.toFloat(), s / 100f, l / 100f)
+    val h = ((code and Int.MAX_VALUE) + hOffset) % 360  // 色相 0..359
+    val s = sBase + (code and ((1 shl 16) - 1)) % 6 // 饱和度
+    val l = lBase + (code shr 16) % 6 // 亮度
+    return hslToColor(
+        h.coerceIn(0, 359).toFloat(),
+        s.coerceIn(0, 100) / 100f,
+        l.coerceIn(0, 100) / 100f
+    )
 }
 
 fun hslToColor(h: Float, s: Float, l: Float): Int {

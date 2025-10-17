@@ -18,8 +18,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="center"
-            android:maxLines="3"
-            android:text="title"
+            android:text="\n\n\ntitle"
             android:textColor="@color/white"
             android:textSize="9sp"
             android:textStyle="bold" />
@@ -30,8 +29,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="center"
-            android:maxLines="2"
-            android:text="12:00\n13:00"
+            android:text="12:00\n13:00\n\n\n"
             android:textColor="@color/white"
             android:textSize="8sp" />
     </LinearLayout>

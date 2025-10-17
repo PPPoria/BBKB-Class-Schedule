@@ -21,7 +21,7 @@ import com.bbkb.sc.databinding.ItemTableCellBinding
 import com.bbkb.sc.databinding.ItemTableXBinding
 import com.bbkb.sc.databinding.ItemTableYBinding
 import com.bbkb.sc.isNightModeYes
-import com.bbkb.sc.ui.activity.TableActivity
+import com.bbkb.sc.schedule.TableAttr
 import com.bbkb.sc.util.SCLog
 import com.poria.base.ext.dp2px
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
@@ -50,12 +50,41 @@ class TableView : ViewGroup {
     var onScrollToPre: (List<Cell>) -> Unit = {}
     var onScrollToNext: (List<Cell>) -> Unit = {}
 
-    // 尺寸、位置相关
+    // 尺寸
+    private val dayOfWeekTextSizeBase = 9f
+    private val dateTextSizeBase = 8f
+    private val xHBase = dp2px(43f)
+    private val nodeNumberTextSizeBase = 9f
+    private val timeTextSizeBase = 8f
+    private val yWBase = dp2px(35f)
+    private val nameTextSizeBase = 9f
+    private val teacherAndRoomTextSizeBase = 8f
+    private val tableHeightBase = dp2px(100f)
+    private var attr: TableAttr = TableAttr.latest
+    private val dayOfWeekTextSize: Float
+        get() = dayOfWeekTextSizeBase * attr.xAxisDayOfWeekTextSizeScale
+    private val dateTextSize: Float
+        get() = dateTextSizeBase * attr.xAxisDateTextSizeScale
+    private val xH: Float
+        get() = xHBase * attr.xAxisHeightScale
+    private val nodeNumberTextSize: Float
+        get() = nodeNumberTextSizeBase * attr.yAxisNodeNumberTextSizeScale
+    private val timeTextSize: Float
+        get() = timeTextSizeBase * attr.yAxisTimeTexSizeStScale
+    private val yW: Float
+        get() = yWBase * attr.yAxisWidthScale
+    private val nameTextSize: Float
+        get() = nameTextSizeBase * attr.courseNameTextSizeScale
+    private val teacherAndRoomTextSize: Float
+        get() = teacherAndRoomTextSizeBase * attr.courseTeacherAndRoomTextSizeScale
+    private val tableHeight: Float
+        get() = tableHeightBase * attr.tableHeightScale
+
+
+    // 数据
     private var courseViews: ArrayList<View> = ArrayList()
     private var xAxisViews: ArrayList<View> = ArrayList()
     private var yAxisViews: ArrayList<View> = ArrayList()
-    private val yW = dp2px(35f)
-    private val xH = dp2px(43f)
     private var rows: Int = 0
     private var columns: Int = 0
     private var preCells: List<Cell> = emptyList()
@@ -80,6 +109,7 @@ class TableView : ViewGroup {
         yAxis: List<YItem> = emptyList(),
         highlightXIds: List<Long> = emptyList(),
         highlightYIds: List<Long> = emptyList(),
+        attr: TableAttr = TableAttr.latest
     ) {
         if (rows <= 0 || columns <= 0)
             throw IllegalArgumentException("rows and columns must be positive")
@@ -94,6 +124,7 @@ class TableView : ViewGroup {
         this.yAxis = yAxis
         this.highlightXIds = highlightXIds
         this.highlightYIds = highlightYIds
+        this.attr = attr
         val dealViews = { list: ArrayList<View>, count: Int, id: Int ->
             while (list.size < count) {
                 LayoutInflater.from(context)
@@ -127,8 +158,91 @@ class TableView : ViewGroup {
             R.layout.item_table_y
         )
         offsetX = 0f
+        bindData()
         requestLayout()
         invalidate()
+    }
+
+    /* ==== 绑定数据 ==== */
+    private fun bindData() {
+        if (columns <= 0 || rows <= 0) return
+
+        // course
+        val bindCourse = { view: View, cell: Cell ->
+            with(ItemTableCellBinding.bind(view)) {
+                bg.isEnabled = true
+                bg.setOnClickListenerWithClickAnimation { onClickCell(cell) }
+                bgFill.backgroundTintList = ColorStateList.valueOf(cell.color)
+                title.text = cell.title
+                content.text = cell.content
+                title.textSize = nameTextSize
+                content.textSize = teacherAndRoomTextSize
+            }
+        }
+        for (i in preCells.indices) {
+            val cell = preCells[i]
+            val view = courseViews[i]
+            bindCourse(view, cell)
+        }
+        for (i in curCells.indices) {
+            val cell = curCells[i]
+            val view = courseViews[i + preCells.size]
+            bindCourse(view, cell)
+        }
+        for (i in nextCells.indices) {
+            val cell = nextCells[i]
+            val view = courseViews[i + preCells.size + curCells.size]
+            bindCourse(view, cell)
+        }
+
+        // 横坐标
+        val bindXAxis = { view: View, item: XItem ->
+            with(ItemTableXBinding.bind(view)) {
+                bg.isEnabled = false
+                dayOfWeek.text = item.dayOfWeek
+                date.text = item.date
+                dayOfWeek.textSize = dayOfWeekTextSize
+                date.textSize = dateTextSize
+                if (context.isNightModeYes()) {
+                    bgFill.isVisible = item.id in highlightXIds
+                } else {
+                    if (item.id in highlightXIds) {
+                        bgFill.isVisible = true
+                        dayOfWeek.setTextColor(white)
+                        date.setTextColor(white)
+                    } else {
+                        bgFill.isVisible = false
+                        dayOfWeek.setTextColor(black)
+                        date.setTextColor(black)
+                    }
+                }
+            }
+        }
+        for (i in 0 until columns) {
+            val view = xAxisViews[i]
+            bindXAxis(view, preXAxis[i])
+        }
+        for (i in 0 until columns) {
+            val view = xAxisViews[i + columns]
+            bindXAxis(view, curXAxis[i])
+        }
+        for (i in 0 until columns) {
+            val view = xAxisViews[i + columns * 2]
+            bindXAxis(view, nextXAxis[i])
+        }
+
+        // 纵坐标
+        for (i in 0 until rows) {
+            val view = yAxisViews[i]
+            val item = yAxis[i]
+            with(ItemTableYBinding.bind(view)) {
+                bg.isEnabled = false
+                nodeNumber.text = item.nodeNumber
+                time.text = item.time
+                nodeNumber.textSize = nodeNumberTextSize
+                time.textSize = timeTextSize
+            }
+        }
     }
 
     /* ==== 测量每个cell的尺寸 ==== */
@@ -189,8 +303,6 @@ class TableView : ViewGroup {
     // 颜色相关
     private val white = context.getColor(R.color.white)
     private val black = context.getColor(R.color.black)
-    private val highlightColor = context.getColor(R.color.primary)
-    private val transparent = context.getColor(android.R.color.transparent)
     private fun View.layout(l: Float, t: Float, r: Float, b: Float) {
         layout(l.toInt(), t.toInt(), r.toInt(), b.toInt())
     }
@@ -202,20 +314,10 @@ class TableView : ViewGroup {
         val w = (r - l - yW) / columns
         val h = (b - t - xH) / rows
 
-        // 绘制course
-        val bindCourse = { view: View, cell: Cell ->
-            with(ItemTableCellBinding.bind(view)) {
-                bg.isEnabled = true
-                bg.setOnClickListenerWithClickAnimation { onClickCell(cell) }
-                title.text = cell.title
-                content.text = cell.content
-                bgFill.backgroundTintList = ColorStateList.valueOf(cell.color)
-            }
-        }
+        // course
         for (i in preCells.indices) {
             val cell = preCells[i]
             val view = courseViews[i]
-            bindCourse(view, cell)
             view.layout(
                 (cell.column.first - 1) * w + yW - width,
                 (cell.row.first - 1) * h + xH,
@@ -226,7 +328,6 @@ class TableView : ViewGroup {
         for (i in curCells.indices) {
             val cell = curCells[i]
             val view = courseViews[i + preCells.size]
-            bindCourse(view, cell)
             view.layout(
                 (cell.column.first - 1) * w + yW,
                 (cell.row.first - 1) * h + xH,
@@ -237,7 +338,6 @@ class TableView : ViewGroup {
         for (i in nextCells.indices) {
             val cell = nextCells[i]
             val view = courseViews[i + preCells.size + curCells.size]
-            bindCourse(view, cell)
             view.layout(
                 (cell.column.first - 1) * w + yW + width,
                 (cell.row.first - 1) * h + xH,
@@ -246,34 +346,9 @@ class TableView : ViewGroup {
             )
         }
 
-        // 绘制横坐标
-        val bindXAxis = { view: View, item: XItem ->
-            with(ItemTableXBinding.bind(view)) {
-                bg.isEnabled = false
-                dayOfWeek.text = item.dayOfWeek
-                date.text = item.date
-                if (context.isNightModeYes()) {
-                    if (item.id in highlightXIds) {
-                        bgFill.isVisible = true
-                    } else {
-                        bgFill.isVisible = false
-                    }
-                } else {
-                    if (item.id in highlightXIds) {
-                        bgFill.isVisible = true
-                        dayOfWeek.setTextColor(white)
-                        date.setTextColor(white)
-                    }else {
-                        bgFill.isVisible = false
-                        dayOfWeek.setTextColor(black)
-                        date.setTextColor(black)
-                    }
-                }
-            }
-        }
+        // 横坐标
         for (i in 0 until columns) {
             val view = xAxisViews[i]
-            bindXAxis(view, preXAxis[i])
             view.layout(
                 i * w + yW - width,
                 0f,
@@ -283,7 +358,6 @@ class TableView : ViewGroup {
         }
         for (i in 0 until columns) {
             val view = xAxisViews[i + columns]
-            bindXAxis(view, curXAxis[i])
             view.layout(
                 i * w + yW,
                 0f,
@@ -293,7 +367,6 @@ class TableView : ViewGroup {
         }
         for (i in 0 until columns) {
             val view = xAxisViews[i + columns * 2]
-            bindXAxis(view, nextXAxis[i])
             view.layout(
                 i * w + yW + width,
                 0f,
@@ -302,15 +375,9 @@ class TableView : ViewGroup {
             )
         }
 
-        // 绘制纵坐标
+        // 纵坐标
         for (i in 0 until rows) {
             val view = yAxisViews[i]
-            val item = yAxis[i]
-            with(ItemTableYBinding.bind(view)) {
-                bg.isEnabled = false
-                nodeNumber.text = item.nodeNumber
-                time.text = item.time
-            }
             view.layout(
                 0f,
                 i * h + xH,

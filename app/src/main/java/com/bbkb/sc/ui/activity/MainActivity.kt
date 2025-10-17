@@ -115,7 +115,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             }.ifEmpty { // 空则添加一个空课程用来提示用户
                 TableWidgetManager.noneCourse.copy(
                     zc = zc,
-                    xq = curTime.toDayOfWeek(),
+                    xq = curTime.toDayOfWeek() - 1,
                     name = "暂无课程",
                     classroom = "--"
                 ).let { listOf(it) }

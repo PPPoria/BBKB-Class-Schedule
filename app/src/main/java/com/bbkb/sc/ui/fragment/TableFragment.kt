@@ -6,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bbkb.sc.databinding.FragmentTableBinding
 import com.bbkb.sc.datastore.LongKeys
+import com.bbkb.sc.schedule.TableAttr
 import com.bbkb.sc.schedule.TableConfig
 import com.bbkb.sc.schedule.database.Course
 import com.bbkb.sc.schedule.database.CourseDB
@@ -19,14 +20,13 @@ import com.bbkb.sc.ui.dialog.CourseDetailDialog
 import com.bbkb.sc.ui.widget.TableView
 import com.bbkb.sc.util.ScheduleUtils
 import com.poria.base.base.BaseFragment
-import com.poria.base.ext.genMacaronColor
+import com.poria.base.ext.genColor
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
 import com.poria.base.ext.toDateFormat
 import com.poria.base.store.DSManager
 import com.poria.base.viewmodel.SingleVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -140,7 +140,7 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
                     preCourses = data.preCourses,
                     curCourses = data.curCourses,
                     nextCourses = data.nextCourses,
-                    tableConfig = data.tableConfig
+                    tableAttr = data.tableAttr,
                 )
             }
         }
@@ -153,7 +153,8 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
         preCourses: List<Course>,
         curCourses: List<Course>,
         nextCourses: List<Course>,
-        tableConfig: TableConfig
+        tableAttr: TableAttr = TableAttr.latest,
+        tableConfig: TableConfig = TableConfig.latest
     ) = lifecycleScope.launch {
         val sd = vm.latest?.schoolData ?: return@launch
         val filterToCells: (List<Course>) -> List<TableView.Cell> = { courses ->
@@ -177,7 +178,13 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
                     content = course.run {
                         "$teacher\n$classroom"
                     },
-                    color = course.name.genMacaronColor(),
+                    color = tableAttr.run {
+                        course.name.genColor(
+                            courseColorHHueOffset,
+                            courseColorSHueBase,
+                            courseColorLHueBase
+                        )
+                    },
                     row = course.run { startNode to endNode },
                     column = course.run { xq to xq }
                 )
@@ -220,6 +227,7 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
                 curXAxisAndHighlightXId.second,
                 nextXAxisAndHighlightXId.second
             ),
+            attr = tableAttr,
         )
     }
 

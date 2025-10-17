@@ -12,7 +12,7 @@ class SingleVM<T> : ViewModel() {
     val latest: T?
         get() = latestState
 
-    fun update(value: T) = synchronized(this) {
+    fun update(value: T) {
         latestState = value
         mutableFlow.value = value
     }

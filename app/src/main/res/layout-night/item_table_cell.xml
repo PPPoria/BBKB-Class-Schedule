@@ -19,7 +19,7 @@
             android:id="@+id/bg_fill"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:alpha="0.3"
+            android:alpha="0.5"
             android:background="@drawable/corner_6"
             android:backgroundTint="@color/primary" />
 
@@ -46,7 +46,7 @@
             android:gravity="bottom"
             android:paddingHorizontal="3dp"
             android:paddingVertical="5dp"
-            android:text="teacher\nroom"
+            android:text="\n\n\nteacher\nroom"
             android:textColor="@color/white"
             android:textSize="8sp"
             app:layout_constraintBottom_toBottomOf="parent" />

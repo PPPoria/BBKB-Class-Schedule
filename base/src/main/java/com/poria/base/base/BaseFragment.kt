@@ -10,33 +10,22 @@ import kotlinx.coroutines.launch
 
 abstract class BaseFragment<out T : ViewBinding> : Fragment() {
     val binding by lazy { onViewBindingCreate() }
-    private var isRestarted = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ) = binding.apply {
-        lifecycleScope.launch {
-            refreshDataInScope()
-            initView()
-            initListener()
-            observeDataInScope()
-        }
+        initView()
+        initListener()
     }.root
-
-    override fun onStart() {
-        super.onStart()
-        if (isRestarted) {
-            lifecycleScope.launch {
-                refreshDataInScope()
-            }
-        } else isRestarted = true
-    }
 
     abstract fun onViewBindingCreate(): T
     open fun initView() {}
     open fun initListener() {}
+    /**
+     * 由 activity 进行调用刷新与监听数据
+     */
     open suspend fun refreshDataInScope() {}
     open suspend fun observeDataInScope() {}
 }

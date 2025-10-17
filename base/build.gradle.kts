@@ -45,4 +45,8 @@ dependencies {
     // Kotlin Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+
+    // Fragment
+    val fragment_version = "1.8.9"
+    implementation("androidx.fragment:fragment-ktx:$fragment_version")
 }

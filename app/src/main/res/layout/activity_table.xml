@@ -86,23 +86,37 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cur_date_layout" />
 
-        <!-- filter menu -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/filter_bg"
+        <!-- table menu -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/table_menu_bg"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="invisible">
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/table_config_fragment_container"
+            <LinearLayout
+                android:id="@+id/table_menu_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/padding_h_2"
-                android:layout_marginTop="50dp"
-                android:background="@drawable/corner_12"
-                android:backgroundTint="@color/transparent"
-                android:translationZ="@dimen/translation_z_1"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:orientation="vertical">
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp" />
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/table_config_fragment_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/padding_h_2"
+                    android:background="@drawable/corner_12"
+                    android:backgroundTint="@color/transparent"
+                    android:translationZ="@dimen/translation_z_1"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,6 +32,22 @@
     <string name="major_filter">专业筛选：</string>
     <string name="change_background_img">更换背景图片</string>
     <string name="cancel_background_img">取消背景图片</string>
+    <string name="table_size_setting">课表尺寸</string>
+    <string name="x_axis_day_of_week_text_size_scale">X轴星期文字大小</string>
+    <string name="x_axis_date_text_size_scale">X轴日期文字大小</string>
+    <string name="x_axis_height_scale">X轴高度</string>
+    <string name="y_axis_node_number_text_size_scale">Y轴节次文字大小</string>
+    <string name="y_axis_time_text_size_scale">Y轴时间文字大小</string>
+    <string name="y_axis_width_scale">Y轴宽度</string>
+    <string name="course_name_text_size_scale">课程名称文字大小</string>
+    <string name="course_teacher_and_room_text_size_scale">教师/场地文字大小</string>
+    <string name="table_height_scale">课表高度</string>
+    <string name="table_color_setting">课表色彩</string>
+    <string name="table_bg_img_mask_color">课表背景 遮罩颜色</string>
+    <string name="table_bg_img_mask_alpha">课表背景 遮罩透明度</string>
+    <string name="course_color_h_hue_offset">课程颜色 色相偏移</string>
+    <string name="course_color_s_hue_base">课程颜色 饱和度基准</string>
+    <string name="course_color_l_hue_base">课程颜色 亮度基准</string>
 
     <!-- Course Detail Dialog -->
     <string name="course_name">课程：</string>
