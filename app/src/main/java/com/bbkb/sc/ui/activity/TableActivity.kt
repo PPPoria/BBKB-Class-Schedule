@@ -16,6 +16,7 @@ import com.bbkb.sc.datastore.StringKeys
 import com.bbkb.sc.isNightModeYes
 import com.bbkb.sc.util.ScheduleUtils
 import com.bbkb.sc.schedule.School
+import com.bbkb.sc.schedule.TableAttr
 import com.bbkb.sc.schedule.TableConfig
 import com.bbkb.sc.schedule.database.Course
 import com.bbkb.sc.ui.fragment.TableConfigFragment
@@ -35,8 +36,8 @@ import kotlinx.coroutines.withContext
 class TableActivity : BaseActivity<ActivityTableBinding>() {
     override fun onViewBindingCreate() = ActivityTableBinding.inflate(layoutInflater)
     private val vm by viewModels<SingleVM<MData>>()
-    private val tableFragmentTag = "table_fragment"
-    private val tableConfigFragmentTag = "filter_fragment"
+    override val baseFragmentTagList: List<String>
+        get() = listOf("table_fragment", "filter_fragment")
 
     override fun initWindowInsets(l: Int, t: Int, r: Int, b: Int) {
         super.initWindowInsets(l, t, r, b)
@@ -47,6 +48,25 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             systemBarPadding[r],
             systemBarPadding[b]
         )
+    }
+
+    override fun addFragment() {
+        supportFragmentManager.commit {
+            val bundle = bundleOf(
+                KEY_MODE to intent.getIntExtra(KEY_MODE, MODE_NORMAL),
+                KEY_NOTE_CATEGORY_ID to intent.getLongExtra(KEY_NOTE_CATEGORY_ID, 0L)
+            )
+            setReorderingAllowed(true)
+            add<TableFragment>(
+                R.id.table_fragment_container,
+                tag = baseFragmentTagList[0],
+                args = bundle
+            )
+            add<TableConfigFragment>(
+                R.id.table_config_fragment_container,
+                tag = baseFragmentTagList[1],
+            )
+        }
     }
 
     override fun initView() {
@@ -69,25 +89,6 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             recreate()
             return
-        }
-    }
-
-    override fun addFragment() {
-        supportFragmentManager.commit {
-            val bundle = bundleOf(
-                KEY_MODE to intent.getIntExtra(KEY_MODE, MODE_NORMAL),
-                KEY_NOTE_CATEGORY_ID to intent.getLongExtra(KEY_NOTE_CATEGORY_ID, 0L)
-            )
-            setReorderingAllowed(true)
-            add<TableFragment>(
-                R.id.table_fragment_container,
-                tag = tableFragmentTag,
-                args = bundle
-            )
-            add<TableConfigFragment>(
-                R.id.table_config_fragment_container,
-                tag = tableConfigFragmentTag,
-            )
         }
     }
 
@@ -114,13 +115,9 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         }
         val curZC = ScheduleUtils.getZC(System.currentTimeMillis())
         val tableZC = if (old.tableZC == 0) curZC else old.tableZC
-        val tableConfig = withContext(Dispatchers.Default) {
-            ScheduleUtils.getTableConfig()
-        }
         old.copy(
             curZC = curZC,
             tableZC = tableZC,
-            tableConfig = tableConfig,
         ).also { vm.update(it) }
     }
 
@@ -136,10 +133,11 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     }
 
     data class MData(
+        val lastUpdateTime: Long = System.currentTimeMillis(),
         val schoolData: School.SchoolData,
         val curZC: Int = 0,
         val tableZC: Int = 0,
-        val tableConfig: TableConfig = TableConfig(),
+        val tableAttr: TableAttr = TableAttr.latest,
         val preCourses: List<Course> = emptyList(),
         val curCourses: List<Course> = emptyList(),
         val nextCourses: List<Course> = emptyList(),

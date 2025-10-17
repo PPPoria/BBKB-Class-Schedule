@@ -37,19 +37,6 @@ object ScheduleUtils {
         }
     }
 
-    suspend fun getTableConfig(): TableConfig = Gson().let {
-        val flow = DSManager.getString(
-            StringKeys.TABLE_CONFIG,
-            it.toJson(TableConfig())
-        )
-        it.fromJson(
-            withContext(Dispatchers.Default) {
-                flow.first()
-            },
-            TableConfig::class.java
-        )
-    }
-
     suspend fun getRemarkByCourseName(courseName: String): Remark = withContext(Dispatchers.IO) {
         val flow = RemarkDB
             .get()

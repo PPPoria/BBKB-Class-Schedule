@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 abstract class BaseActivity<out T : ViewBinding> : AppCompatActivity() {
     lateinit var systemBarPadding: IntArray
     val binding by lazy { onViewBindingCreate() }
+    open val baseFragmentTagList = emptyList<String>()
 
     override fun onCreate(savedInstanceState: android.os.Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,12 +37,13 @@ abstract class BaseActivity<out T : ViewBinding> : AppCompatActivity() {
             initWindowInsets()
             insets
         }
+        if (savedInstanceState == null) addFragment()
+        initView()
+        initListener()
         lifecycleScope.launch {
             refreshDataInScope()
-            if (savedInstanceState == null) addFragment()
-            initView()
-            initListener()
-            observeDataInScope()
+            allowFragmentVM()
+            launch { observeDataInScope() }
         }
     }
 
@@ -49,6 +51,7 @@ abstract class BaseActivity<out T : ViewBinding> : AppCompatActivity() {
         super.onRestart()
         lifecycleScope.launch {
             refreshDataInScope()
+            allowFragmentVM()
         }
     }
 
@@ -72,6 +75,17 @@ abstract class BaseActivity<out T : ViewBinding> : AppCompatActivity() {
     open fun initListener() {}
     open suspend fun refreshDataInScope() {}
     open suspend fun observeDataInScope() {}
+    open suspend fun allowFragmentVM() {
+        val fs = baseFragmentTagList.map { tag ->
+            supportFragmentManager.findFragmentByTag(tag) as? BaseFragment<*>
+        }.filterNotNull()
+        fs.forEach { it.refreshDataInScope() }
+        fs.forEach {
+            lifecycleScope.launch {
+                it.observeDataInScope()
+            }
+        }
+    }
 
     fun setLightStatusBar(isLight: Boolean = true) {
         WindowCompat.getInsetsController(window, window.decorView)

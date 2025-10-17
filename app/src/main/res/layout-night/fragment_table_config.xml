@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/corner_12"
-    android:backgroundTint="@color/black_shade"
+    android:backgroundTint="@color/black_alpha_90"
     android:paddingHorizontal="@dimen/padding_h_3"
     android:paddingVertical="@dimen/padding_v_3"
     tools:context=".ui.fragment.TableConfigFragment">
@@ -109,7 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/corner_888"
-                android:backgroundTint="@color/gray"
+                android:backgroundTint="@color/gray_shade"
                 android:gravity="center"
                 android:paddingVertical="@dimen/padding_v_3"
                 android:text="@string/ignore_saturday"
@@ -122,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="@dimen/padding_v_3"
                 android:background="@drawable/corner_888"
-                android:backgroundTint="@color/gray"
+                android:backgroundTint="@color/gray_shade"
                 android:gravity="center"
                 android:paddingVertical="@dimen/padding_v_3"
                 android:text="@string/ignore_sunday"
@@ -134,7 +134,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/corner_888"
-                android:backgroundTint="@color/gray"
+                android:backgroundTint="@color/gray_shade"
                 android:gravity="center"
                 android:paddingVertical="@dimen/padding_v_3"
                 android:text="@string/ignore_evening"
@@ -143,27 +143,90 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/change_background_img_btn"
-        android:layout_width="wrap_content"
+    <!-- background image button -->
+    <LinearLayout
+        android:id="@+id/bg_img_btn_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/change_background_img"
-        android:textColor="@color/secondary"
-        android:textSize="@dimen/text_size_2h"
-        android:textStyle="italic|bold"
+        android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/filter_layout" />
+        app:layout_constraintTop_toBottomOf="@id/filter_layout">
 
-    <TextView
-        android:id="@+id/cancel_background_img_btn"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/change_background_img_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/change_background_img"
+            android:textColor="@color/secondary"
+            android:textSize="@dimen/text_size_2h"
+            android:textStyle="italic|bold" />
+
+        <TextView
+            android:id="@+id/cancel_background_img_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_h_2"
+            android:text="@string/cancel_background_img"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_2h"
+            android:textStyle="italic" />
+    </LinearLayout>
+
+    <!-- table size -->
+    <LinearLayout
+        android:id="@+id/table_size_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/cancel_background_img"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_size_2h"
-        android:textStyle="italic"
-        android:layout_marginStart="@dimen/padding_h_2"
-        app:layout_constraintStart_toEndOf="@id/change_background_img_btn"
-        app:layout_constraintTop_toBottomOf="@id/filter_layout" />
+        android:layout_marginTop="@dimen/padding_v_3"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/bg_img_btn_layout">
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/black_shade" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/padding_v_4"
+            android:text="@string/table_size_setting"
+            android:textColor="@color/gray_shade"
+            android:textSize="@dimen/text_size_3h" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/table_size_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent" />
+    </LinearLayout>
+
+    <!-- course color -->
+    <LinearLayout
+        android:id="@+id/course_color_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_v_3"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/table_size_layout">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/black_shade" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/padding_v_4"
+            android:text="@string/table_color_setting"
+            android:textColor="@color/gray_shade"
+            android:textSize="@dimen/text_size_3h" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/course_color_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
