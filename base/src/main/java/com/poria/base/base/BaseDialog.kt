@@ -26,10 +26,10 @@ abstract class BaseDialog<out T : ViewBinding> : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ) = binding.apply {
-        initView()
-        initListener()
         lifecycleScope.launch {
             refreshDataInScope()
+            initView()
+            initListener()
             observeDataInScope()
         }
     }.root

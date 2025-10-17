@@ -15,11 +15,13 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.OverScroller
 import androidx.core.animation.doOnEnd
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.bbkb.sc.R
-import com.bbkb.sc.SCApp
 import com.bbkb.sc.databinding.ItemTableCellBinding
 import com.bbkb.sc.databinding.ItemTableXBinding
 import com.bbkb.sc.databinding.ItemTableYBinding
+import com.bbkb.sc.isNightModeYes
+import com.bbkb.sc.ui.activity.TableActivity
 import com.bbkb.sc.util.SCLog
 import com.poria.base.ext.dp2px
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
@@ -187,7 +189,6 @@ class TableView : ViewGroup {
     // 颜色相关
     private val white = context.getColor(R.color.white)
     private val black = context.getColor(R.color.black)
-    private val blackShade = context.getColor(R.color.black_shade)
     private val highlightColor = context.getColor(R.color.primary)
     private val transparent = context.getColor(android.R.color.transparent)
     private fun View.layout(l: Float, t: Float, r: Float, b: Float) {
@@ -206,14 +207,9 @@ class TableView : ViewGroup {
             with(ItemTableCellBinding.bind(view)) {
                 bg.isEnabled = true
                 bg.setOnClickListenerWithClickAnimation { onClickCell(cell) }
-                if (title.textColors.defaultColor != black) {
-                    title.setTextColor(cell.color)
-                    content.setTextColor(cell.color)
-                } else {
-                    bg.backgroundTintList = ColorStateList.valueOf(cell.color)
-                }
                 title.text = cell.title
                 content.text = cell.content
+                bgFill.backgroundTintList = ColorStateList.valueOf(cell.color)
             }
         }
         for (i in preCells.indices) {
@@ -256,16 +252,19 @@ class TableView : ViewGroup {
                 bg.isEnabled = false
                 dayOfWeek.text = item.dayOfWeek
                 date.text = item.date
-                if (item.id in highlightXIds) {
-                    bg.backgroundTintList = ColorStateList.valueOf(highlightColor)
-                    dayOfWeek.setTextColor(white)
-                    date.setTextColor(white)
+                if (context.isNightModeYes()) {
+                    if (item.id in highlightXIds) {
+                        bgFill.isVisible = true
+                    } else {
+                        bgFill.isVisible = false
+                    }
                 } else {
-                    bg.backgroundTintList = ColorStateList.valueOf(transparent)
-                    if (dayOfWeek.textColors.defaultColor != black) {
+                    if (item.id in highlightXIds) {
+                        bgFill.isVisible = true
                         dayOfWeek.setTextColor(white)
                         date.setTextColor(white)
-                    } else {
+                    }else {
+                        bgFill.isVisible = false
                         dayOfWeek.setTextColor(black)
                         date.setTextColor(black)
                     }
@@ -311,11 +310,6 @@ class TableView : ViewGroup {
                 bg.isEnabled = false
                 nodeNumber.text = item.nodeNumber
                 time.text = item.time
-
-                /*time.setTextColor(
-                    if (item.id in highlightYIds) highlightColor
-                    else
-                )*/
             }
             view.layout(
                 0f,

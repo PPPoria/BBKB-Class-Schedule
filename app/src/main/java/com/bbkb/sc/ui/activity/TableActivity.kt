@@ -1,12 +1,10 @@
 package com.bbkb.sc.ui.activity
 
-import android.content.res.ColorStateList
-import android.content.res.Configuration
 import androidx.activity.addCallback
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.core.view.setPadding
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
@@ -15,6 +13,7 @@ import com.bbkb.sc.R
 import com.bbkb.sc.SCApp
 import com.bbkb.sc.databinding.ActivityTableBinding
 import com.bbkb.sc.datastore.StringKeys
+import com.bbkb.sc.isNightModeYes
 import com.bbkb.sc.util.ScheduleUtils
 import com.bbkb.sc.schedule.School
 import com.bbkb.sc.schedule.TableConfig
@@ -50,6 +49,29 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         )
     }
 
+    override fun initView() {
+        val path = bgImgPath
+        if (path.isNotEmpty()) {
+            // 如果有背景图片，则显示强制黑夜模式
+            if (!isNightModeYes()) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                recreate()
+                return
+            }
+            Glide.with(this)
+                .load(path)
+                .centerCrop()
+                .into(binding.bgImg)
+            binding.bgImg.isVisible = true
+            binding.bgMask.isVisible = true
+        } else if (isNightModeYes() != SCApp.app.isNightModeYes()) {
+            // 如果背景图片不存在，且当前模式与系统模式不同，选择跟随系统模式
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            recreate()
+            return
+        }
+    }
+
     override fun addFragment() {
         supportFragmentManager.commit {
             val bundle = bundleOf(
@@ -74,7 +96,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             if (filterBg.isVisible) filterBg.isVisible = false
             else finish()
         }
-        moreBtn.setOnClickListenerWithClickAnimation { _ ->
+        moreBtn.setOnClickListenerWithClickAnimation {
             filterBg.also { it.isVisible = !it.isVisible }
         }
         filterBg.setOnClickListener { filterBg.isVisible = false }
@@ -95,15 +117,10 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         val tableConfig = withContext(Dispatchers.Default) {
             ScheduleUtils.getTableConfig()
         }
-        val path = DSManager.getString(
-            StringKeys.TABLE_BACKGROUND_IMG_PATH,
-            ""
-        ).first()
         old.copy(
             curZC = curZC,
             tableZC = tableZC,
             tableConfig = tableConfig,
-            bgImgPath = path
         ).also { vm.update(it) }
     }
 
@@ -114,34 +131,8 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                     "$year/$month/$day"
                 }.also { binding.todayDate.text = it }
                 "第${data.curZC}周".also { binding.todayZc.text = it }
-                if (data.bgImgPath.isNotEmpty())
-                    setAttrHasBgImg(data)
-                else if (SCApp.isDarkTheme) setAttrDark(data)
-                else setAttrLight(data)
             }
         }
-    }
-
-    private fun setAttrLight(data: MData) {
-        binding.bgImg.isVisible = false
-        binding.bgMask.isVisible = false
-        binding.main.backgroundTintList = ColorStateList.valueOf(getColor(R.color.white))
-        binding.todayDate.setTextColor(getColor(R.color.black))
-        binding.todayZc.setTextColor(getColor(R.color.black))
-    }
-
-    private fun setAttrDark(data: MData) {
-        binding.bgImg.isVisible = false
-        binding.bgMask.isVisible = false
-    }
-
-    private fun setAttrHasBgImg(data: MData) {
-        binding.bgImg.isVisible = true
-        binding.bgMask.isVisible = true
-        Glide.with(this@TableActivity)
-            .load(data.bgImgPath)
-            .centerCrop()
-            .into(binding.bgImg)
     }
 
     data class MData(
@@ -149,7 +140,6 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         val curZC: Int = 0,
         val tableZC: Int = 0,
         val tableConfig: TableConfig = TableConfig(),
-        val bgImgPath: String = "",
         val preCourses: List<Course> = emptyList(),
         val curCourses: List<Course> = emptyList(),
         val nextCourses: List<Course> = emptyList(),
@@ -160,5 +150,12 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
         const val KEY_NOTE_CATEGORY_ID = "category_id"
         const val MODE_NORMAL = 0
         const val MODE_ADD_RELATED_NOTE = 1
+        val bgImgPath: String
+            get() = runBlocking {
+                DSManager.getString(
+                    StringKeys.TABLE_BACKGROUND_IMG_PATH,
+                    ""
+                ).first()
+            }
     }
 }

@@ -46,12 +46,6 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
     private var authSuccess = false
 
     override fun initView() {
-        if (SCApp.isDarkTheme) {
-            setLightStatusBar(false)
-            setLightNavigationBar(false)
-        }
-        setLightStatusBar(true)
-        setLightNavigationBar(true)
         showAuthView()
     }
 

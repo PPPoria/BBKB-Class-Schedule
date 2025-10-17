@@ -4,7 +4,6 @@ import android.content.res.ColorStateList
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -12,8 +11,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.bbkb.sc.R
 import com.bbkb.sc.SCApp
 import com.bbkb.sc.databinding.FragmentTableConfigBinding
-import com.bbkb.sc.datastore.IntKeys
 import com.bbkb.sc.datastore.StringKeys
+import com.bbkb.sc.isNightModeYes
 import com.bbkb.sc.schedule.TableConfig
 import com.bbkb.sc.ui.activity.TableActivity
 import com.bbkb.sc.util.FileManager
@@ -24,9 +23,9 @@ import com.poria.base.store.DSManager
 import com.poria.base.viewmodel.SingleVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
@@ -56,10 +55,9 @@ class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
                         FileManager.deleteInnerImage(oldPath)
                     }
                     DSManager.setString(StringKeys.TABLE_BACKGROUND_IMG_PATH, path)
-                    vm.latest?.copy(
-                        bgImgPath = path
-                    )?.let { vm.update(it) }
-                    toDarkMode()
+                    withContext(Dispatchers.Main) {
+                        activity?.recreate()
+                    }
                 }
             }
         }
@@ -130,12 +128,11 @@ class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
                 ).first()
                 if (oldPath.isNotEmpty() && oldPath.isNotBlank()) {
                     FileManager.deleteInnerImage(oldPath)
-                }
+                } else return@launch
                 DSManager.setString(StringKeys.TABLE_BACKGROUND_IMG_PATH, "")
-                vm.latest?.copy(
-                    bgImgPath = ""
-                )?.let { vm.update(it) }
-                normalMode()
+                withContext(Dispatchers.Main) {
+                    activity?.recreate()
+                }
             }
         }
     }.let { }
@@ -157,7 +154,7 @@ class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
                     SCApp.app.getColor(R.color.primary)
                 )
             } else {
-                if (SCApp.isDarkTheme) {
+                if (requireActivity().isNightModeYes()) {
                     it.setTextColor(SCApp.app.getColor(R.color.black))
                     it.backgroundTintList = ColorStateList.valueOf(
                         SCApp.app.getColor(R.color.gray)
@@ -177,7 +174,7 @@ class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
                     SCApp.app.getColor(R.color.primary)
                 )
             } else {
-                if (SCApp.isDarkTheme) {
+                if (requireActivity().isNightModeYes()) {
                     it.setTextColor(SCApp.app.getColor(R.color.black))
                     it.backgroundTintList = ColorStateList.valueOf(
                         SCApp.app.getColor(R.color.gray)
@@ -197,7 +194,7 @@ class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
                     SCApp.app.getColor(R.color.primary)
                 )
             } else {
-                if (SCApp.isDarkTheme) {
+                if (requireActivity().isNightModeYes()) {
                     it.setTextColor(SCApp.app.getColor(R.color.black))
                     it.backgroundTintList = ColorStateList.valueOf(
                         SCApp.app.getColor(R.color.gray)
@@ -225,29 +222,6 @@ class TableConfigFragment : BaseFragment<FragmentTableConfigBinding>() {
             Gson().toJson(tableConfig).also { str ->
                 DSManager.setString(StringKeys.TABLE_CONFIG, str)
             }
-        }
-    }
-
-    private fun normalMode() {
-        MainScope().launch {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            DSManager.setInt(IntKeys.NIGHT_MODE, AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            recreate()
-        }
-    }
-
-    private fun toDarkMode() {
-        MainScope().launch {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            DSManager.setInt(IntKeys.NIGHT_MODE, AppCompatDelegate.MODE_NIGHT_YES)
-            recreate()
-        }
-    }
-
-    private fun recreate() {
-        if (Lifecycle.State.RESUMED == lifecycle.currentState) {
-            startActivity(requireActivity().intent)
-            requireActivity().finish()
         }
     }
 }

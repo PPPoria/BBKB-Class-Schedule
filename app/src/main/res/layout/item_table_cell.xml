@@ -1,44 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bg"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_margin="1dp"
         android:layout_weight="5"
-        android:background="@drawable/corner_6"
-        android:orientation="vertical"
-        android:paddingHorizontal="3dp"
-        android:paddingVertical="5dp">
+        android:background="@drawable/corner_6_s_white"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/bg_fill"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="1"
+            android:background="@drawable/corner_6"
+            android:backgroundTint="@color/primary" />
 
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:ellipsize="end"
             android:gravity="top"
-            android:maxLines="3"
+            android:paddingHorizontal="3dp"
+            android:paddingVertical="5dp"
             android:text="title"
             android:textColor="@color/black"
             android:textSize="9sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/content"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="bottom"
-            android:maxLines="3"
-            android:text="content"
+            android:paddingHorizontal="3dp"
+            android:paddingVertical="5dp"
+            android:text="teacher\nroom"
             android:textColor="@color/black"
-            android:textSize="8sp" />
-    </LinearLayout>
+            android:textSize="8sp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

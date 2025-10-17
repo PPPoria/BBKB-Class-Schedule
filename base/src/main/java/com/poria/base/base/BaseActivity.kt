@@ -36,13 +36,11 @@ abstract class BaseActivity<out T : ViewBinding> : AppCompatActivity() {
             initWindowInsets()
             insets
         }
-
-        initView()
-
-        initListener()
         lifecycleScope.launch {
             refreshDataInScope()
             if (savedInstanceState == null) addFragment()
+            initView()
+            initListener()
             observeDataInScope()
         }
     }

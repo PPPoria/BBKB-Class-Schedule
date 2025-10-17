@@ -17,10 +17,10 @@ abstract class BaseFragment<out T : ViewBinding> : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ) = binding.apply {
-        initView()
-        initListener()
         lifecycleScope.launch {
             refreshDataInScope()
+            initView()
+            initListener()
             observeDataInScope()
         }
     }.root
