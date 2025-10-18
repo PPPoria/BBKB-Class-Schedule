@@ -1,5 +1,6 @@
 package com.bbkb.sc.ui.activity
 
+import android.content.Intent
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
@@ -17,7 +18,6 @@ import com.bbkb.sc.isNightModeYes
 import com.bbkb.sc.util.ScheduleUtils
 import com.bbkb.sc.schedule.School
 import com.bbkb.sc.schedule.TableAttr
-import com.bbkb.sc.schedule.TableConfig
 import com.bbkb.sc.schedule.database.Course
 import com.bbkb.sc.ui.fragment.TableConfigFragment
 import com.bbkb.sc.ui.fragment.TableFragment
@@ -28,14 +28,13 @@ import com.poria.base.ext.setOnClickListenerWithClickAnimation
 import com.poria.base.ext.toDateFormat
 import com.poria.base.store.DSManager
 import com.poria.base.viewmodel.SingleVM
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 class TableActivity : BaseActivity<ActivityTableBinding>() {
     override fun onViewBindingCreate() = ActivityTableBinding.inflate(layoutInflater)
     private val vm by viewModels<SingleVM<MData>>()
+    private val whoStartMe by lazy { intent.getStringExtra(SplashActivity.KEY_TAG_WHO_START_ME) }
     val path = bgImgPath
     override val baseFragmentTagList: List<String>
         get() = listOf("table_fragment", "filter_fragment")
@@ -93,7 +92,12 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     override fun initListener() = with(binding) {
         onBackPressedDispatcher.addCallback {
             if (tableMenuBg.isVisible) tableMenuBg.isVisible = false
-            else finish()
+            else {
+                if (whoStartMe == SplashActivity.TAG) {
+                    startActivity(Intent(this@TableActivity, MainActivity::class.java))
+                }
+                finish()
+            }
         }
         moreBtn.setOnClickListenerWithClickAnimation {
             tableMenuBg.also { it.isVisible = !it.isVisible }

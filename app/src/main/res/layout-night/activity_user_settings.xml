@@ -4,7 +4,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/black"
     android:orientation="vertical"
     tools:context=".ui.activity.UserSettingsActivity">
 
@@ -15,7 +15,7 @@
         android:layout_marginHorizontal="@dimen/padding_h_2"
         android:layout_marginTop="@dimen/padding_v_1"
         android:background="@drawable/corner_12"
-        android:backgroundTint="#FFFFFF"
+        android:backgroundTint="@color/black_shade"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="@dimen/padding_h_2"
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/binding_school"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="@dimen/text_size_2h" />
 
         <TextView
@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/none"
-            android:textColor="@color/gray"
+            android:textColor="@color/white_dim"
             android:textSize="@dimen/text_size_2h" />
 
         <ImageView
@@ -51,7 +51,7 @@
         android:layout_marginHorizontal="@dimen/padding_h_2"
         android:layout_marginTop="@dimen/padding_v_1"
         android:background="@drawable/corner_12"
-        android:backgroundTint="#FFFFFF"
+        android:backgroundTint="@color/black_shade"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="@dimen/padding_h_2"
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/privacy_policy"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="@dimen/text_size_2h" />
 
         <ImageView
@@ -79,7 +79,7 @@
         android:layout_marginHorizontal="@dimen/padding_h_2"
         android:layout_marginTop="@dimen/padding_v_1"
         android:background="@drawable/corner_12"
-        android:backgroundTint="#FFFFFF"
+        android:backgroundTint="@color/black_shade"
         android:gravity="center_vertical"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/padding_h_2"
@@ -89,7 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/when_start_app"
-            android:textColor="@color/gray"
+            android:textColor="@color/white_dim"
             android:textSize="@dimen/text_size_3h" />
 
         <TextView
@@ -98,7 +98,7 @@
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/padding_v_4"
             android:background="@drawable/corner_888"
-            android:backgroundTint="@color/white_dim"
+            android:backgroundTint="@color/gray"
             android:gravity="center"
             android:paddingHorizontal="@dimen/padding_h_2"
             android:paddingVertical="@dimen/padding_v_4"
@@ -113,7 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/padding_v_4"
             android:background="@drawable/corner_888"
-            android:backgroundTint="@color/white_dim"
+            android:backgroundTint="@color/gray"
             android:gravity="center"
             android:paddingHorizontal="@dimen/padding_h_2"
             android:paddingVertical="@dimen/padding_v_4"
@@ -127,7 +127,7 @@
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/padding_v_4"
             android:background="@drawable/corner_888"
-            android:backgroundTint="@color/white_dim"
+            android:backgroundTint="@color/gray"
             android:gravity="center"
             android:paddingHorizontal="@dimen/padding_h_2"
             android:paddingVertical="@dimen/padding_v_4"

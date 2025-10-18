@@ -44,6 +44,7 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
     private val vm by viewModels<SingleVM<MData>>()
     private val mode by lazy { intent.getIntExtra(KEY_MODE, MODE_NORMAL) }
     private val addedCourseName by lazy { intent.getStringExtra(KEY_COURSE_NAME) }
+    private val whoStartMe by lazy { intent.getStringExtra(SplashActivity.KEY_TAG_WHO_START_ME) }
     private val whiteStateList = ColorStateList.valueOf("#FFFFFF".toColorInt())
     private val grayStateList = ColorStateList.valueOf(SCApp.app.getColor(R.color.gray_shade))
     private val adapter by lazy {
@@ -161,8 +162,17 @@ class NoteCategoryListActivity : BaseActivity<ActivityNoteCategoryListBinding>()
 
     override fun initListener() = with(binding) {
         onBackPressedDispatcher.addCallback {
-            if (searchEdit.text.toString().isEmpty()) finish()
-            else searchEdit.setText("")
+            if (searchEdit.text.toString().isEmpty()) {
+                if (whoStartMe == SplashActivity.TAG) {
+                    startActivity(
+                        Intent(
+                            this@NoteCategoryListActivity,
+                            MainActivity::class.java
+                        )
+                    )
+                }
+                finish()
+            } else searchEdit.setText("")
         }
         searchEdit.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) = Unit

@@ -21,6 +21,10 @@
     <!-- User Settings Activity -->
     <string name="binding_school">绑定学校</string>
     <string name="privacy_policy">隐私协议</string>
+    <string name="when_start_app">启动应用时</string>
+    <string name="go_to_main">进入主页</string>
+    <string name="go_to_table">进入课表页</string>
+    <string name="go_to_note">进入笔记页</string>
 
     <!-- Table Activity -->
     <string name="today_date">今日：</string>

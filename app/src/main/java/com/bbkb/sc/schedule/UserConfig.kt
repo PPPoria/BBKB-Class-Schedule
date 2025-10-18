@@ -92,3 +92,13 @@ data class TableAttr(
         var latest by jsonDelegate(StringKeys.TABLE_ATTR, TableAttr())
     }
 }
+
+data class StartPreference(
+    val goToMainWhenStartApp: Boolean = true,
+    val goToTableWhenStartApp: Boolean = false,
+    val goToNoteWhenStartApp: Boolean = false,
+) {
+    companion object {
+        var latest by jsonDelegate(StringKeys.START_PREFERENCE, StartPreference())
+    }
+}
