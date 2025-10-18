@@ -4,6 +4,7 @@ import com.bbkb.sc.schedule.database.Course
 import com.bbkb.sc.util.SCLog
 import com.bbkb.sc.util.ScheduleUtils
 import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import com.poria.base.ext.DateFormat
 import com.poria.base.ext.toTimeStamp
 
@@ -55,30 +56,28 @@ class GDUTGripper : Gripper() {
     override fun decodeCourseData(data: String): List<Course> {
         val gson = GsonBuilder().serializeNulls().create()
         // 不要删掉这行，否则 gson.fromJson 会报错
-        SCLog.debug(TAG, "test gson: ${gson.toJson(Item(kcmc = "test"))}")
-        val items = data
+        SCLog.debug(
+            TAG, "test gson: ${
+                gson.toJson(
+                    listOf(
+                        Item(kcmc = "test"),
+                        Item(kcmc = "test"),
+                    )
+                )
+            }"
+        )
+        val items: List<Item> = data
             .replace("\\\"", "\"")
             .replace("[", "")
             .replace("]", "")
             .let { raw ->
-                val itemsStartIndexList = mutableListOf<Int>()
-                var i = -1
-                while (true) {
-                    i = raw.indexOf("{", i + 1)
-                    if (i == -1) break
-                    itemsStartIndexList.add(i)
-                }
-                itemsStartIndexList.add(raw.length)
-                mutableListOf<Item>().also { list ->
-                    for (index in 0..itemsStartIndexList.size - 2) {
-                        raw.substring(
-                            itemsStartIndexList[index],
-                            itemsStartIndexList[index + 1] - 1
-                        ).also {
-                            list.add(gson.fromJson(it, Item::class.java))
-                        }
-                    }
-                }
+                val sb = StringBuilder("[")
+                sb.append(raw.substring(1, raw.length - 1))
+                sb.append("]")
+                val json = sb.toString()
+                // 不要删掉这行，否则 gson.fromJson 会报错
+                SCLog.debug(TAG, "json: $json")
+                gson.fromJson(json, object : TypeToken<List<Item>>() {}.type)
             }
         val beginDate = items[items.size - 7].rq
             ?.split("-")?.map {

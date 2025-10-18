@@ -3,6 +3,7 @@ package com.bbkb.sc.ui.activity
 import android.annotation.SuppressLint
 import android.webkit.CookieManager
 import android.webkit.WebChromeClient
+import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.lifecycle.lifecycleScope
@@ -135,15 +136,22 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
                             }
                         }
                     }
-                    // 开始抓取课程信息
-                    for (js in gripper.getAllCoursesJs()) {
-                        withContext(Dispatchers.Main) {
-                            binding.webView.evaluateJavascript(js) { data ->
-                                courseList.addAll(gripper.decodeCourseData(data))
-                                counter.next()
+                    counter.callbackButIgnoreFinish = {
+                        if (it != jsList.size) CoroutineScope(Dispatchers.Default).launch {
+                            withContext(Dispatchers.Main) {
+                                binding.webView.evaluateJavascript(jsList[it]) { data ->
+                                    courseList.addAll(gripper.decodeCourseData(data))
+                                    counter.next()
+                                }
                             }
+                            delay(400L)
                         }
-                        delay(400L)
+                    }
+                    withContext(Dispatchers.Main) {
+                        binding.webView.evaluateJavascript(jsList.first()) { data ->
+                            courseList.addAll(gripper.decodeCourseData(data))
+                            counter.next()
+                        }
                     }
                 } else { // 更新单周以及其下一周（如果有的话）
                     counter = Counter(2)
@@ -162,6 +170,19 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
                             }
                         }
                     }
+                    counter.callbackButIgnoreFinish = {
+                        if (updateZC < sd.weekNum) CoroutineScope(Dispatchers.Default).launch {
+                            withContext(Dispatchers.Main) {
+                                binding.webView.evaluateJavascript(
+                                    gripper.getZCCourseJs(updateZC + 1)
+                                ) { data ->
+                                    courseList.addAll(gripper.decodeCourseData(data))
+                                    counter.next()
+                                }
+                            }
+                            delay(400L)
+                        } else counter.next()
+                    }
                     withContext(Dispatchers.Main) {
                         binding.webView.evaluateJavascript(
                             gripper.getZCCourseJs(updateZC)
@@ -170,18 +191,6 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
                             counter.next()
                         }
                     }
-                    delay(400L)
-                    if (updateZC < sd.weekNum) {
-                        withContext(Dispatchers.Main) {
-                            binding.webView.evaluateJavascript(
-                                gripper.getZCCourseJs(updateZC + 1)
-                            ) { data ->
-                                courseList.addAll(gripper.decodeCourseData(data))
-                                counter.next()
-                            }
-                        }
-                        delay(400L)
-                    } else counter.next()
                 }
             }.onFailure {
                 SCLog.error(TAG, it)
@@ -199,8 +208,9 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
             authSuccess = false
             SCLog.debug(TAG, "auth = false")
             SCToast.show("请稍后再试")
-            delay(1_000L)
-            finish()
+            clearWebView {
+                finish()
+            }
             return@launch
         }
         SCToast.show("课表导入成功")
@@ -208,19 +218,30 @@ class AuthActivity : BaseActivity<ActivityAuthBinding>() {
         finish()
     }
 
+    private inline fun clearWebView(onDone: (() -> Unit)) {
+        runCatching {
+            CookieManager.getInstance().apply {
+                removeAllCookies { }
+                flush()
+            }
+            WebStorage.getInstance().deleteAllData()
+            WebView(SCApp.app).clearCache(true)
+            onDone()
+        }.onFailure { onDone() }
+    }
+
     class Counter(
         private val target: Int,
     ) {
         private var count = 0
-        var callback: ((Int) -> Unit)? = null
+        var callbackButIgnoreFinish: ((Int) -> Unit)? = null
         var onFinish: (() -> Unit)? = null
 
         fun next() {
             count++
-            callback?.invoke(count)
             if (count == target) {
                 onFinish?.invoke()
-            }
+            } else callbackButIgnoreFinish?.invoke(count)
         }
     }
 
