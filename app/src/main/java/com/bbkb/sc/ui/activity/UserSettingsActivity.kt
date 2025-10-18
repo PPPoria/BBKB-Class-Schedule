@@ -3,6 +3,7 @@ package com.bbkb.sc.ui.activity
 import android.content.res.ColorStateList
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.core.view.isGone
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.bbkb.sc.R
@@ -65,22 +66,6 @@ class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
         }
     }.let { }
 
-    override suspend fun observeDataInScope() {
-        repeatOnLifecycle(Lifecycle.State.STARTED) {
-            vm.flow.collect { data ->
-                binding.bindSchoolName.text = data.schoolName
-                StartPreference.latest.run {
-                    if (goToMainWhenStartApp) binding.goToMain.setSelectedColor()
-                    else binding.goToMain.setUnselectedColor()
-                    if (goToNoteWhenStartApp) binding.goToNote.setSelectedColor()
-                    else binding.goToNote.setUnselectedColor()
-                    if (goToTableWhenStartApp) binding.goToTable.setSelectedColor()
-                    else binding.goToTable.setUnselectedColor()
-                }
-            }
-        }
-    }
-
     private fun TextView.setUnselectedColor() {
         if (isNightModeYes()) {
             alpha = 1f
@@ -110,6 +95,23 @@ class UserSettingsActivity : BaseActivity<ActivityUserSettingsBinding>() {
                 ).first()
             }
         ).also { vm.update(it) }
+    }
+
+    override suspend fun observeDataInScope() {
+        repeatOnLifecycle(Lifecycle.State.STARTED) {
+            vm.flow.collect { data ->
+                binding.bindSchoolName.text = data.schoolName
+                binding.startPreferenceLayout.isGone = data.schoolName == "--"
+                StartPreference.latest.run {
+                    if (goToMainWhenStartApp) binding.goToMain.setSelectedColor()
+                    else binding.goToMain.setUnselectedColor()
+                    if (goToNoteWhenStartApp) binding.goToNote.setSelectedColor()
+                    else binding.goToNote.setUnselectedColor()
+                    if (goToTableWhenStartApp) binding.goToTable.setSelectedColor()
+                    else binding.goToTable.setUnselectedColor()
+                }
+            }
+        }
     }
 
     data class MData(

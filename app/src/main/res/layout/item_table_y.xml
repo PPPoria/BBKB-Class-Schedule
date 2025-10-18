@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="center"
-            android:text="\n\n\ntitle"
+            android:text="title"
             android:textColor="@color/black"
             android:textSize="9sp"
             android:textStyle="bold" />
@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="center"
-            android:text="12:00\n13:00\n\n\n"
+            android:text="12:00\n13:00"
             android:textColor="@color/black"
             android:textSize="8sp" />
     </LinearLayout>

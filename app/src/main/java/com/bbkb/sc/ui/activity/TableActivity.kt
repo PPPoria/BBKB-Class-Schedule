@@ -2,13 +2,17 @@ package com.bbkb.sc.ui.activity
 
 import android.content.Intent
 import androidx.activity.addCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bbkb.sc.R
 import com.bbkb.sc.SCApp
@@ -29,6 +33,7 @@ import com.poria.base.ext.toDateFormat
 import com.poria.base.store.DSManager
 import com.poria.base.viewmodel.SingleVM
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class TableActivity : BaseActivity<ActivityTableBinding>() {
@@ -39,6 +44,21 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     override val baseFragmentTagList: List<String>
         get() = listOf("table_fragment", "filter_fragment")
 
+    override fun onCreate(savedInstanceState: android.os.Bundle?) {
+        initHasBgImgMode()
+        super.onCreate(savedInstanceState)
+    }
+
+    private fun initHasBgImgMode() {
+        if (path.isNotEmpty()) {
+            // 如果有背景图片，则显示强制黑夜模式
+            delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_YES
+        } else if (isNightModeYes() != SCApp.app.isNightModeYes()) {
+            // 如果背景图片不存在，且当前模式与系统模式不同，选择跟随系统模式
+            delegate.localNightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        }
+    }
+
     override fun initWindowInsets(l: Int, t: Int, r: Int, b: Int) {
         super.initWindowInsets(l, t, r, b)
         binding.root.setPadding(0, 0, 0, 0)
@@ -48,6 +68,15 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
             systemBarPadding[r],
             systemBarPadding[b]
         )
+    }
+
+    override fun initView() {
+        if (path.isNotEmpty()) {
+            Glide.with(this)
+                .load(path)
+                .centerCrop()
+                .into(binding.bgImg)
+        }
     }
 
     override fun addFragment() {
@@ -66,26 +95,6 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
                 R.id.table_config_fragment_container,
                 tag = baseFragmentTagList[1],
             )
-        }
-    }
-
-    override fun initView() {
-        if (path.isNotEmpty()) {
-            // 如果有背景图片，则显示强制黑夜模式
-            if (!isNightModeYes()) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                recreate()
-                return
-            }
-            Glide.with(this)
-                .load(path)
-                .centerCrop()
-                .into(binding.bgImg)
-        } else if (isNightModeYes() != SCApp.app.isNightModeYes()) {
-            // 如果背景图片不存在，且当前模式与系统模式不同，选择跟随系统模式
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            recreate()
-            return
         }
     }
 

@@ -46,7 +46,7 @@
             android:gravity="bottom"
             android:paddingHorizontal="3dp"
             android:paddingVertical="5dp"
-            android:text="\n\n\n\nteacher\nroom"
+            android:text="teacher\nroom"
             android:textColor="@color/black"
             android:textSize="8sp"
             app:layout_constraintBottom_toBottomOf="parent" />
