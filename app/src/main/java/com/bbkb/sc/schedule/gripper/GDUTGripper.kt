@@ -66,7 +66,7 @@ class GDUTGripper : Gripper() {
                 )
             }"
         )
-        val items: List<Item> = data
+        val items: List<Item?> = data
             .replace("\\\"", "\"")
             .replace("[", "")
             .replace("]", "")
@@ -79,14 +79,17 @@ class GDUTGripper : Gripper() {
                 SCLog.debug(TAG, "json: $json")
                 gson.fromJson(json, object : TypeToken<List<Item>>() {}.type)
             }
-        val beginDate = items[items.size - 7].rq
+        SCLog.debug(TAG, "items: ${items.toList().toString()}")
+        val beginDate = items[items.size - 7]?.rq
             ?.split("-")?.map {
                 it.toInt()
             } ?: return emptyList()
         val oneDay = 86_400_000L
         return ArrayList<Course>().apply {
             for (i in 0..items.size - 8) {
-                val item = items[i]
+                val item = items[i]?.also {
+                    it.jcdm2 ?: return@apply
+                } ?: return@apply
                 val dm = item.jcdm2!!
                     .split(",")
                     .map { it.toInt() }
