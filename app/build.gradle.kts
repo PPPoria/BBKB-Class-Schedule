@@ -12,8 +12,8 @@ android {
         applicationId = "com.bbkb.sc"
         minSdk = 31
         targetSdk = 36
-        versionCode = 113
-        versionName = "1.1.3" // 大版本号.小版本号.修订号；其中修订号为0表示正式版，非0表示测试版或修订版
+        versionCode = 1104
+        versionName = "1.1.4" // 大版本号.小版本号.修订号；其中修订号为0表示正式版，非0表示测试版或修订版
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
