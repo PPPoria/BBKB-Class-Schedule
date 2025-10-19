@@ -424,6 +424,7 @@ class TableView : ViewGroup {
         return false
     }
 
+    /* ==== 事件处理 ==== */
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event ?: return false
@@ -475,6 +476,7 @@ class TableView : ViewGroup {
         return true
     }
 
+    /* ==== 惯性滑动 ==== */
     private fun fling(velocityX: Float) {
         val (minX, maxX) = -width to width
         scroller.fling(
@@ -531,6 +533,7 @@ class TableView : ViewGroup {
                 for (i in 0 until columns * 3) {
                     xAxisViews[i].translationX = value
                 }
+                onScrollListener(offsetX, width.toFloat())
             }
             doOnEnd {
                 scrollAnimator = null

@@ -20,6 +20,7 @@ import com.bbkb.sc.ui.dialog.CourseDetailDialog
 import com.bbkb.sc.ui.widget.TableView
 import com.bbkb.sc.util.ScheduleUtils
 import com.poria.base.base.BaseFragment
+import com.poria.base.ext.dp2px
 import com.poria.base.ext.genColor
 import com.poria.base.ext.setOnClickListenerWithClickAnimation
 import com.poria.base.ext.toDateFormat
@@ -76,12 +77,12 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
             onClickCell = this@TableFragment::onClickTableItem
             onScrollToPre = { onScrollToTablePre() }
             onScrollToNext = { onScrollToTableNext() }
-            onScrollListener = this@TableFragment::onScrollListener
+            onScrollListener = this@TableFragment::onScrolling
         }
     }
 
     override fun initListener() = with(binding) {
-        tablePreBtn.setOnClickListenerWithClickAnimation {
+        /*tablePreBtn.setOnClickListenerWithClickAnimation {
             val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
             lifecycleScope.launch {
                 data.copy(
@@ -107,7 +108,7 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
                     }
                 ).also { vm.update(it) }
             }
-        }
+        }*/
     }.let { }
 
     override suspend fun refreshDataInScope() {
@@ -130,9 +131,12 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
                 val preZC = (data.tableZC - 2 + data.schoolData.weekNum) %
                         data.schoolData.weekNum + 1
                 val nextZC = (data.tableZC) % data.schoolData.weekNum + 1
-                "第${data.tableZC}周".also { binding.zc.text = it }
-                "第${preZC}周".also { binding.tablePreBtn.text = it }
-                "第${nextZC}周".also { binding.tableNextBtn.text = it }
+                "第${data.tableZC}周".also { binding.tableZcText.text = it }
+                "第${preZC}周".also { binding.tablePreZcText.text = it }
+                "第${nextZC}周".also { binding.tableNextZcText.text = it }
+                binding.tableZcText.translationX = 0f
+                binding.tablePreZcText.translationX = 0f
+                binding.tableNextZcText.translationX = 0f
                 updateTableData(
                     preZC = preZC,
                     tableZC = data.tableZC,
@@ -329,7 +333,11 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
         ).also { vm.update(it) }
     }
 
-    private fun onScrollListener(offsetX: Float, width: Float) = lifecycleScope.launch {
-
-    }.let { }
+    private fun onScrolling(offset: Float, width: Float) {
+        val mWidth = dp2px(100f)
+        val mOffset = offset / width * mWidth
+        binding.tableZcText.translationX = mOffset
+        binding.tablePreZcText.translationX = mOffset
+        binding.tableNextZcText.translationX = mOffset
+    }
 }

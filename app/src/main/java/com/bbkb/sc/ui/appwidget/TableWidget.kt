@@ -68,9 +68,7 @@ internal fun updateWidget(
         }
     }.setViewTypeCount(1).build()
     setRemoteAdapter(R.id.widget_list_view, itemViews)
-}.let {
-    appWidgetManager.updateAppWidget(appWidgetId, it)
-}
+}.let { appWidgetManager.updateAppWidget(appWidgetId, it) }
 
 object TableWidgetManager {
     private val noneCourse = Course(
