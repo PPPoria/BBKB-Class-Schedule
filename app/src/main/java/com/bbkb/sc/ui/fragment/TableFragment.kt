@@ -81,35 +81,7 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
         }
     }
 
-    override fun initListener() = with(binding) {
-        /*tablePreBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
-            lifecycleScope.launch {
-                data.copy(
-                    tableZC = (data.tableZC - 2 + data.schoolData.weekNum)
-                            % data.schoolData.weekNum + 1,
-                    curCourses = withContext(Dispatchers.IO) {
-                        CourseDB.get().dao()
-                            .getByZC(data.tableZC - 1)
-                            .first()
-                    }
-                ).also { vm.update(it) }
-            }
-        }
-        tableNextBtn.setOnClickListenerWithClickAnimation {
-            val data = vm.latest ?: return@setOnClickListenerWithClickAnimation
-            lifecycleScope.launch {
-                data.copy(
-                    tableZC = (data.tableZC) % data.schoolData.weekNum + 1,
-                    curCourses = withContext(Dispatchers.IO) {
-                        CourseDB.get().dao()
-                            .getByZC(data.tableZC + 1)
-                            .first()
-                    }
-                ).also { vm.update(it) }
-            }
-        }*/
-    }.let { }
+    override fun initListener() = Unit
 
     override suspend fun refreshDataInScope() {
         vm.latest?.let { old ->
@@ -177,7 +149,7 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
                 tableConfig.majorFilter.isEmpty() || it.major.contains(tableConfig.majorFilter)
             }.map { course ->
                 TableView.Cell(
-                    id = unitId,
+                    id = course.id,
                     title = course.name,
                     content = course.run {
                         "$teacher\n$classroom"
@@ -282,9 +254,9 @@ class TableFragment : BaseFragment<FragmentTableBinding>() {
 
     private fun onClickTableItem(cell: TableView.Cell) {
         if (mode == MODE_NORMAL) {
-            val course = vm.latest!!.curCourses.find {
-                it.name == cell.title
-            }!!
+            val course = vm.latest?.curCourses?.find {
+                it.id == cell.id
+            } ?: return
             CourseDetailDialog().also {
                 it.course = course
                 it.show(

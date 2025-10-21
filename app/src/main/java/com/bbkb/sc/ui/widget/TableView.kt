@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import android.widget.OverScroller
 import androidx.core.animation.doOnEnd
 import androidx.core.view.isGone
@@ -392,7 +393,7 @@ class TableView : ViewGroup {
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private val minFling = ViewConfiguration.get(context).scaledMinimumFlingVelocity
     private val maxFling = ViewConfiguration.get(context).scaledMaximumFlingVelocity
-    private val thresholdsScaleWithWidth = 0.7f
+    private val thresholdsScaleWithWidth = 0.5f
     private var downX = 0f
     private var lastX = 0f
     private var offsetX = 0f
@@ -522,18 +523,18 @@ class TableView : ViewGroup {
         }.toFloat()
         val cellCount = preCells.size + curCells.size + nextCells.size
         scrollAnimator = ValueAnimator.ofFloat(offsetX, targetX).apply {
-            duration = 200L // 200ms 在手机竖屏上操控的手感最好
+            duration = 140L
             interpolator = DecelerateInterpolator()
             addUpdateListener {
                 val value = it.animatedValue as Float
                 offsetX = value
+                onScrollListener(value, width.toFloat())
                 for (i in 0 until cellCount) {
                     courseViews[i].translationX = value
                 }
                 for (i in 0 until columns * 3) {
                     xAxisViews[i].translationX = value
                 }
-                onScrollListener(offsetX, width.toFloat())
             }
             doOnEnd {
                 scrollAnimator = null

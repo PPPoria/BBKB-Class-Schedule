@@ -9,8 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="@dimen/padding_v_4"
-        android:background="@drawable/corner_6"
-        android:backgroundTint="@color/black_alpha_90"
         android:paddingHorizontal="@dimen/padding_h_4"
         android:paddingVertical="@dimen/padding_v_4"
         app:layout_constraintBottom_toBottomOf="parent"
