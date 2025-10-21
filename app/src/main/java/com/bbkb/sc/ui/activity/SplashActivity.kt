@@ -2,7 +2,6 @@ package com.bbkb.sc.ui.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.bbkb.sc.databinding.ActivitySplashBinding
 import com.bbkb.sc.schedule.StartPreference
@@ -12,7 +11,6 @@ import com.poria.base.base.BaseActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : BaseActivity<ActivitySplashBinding>() {
@@ -48,7 +46,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
     private fun updateTableWidgetAsync() {
         CoroutineScope(Dispatchers.Default).launch {
-            TableWidgetManager.updateNowTable(baseContext)
+            TableWidgetManager.updateAllWidget(baseContext)
         }
     }
 

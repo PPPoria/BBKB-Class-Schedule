@@ -116,9 +116,7 @@ class TableActivity : BaseActivity<ActivityTableBinding>() {
     }.let { }
 
     override suspend fun refreshDataInScope() {
-        val old = vm.latest ?: DSManager.run {
-            val name = getString(StringKeys.SCHOOL_NAME).first()
-            val sd = School.dataList.find { it.name == name }
+        val old = vm.latest ?: School.curSchoolData.let { sd ->
             if (sd == null) {
                 SCToast.show(getString(R.string.please_bind_school))
                 return

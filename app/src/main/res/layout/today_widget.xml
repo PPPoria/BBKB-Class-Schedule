@@ -2,8 +2,8 @@
     style="@style/Widget.BBKBClassSchedule.AppWidget.Container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/corner_12"
-    android:backgroundTint="@color/black"
+    android:background="@drawable/corner_24"
+    android:backgroundTint="@color/white"
     android:orientation="vertical"
     android:theme="@style/Theme.BBKBClassSchedule.AppWidgetContainer">
 
@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/none"
-            android:textColor="@color/gray_shade"
+            android:textColor="@color/gray"
             android:textSize="@dimen/text_size_3h" />
 
         <TextView
@@ -26,9 +26,19 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/padding_h_3"
             android:text="@string/none"
-            android:textColor="@color/gray_shade"
+            android:textColor="@color/gray"
             android:textSize="@dimen/text_size_3h" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/no_course_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/today_no_course"
+        android:textColor="@color/gray"
+        android:textSize="@dimen/text_size_hb"
+        android:visibility="gone" />
 
     <!-- course list view -->
     <ListView

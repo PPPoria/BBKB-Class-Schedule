@@ -51,15 +51,18 @@ fun hslToColor(h: Float, s: Float, l: Float): Int {
     val rr = ((r + m) * 255).toInt()
     val gg = ((g + m) * 255).toInt()
     val bb = ((b + m) * 255).toInt()
-    return Color.rgb(rr, gg, bb)
+    return Color.argb(255, rr, gg, bb)
 }
 
 fun Long.toDayOfWeek(): Int {
     val cal = Calendar.getInstance().apply {
         timeInMillis = this@toDayOfWeek
-        firstDayOfWeek = Calendar.MONDAY
+        firstDayOfWeek = Calendar.SUNDAY
     }
-    return cal.get(Calendar.DAY_OF_WEEK)
+    // 符合中文习惯
+    // 周一到周日对应数字1到7
+    val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK) - 1
+    return if (dayOfWeek == 0) 7 else dayOfWeek
 }
 
 fun Long.toDateFormat(): DateFormat {

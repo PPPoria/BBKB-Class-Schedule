@@ -1,6 +1,10 @@
 package com.bbkb.sc.schedule
 
 import com.bbkb.sc.R
+import com.bbkb.sc.datastore.StringKeys
+import com.poria.base.store.DSManager
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 object School {
     val dataList = listOf(
@@ -40,6 +44,13 @@ object School {
             )
         ),
     ).sortedBy { it.name }
+
+    val curSchoolData: SchoolData?
+        get() = runBlocking {
+            val name = DSManager.getString(StringKeys.SCHOOL_NAME).first()
+            return@runBlocking dataList.find { it.name == name }
+        }
+
 
     data class SchoolData(
         val id: Int,
