@@ -25,6 +25,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BBKBClassSchedule"
         android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ui.activity.EbbinghausActivity"
+            android:exported="false" />
+
         <receiver
             android:name=".ui.appwidget.NextCourseWidget"
             android:exported="false"
@@ -49,6 +53,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/today_widget_info" />
         </receiver>
+
         <activity
             android:name=".ui.activity.WebActivity"
             android:exported="false" />

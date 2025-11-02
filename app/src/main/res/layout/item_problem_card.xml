@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/card_layout"
+        android:background="@drawable/corner_24"
+        android:layout_marginHorizontal="@dimen/padding_h_1"
+        android:layout_marginVertical="@dimen/padding_v_1"
+        android:translationZ="@dimen/translation_z_1"
+        android:backgroundTint="#1B88DE">
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
