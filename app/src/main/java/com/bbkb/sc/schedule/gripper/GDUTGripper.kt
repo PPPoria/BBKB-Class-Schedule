@@ -34,6 +34,7 @@ class GDUTGripper : Gripper() {
         return courses
     }
 
+    // 学年学期
     val xnxqdm = ScheduleUtils.getXnXq(System.currentTimeMillis())
         .run { "${this.first}0${this.second}" }
 
